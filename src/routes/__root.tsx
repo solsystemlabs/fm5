@@ -5,7 +5,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import "../styles/global.css";
+import appCss from "../styles/global.css?url";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -13,6 +13,10 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "TanStack Start Starter" },
+    ],
+    links: [
+      { rel: "preload", href: appCss, as: "style" },
+      { rel: "stylesheet", href: appCss },
     ],
   }),
   component: RootComponent,

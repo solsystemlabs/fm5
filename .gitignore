@@ -109,3 +109,5 @@ storybook-static/
 
 # Misc
 *.tsbuildinfo
+
+/prisma/db/generated/prisma

@@ -5,6 +5,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import "../styles/global.css";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -15,7 +16,11 @@ export const Route = createRootRoute({
     ],
   }),
   component: RootComponent,
-  notFoundComponent: () => <div>404 Not Found</div>,
+  notFoundComponent: () => (
+    <div className="flex w-full h-full justify-center items-center text-lg">
+      404 Not Found
+    </div>
+  ),
 });
 
 function RootComponent() {
@@ -28,11 +33,11 @@ function RootComponent() {
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html>
+    <html className="flex w-full h-full">
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="flex w-full h-full">
         {children}
         <Scripts />
       </body>

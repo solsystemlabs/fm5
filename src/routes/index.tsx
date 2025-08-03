@@ -34,6 +34,7 @@ function Home() {
   return (
     <button
       type="button"
+      className="w-20"
       onClick={() => {
         updateCount({ data: 1 }).then(() => {
           router.invalidate();

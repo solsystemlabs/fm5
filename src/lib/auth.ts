@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth";
+import { reactStartCookies } from "better-auth/react-start";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { PrismaClient } from "@prisma/client";
 
@@ -10,4 +11,5 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  plugins: [reactStartCookies()],
 });

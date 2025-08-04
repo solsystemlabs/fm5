@@ -1,29 +1,60 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useState, useEffect } from 'react'
+import { FilamentsTable } from '@/components/FilamentsTable'
+import { AddFilamentDialog } from '@/components/AddFilamentDialog'
+import { Button } from '@/components/ui/button'
+import { Filament } from '@/lib/types'
 
 export const Route = createFileRoute('/filaments')({
   component: FilamentsPage,
 })
 
 function FilamentsPage() {
-  const context = Route.useRouteContext();
-  
+  const context = Route.useRouteContext()
+  const [filaments, setFilaments] = useState<Filament[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  const fetchFilaments = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/filaments')
+      if (response.ok) {
+        const data = await response.json()
+        setFilaments(data)
+      } else {
+        console.error('Failed to fetch filaments')
+      }
+    } catch (error) {
+      console.error('Error fetching filaments:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchFilaments()
+  }, [])
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">Filaments</h1>
-        <button className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
-          Add Filament
-        </button>
+        <AddFilamentDialog onFilamentAdded={fetchFilaments}>
+          <Button>Add Filament</Button>
+        </AddFilamentDialog>
       </div>
       
-      <div className="bg-white rounded-lg shadow p-6">
-        <p className="text-gray-600">
-          Welcome, {context.user?.email}! Track your filament inventory here.
-        </p>
-        <div className="mt-4 text-sm text-gray-500">
-          Monitor colors, materials, remaining quantities, and print settings for all your filaments.
-        </div>
+      <div className="bg-white rounded-lg shadow">
+        {isLoading ? (
+          <div className="p-8 text-center">
+            <p className="text-gray-600">Loading filaments...</p>
+          </div>
+        ) : (
+          <div className="p-6">
+            <FilamentsTable data={filaments} />
+          </div>
+        )}
       </div>
     </div>
-  );
+  )
 }

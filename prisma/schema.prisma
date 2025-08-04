@@ -72,3 +72,33 @@ model Verification {
 
   @@map("verification")
 }
+
+model ModelCategory {
+  id    String  @id
+  name  String  @unique
+  Model Model[]
+}
+
+model Model {
+  id              String        @id
+  name            String        @unique
+  category        ModelCategory @relation(fields: [modelCategoryId], references: [id])
+  modelCategoryId String
+  filaments       Filament[]
+}
+
+model Filament {
+  id             String       @id
+  color          String
+  material       MaterialType @relation(fields: [materialTypeId], references: [id])
+  Model          Model?       @relation(fields: [modelId], references: [id])
+  modelId        String?
+  materialTypeId String
+}
+
+model MaterialType {
+  id   String @id
+  name String @unique
+
+  Filament Filament[]
+}

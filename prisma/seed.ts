@@ -1,13 +1,13 @@
 import { PrismaClient } from '@prisma/client'
-import bcrypt from 'bcryptjs'
+import { hashPassword } from 'better-auth/crypto'
 
 const prisma = new PrismaClient()
 
 async function main() {
   console.log('🌱 Starting database seed...')
 
-  // Hash the password
-  const hashedPassword = await bcrypt.hash('password', 12)
+  // Hash the password using better-auth
+  const hashedPassword = await hashPassword('password')
 
   // Generate consistent user ID
   const userId = crypto.randomUUID()

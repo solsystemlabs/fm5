@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useForm } from "@tanstack/react-form";
 import { authClient } from "../lib/auth-client";
+import { useRouter, useSearch } from "@tanstack/react-router";
+import { useState } from "react";
 
 interface LoginFormData {
   email: string;
@@ -21,21 +23,35 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const router = useRouter();
+  const search = useSearch({ from: '/login' });
+  const [loginError, setLoginError] = useState<string | null>(null);
+
   const form = useForm({
     defaultValues: {
       email: "",
       password: "",
     } as LoginFormData,
     onSubmit: async ({ value }) => {
-      // Handle form submission
-      console.log("Form submitted:", value);
-      const { data, error } = await authClient.signIn.email({
-        email: value.email,
-        password: value.password,
-      });
+      setLoginError(null);
+      
+      try {
+        const { data, error } = await authClient.signIn.email({
+          email: value.email,
+          password: value.password,
+        });
 
-      // You can add your authentication logic here
-      // For example: await login(value.email, value.password)
+        if (error) {
+          setLoginError(error.message || "Login failed. Please try again.");
+          return;
+        }
+
+        // Successful login - redirect to intended page or dashboard
+        const redirectTo = (search as any)?.redirect || '/products';
+        await router.navigate({ to: redirectTo });
+      } catch (err) {
+        setLoginError("An unexpected error occurred. Please try again.");
+      }
     },
   });
 
@@ -49,11 +65,15 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {loginError && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-sm text-red-600">{loginError}</p>
+            </div>
+          )}
           <form
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              console.log("submitting");
               form.handleSubmit();
             }}
           >

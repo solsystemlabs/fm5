@@ -17,6 +17,7 @@
     "@tailwindcss/postcss": "^4.1.11",
     "@tailwindcss/vite": "^4.1.11",
     "@tanstack/react-form": "^1.15.2",
+    "@tanstack/react-query": "^5.84.1",
     "@tanstack/react-router": "^1.130.12",
     "@tanstack/react-start": "^1.130.15",
     "@tanstack/zod-form-adapter": "^0.42.1",

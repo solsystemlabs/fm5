@@ -27,22 +27,22 @@ export const Route = createRootRoute({
   }),
   beforeLoad: async ({ location }) => {
     // Skip auth check for public routes
-    if (location.pathname === '/login' || location.pathname === '/') {
+    if (location.pathname === "/login" || location.pathname === "/") {
       return {};
     }
-    
+
     // Check authentication for all other routes
     const session = await authClient.getSession();
     if (!session?.data?.session) {
       throw redirect({
-        to: '/login',
-        search: { redirect: location.pathname }
+        to: "/login",
+        search: { redirect: location.pathname },
       });
     }
-    
-    return { 
+
+    return {
       user: session.data.user,
-      session: session.data.session 
+      session: session.data.session,
     };
   },
   component: RootComponent,
@@ -57,7 +57,7 @@ function RootComponent() {
   return (
     <RootDocument>
       <QueryClientProvider client={queryClient}>
-        <div className="min-h-screen bg-gray-50">
+        <div className="w-full h-full min-h-screen bg-gray-50">
           <Header />
           <main className="container mx-auto px-4 py-8">
             <Outlet />

@@ -6,6 +6,7 @@ import { authClient } from "../../lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
 
 const navigation = [
+  { name: "Home", href: "/dashboard" },
   { name: "Products", href: "/products" },
   { name: "Models", href: "/models" },
   { name: "Filaments", href: "/filaments" },
@@ -14,7 +15,7 @@ const navigation = [
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+
   const { data: session, isLoading } = useQuery({
     queryKey: ["session"],
     queryFn: () => authClient.getSession(),
@@ -48,7 +49,7 @@ export default function Header() {
                   to={item.href}
                   className="text-sm/6 font-semibold text-gray-900 hover:text-gray-600"
                   activeProps={{
-                    className: "text-sm/6 font-semibold text-indigo-600"
+                    className: "text-sm/6 font-semibold text-indigo-600",
                   }}
                 >
                   {item.name}
@@ -83,7 +84,10 @@ export default function Header() {
               </button>
             </div>
           ) : (
-            <Link to="/login" className="text-sm/6 font-semibold text-gray-900 hover:text-gray-600">
+            <Link
+              to="/login"
+              className="text-sm/6 font-semibold text-gray-900 hover:text-gray-600"
+            >
               Log in <span aria-hidden="true">&rarr;</span>
             </Link>
           )}
@@ -97,7 +101,11 @@ export default function Header() {
         <div className="fixed inset-0 z-50" />
         <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white p-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
-            <Link to="/" className="-m-1.5 p-1.5" onClick={() => setMobileMenuOpen(false)}>
+            <Link
+              to="/"
+              className="-m-1.5 p-1.5"
+              onClick={() => setMobileMenuOpen(false)}
+            >
               <span className="sr-only">FM5 Manager</span>
               <img
                 alt=""
@@ -125,7 +133,8 @@ export default function Header() {
                       onClick={() => setMobileMenuOpen(false)}
                       className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
                       activeProps={{
-                        className: "-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-indigo-600 bg-indigo-50"
+                        className:
+                          "-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-indigo-600 bg-indigo-50",
                       }}
                     >
                       {item.name}

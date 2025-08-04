@@ -11,20 +11,44 @@
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as authProductsIndexRouteImport } from './routes/(auth)/products/index'
+import { Route as authModelsIndexRouteImport } from './routes/(auth)/models/index'
+import { Route as authInventoryIndexRouteImport } from './routes/(auth)/inventory/index'
+import { Route as authFilamentsIndexRouteImport } from './routes/(auth)/filaments/index'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
 const rootServerRouteImport = createServerRootRoute()
 
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LoginIndexRoute = LoginIndexRouteImport.update({
-  id: '/login/',
-  path: '/login/',
+const authProductsIndexRoute = authProductsIndexRouteImport.update({
+  id: '/(auth)/products/',
+  path: '/products/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authModelsIndexRoute = authModelsIndexRouteImport.update({
+  id: '/(auth)/models/',
+  path: '/models/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authInventoryIndexRoute = authInventoryIndexRouteImport.update({
+  id: '/(auth)/inventory/',
+  path: '/inventory/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authFilamentsIndexRoute = authFilamentsIndexRouteImport.update({
+  id: '/(auth)/filaments/',
+  path: '/filaments/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
@@ -35,28 +59,57 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/login': typeof LoginIndexRoute
+  '/login': typeof LoginRoute
+  '/filaments': typeof authFilamentsIndexRoute
+  '/inventory': typeof authInventoryIndexRoute
+  '/models': typeof authModelsIndexRoute
+  '/products': typeof authProductsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/login': typeof LoginIndexRoute
+  '/login': typeof LoginRoute
+  '/filaments': typeof authFilamentsIndexRoute
+  '/inventory': typeof authInventoryIndexRoute
+  '/models': typeof authModelsIndexRoute
+  '/products': typeof authProductsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/login/': typeof LoginIndexRoute
+  '/login': typeof LoginRoute
+  '/(auth)/filaments/': typeof authFilamentsIndexRoute
+  '/(auth)/inventory/': typeof authInventoryIndexRoute
+  '/(auth)/models/': typeof authModelsIndexRoute
+  '/(auth)/products/': typeof authProductsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/filaments'
+    | '/inventory'
+    | '/models'
+    | '/products'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login'
-  id: '__root__' | '/' | '/login/'
+  to: '/' | '/login' | '/filaments' | '/inventory' | '/models' | '/products'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/(auth)/filaments/'
+    | '/(auth)/inventory/'
+    | '/(auth)/models/'
+    | '/(auth)/products/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  LoginIndexRoute: typeof LoginIndexRoute
+  LoginRoute: typeof LoginRoute
+  authFilamentsIndexRoute: typeof authFilamentsIndexRoute
+  authInventoryIndexRoute: typeof authInventoryIndexRoute
+  authModelsIndexRoute: typeof authModelsIndexRoute
+  authProductsIndexRoute: typeof authProductsIndexRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -82,6 +135,13 @@ export interface RootServerRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -89,11 +149,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login/': {
-      id: '/login/'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginIndexRouteImport
+    '/(auth)/products/': {
+      id: '/(auth)/products/'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof authProductsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/models/': {
+      id: '/(auth)/models/'
+      path: '/models'
+      fullPath: '/models'
+      preLoaderRoute: typeof authModelsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/inventory/': {
+      id: '/(auth)/inventory/'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof authInventoryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/filaments/': {
+      id: '/(auth)/filaments/'
+      path: '/filaments'
+      fullPath: '/filaments'
+      preLoaderRoute: typeof authFilamentsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -112,7 +193,11 @@ declare module '@tanstack/react-start/server' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  LoginIndexRoute: LoginIndexRoute,
+  LoginRoute: LoginRoute,
+  authFilamentsIndexRoute: authFilamentsIndexRoute,
+  authInventoryIndexRoute: authInventoryIndexRoute,
+  authModelsIndexRoute: authModelsIndexRoute,
+  authProductsIndexRoute: authProductsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

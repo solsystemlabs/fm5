@@ -16,13 +16,6 @@ const getCount = createServerFn({
   return readCount();
 });
 
-const updateCount = createServerFn({ method: "POST" })
-  .validator((d: number) => d)
-  .handler(async ({ data }) => {
-    const count = await readCount();
-    await fs.promises.writeFile(filePath, `${count + data}`);
-  });
-
 export const Route = createFileRoute("/")({
   component: Home,
   loader: async () => await getCount(),

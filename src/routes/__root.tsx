@@ -1,15 +1,15 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   createRootRoute,
   HeadContent,
   Outlet,
-  Scripts,
   redirect,
+  Scripts,
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import appCss from "../styles/global.css?url";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { authClient } from "../lib/auth-client";
 import Header from "../components/layout/Header";
+import { authClient } from "../lib/auth-client";
+import appCss from "../styles/global.css?url";
 
 const queryClient = new QueryClient();
 

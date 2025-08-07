@@ -1,9 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/(auth)/inventory/$item')({
+export const Route = createFileRoute('/_auth/dashboard')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  return <div>Hello "/(auth)/inventory/$item"!</div>
+  return <div>Hello "/(auth)/dashboard/"!</div>
 }

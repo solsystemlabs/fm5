@@ -12,11 +12,12 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { MaterialType } from '@/lib/types'
+import { MaterialType, Model } from '@/lib/types'
 
 const createFilamentSchema = z.object({
   color: z.string().min(1, 'Color is required'),
   materialTypeId: z.string().min(1, 'Material type is required'),
+  modelIds: z.array(z.string()).optional(),
 })
 
 interface AddFilamentDialogProps {
@@ -27,15 +28,21 @@ interface AddFilamentDialogProps {
 export function AddFilamentDialog({ onFilamentAdded, children }: AddFilamentDialogProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [materialTypes, setMaterialTypes] = useState<MaterialType[]>([])
+  const [models, setModels] = useState<Model[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    // Fetch material types when dialog opens
+    // Fetch material types and models when dialog opens
     if (isOpen) {
-      fetch('/api/material-types')
-        .then((res) => res.json())
-        .then((data) => setMaterialTypes(data))
-        .catch((error) => console.error('Error fetching material types:', error))
+      Promise.all([
+        fetch('/api/material-types').then((res) => res.json()),
+        fetch('/api/models').then((res) => res.json())
+      ])
+        .then(([materialTypesData, modelsData]) => {
+          setMaterialTypes(materialTypesData)
+          setModels(modelsData)
+        })
+        .catch((error) => console.error('Error fetching data:', error))
     }
   }, [isOpen])
 
@@ -43,6 +50,7 @@ export function AddFilamentDialog({ onFilamentAdded, children }: AddFilamentDial
     defaultValues: {
       color: '',
       materialTypeId: '',
+      modelIds: [] as string[],
     },
     validatorAdapter: zodValidator,
     validators: {
@@ -137,6 +145,49 @@ export function AddFilamentDialog({ onFilamentAdded, children }: AddFilamentDial
                       </option>
                     ))}
                   </select>
+                  {field.state.meta.touchedErrors ? (
+                    <p className="text-sm text-red-600 mt-1">
+                      {field.state.meta.touchedErrors[0]}
+                    </p>
+                  ) : null}
+                </div>
+              )}
+            />
+          </div>
+
+          <div>
+            <form.Field
+              name="modelIds"
+              children={(field) => (
+                <div>
+                  <Label htmlFor={field.name}>Associated Models (Optional)</Label>
+                  <div className="max-h-32 overflow-y-auto border rounded-md p-2 space-y-2">
+                    {models.map((model) => (
+                      <div key={model.id} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id={`model-${model.id}`}
+                          checked={field.state.value.includes(model.id)}
+                          onChange={(e) => {
+                            const currentIds = field.state.value
+                            if (e.target.checked) {
+                              field.handleChange([...currentIds, model.id])
+                            } else {
+                              field.handleChange(currentIds.filter(id => id !== model.id))
+                            }
+                          }}
+                          className="rounded border-gray-300"
+                        />
+                        <label htmlFor={`model-${model.id}`} className="text-sm flex-1 cursor-pointer">
+                          <span className="font-medium">{model.name}</span>
+                          <span className="text-gray-500 ml-2">({model.category.name})</span>
+                        </label>
+                      </div>
+                    ))}
+                    {models.length === 0 && (
+                      <p className="text-sm text-gray-500">No models available</p>
+                    )}
+                  </div>
                   {field.state.meta.touchedErrors ? (
                     <p className="text-sm text-red-600 mt-1">
                       {field.state.meta.touchedErrors[0]}

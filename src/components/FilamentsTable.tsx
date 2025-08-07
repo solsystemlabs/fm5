@@ -33,13 +33,26 @@ const columns = [
     header: 'Material',
     cell: (info) => info.getValue(),
   }),
-  columnHelper.accessor('Model.name', {
-    header: 'Associated Model',
-    cell: (info) => info.getValue() || <span className="text-gray-400">None</span>,
-  }),
-  columnHelper.accessor('Model.category.name', {
-    header: 'Category',
-    cell: (info) => info.getValue() || <span className="text-gray-400">N/A</span>,
+  columnHelper.accessor('models', {
+    header: 'Associated Models',
+    cell: (info) => {
+      const models = info.getValue()
+      if (!models || models.length === 0) {
+        return <span className="text-gray-400">None</span>
+      }
+      return (
+        <div className="space-y-1">
+          {models.map((model, index) => (
+            <div key={model.id} className="flex items-center space-x-2">
+              <span className="text-sm">{model.name}</span>
+              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                {model.category.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      )
+    },
   }),
 ]
 

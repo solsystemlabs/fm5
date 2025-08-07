@@ -131,13 +131,15 @@ async function main() {
 
   console.log('✅ Models created')
 
-  // Create filaments
+  // Create filaments with model associations
   const redPlaFilament = await prisma.filament.create({
     data: {
       id: crypto.randomUUID(),
       color: 'Red',
       materialTypeId: plaType.id,
-      modelId: dragonModel.id
+      models: {
+        connect: [{ id: dragonModel.id }]
+      }
     }
   })
 
@@ -146,7 +148,9 @@ async function main() {
       id: crypto.randomUUID(),
       color: 'Gray',
       materialTypeId: petgType.id,
-      modelId: castleModel.id
+      models: {
+        connect: [{ id: castleModel.id }]
+      }
     }
   })
 
@@ -155,14 +159,29 @@ async function main() {
       id: crypto.randomUUID(),
       color: 'Green',
       materialTypeId: absType.id,
-      modelId: tankModel.id
+      models: {
+        connect: [{ id: tankModel.id }]
+      }
     }
   })
 
+  // Multi-purpose filament that works with multiple models
   const bluePlaFilament = await prisma.filament.create({
     data: {
       id: crypto.randomUUID(),
       color: 'Blue',
+      materialTypeId: plaType.id,
+      models: {
+        connect: [{ id: dragonModel.id }, { id: castleModel.id }]
+      }
+    }
+  })
+
+  // Unassociated filament
+  const whitePlaFilament = await prisma.filament.create({
+    data: {
+      id: crypto.randomUUID(),
+      color: 'White',
       materialTypeId: plaType.id
     }
   })

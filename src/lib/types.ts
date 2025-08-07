@@ -4,9 +4,8 @@ export interface Filament {
   id: string;
   color: string;
   materialTypeId: string;
-  modelId?: string | null;
   material: MaterialType;
-  Model?: Model | null;
+  models: Model[];
 }
 
 export interface MaterialType {
@@ -30,5 +29,5 @@ export interface ModelCategory {
 export interface CreateFilamentForm {
   color: string;
   materialTypeId: string;
-  modelId?: string;
+  modelIds: string[];
 }

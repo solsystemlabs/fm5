@@ -1,18 +1,18 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
-import { LoginPage } from '../components/pages/LoginPage'
-import { authClient } from '../lib/auth-client'
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { LoginPage } from "../../components/pages/LoginPage";
+import { authClient } from "../../lib/auth-client";
 
 type LoginSearch = {
-  redirect?: string
-}
+  redirect?: string;
+};
 
-export const Route = createFileRoute('/login')({
+export const Route = createFileRoute("/_public/login/")({
   beforeLoad: async ({ search }) => {
     const session = await authClient.getSession();
-    
+
     if (session?.data?.session) {
       // User is already logged in, redirect them
-      const redirectTo = (search as LoginSearch)?.redirect || '/products';
+      const redirectTo = (search as LoginSearch)?.redirect || "/products";
       throw redirect({ to: redirectTo });
     }
   },
@@ -20,4 +20,4 @@ export const Route = createFileRoute('/login')({
     redirect: search.redirect as string,
   }),
   component: LoginPage,
-})
+});

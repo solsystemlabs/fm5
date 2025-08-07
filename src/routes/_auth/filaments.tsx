@@ -5,7 +5,7 @@ import { AddFilamentDialog } from '@/components/AddFilamentDialog'
 import { Button } from '@/components/ui/button'
 import { Filament } from '@/lib/types'
 
-export const Route = createFileRoute('/filaments')({
+export const Route = createFileRoute('/_auth/filaments')({
   component: FilamentsPage,
 })
 

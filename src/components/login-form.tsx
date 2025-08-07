@@ -24,7 +24,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
-  const search = useSearch({ from: '/login' });
+  const search = useSearch({ from: "/_public/login/" });
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const form = useForm({
@@ -34,7 +34,7 @@ export function LoginForm({
     } as LoginFormData,
     onSubmit: async ({ value }) => {
       setLoginError(null);
-      
+
       try {
         const { data, error } = await authClient.signIn.email({
           email: value.email,
@@ -47,7 +47,7 @@ export function LoginForm({
         }
 
         // Successful login - redirect to intended page or dashboard
-        const redirectTo = (search as any)?.redirect || '/products';
+        const redirectTo = (search as any)?.redirect || "/products";
         await router.navigate({ to: redirectTo });
       } catch (err) {
         setLoginError("An unexpected error occurred. Please try again.");

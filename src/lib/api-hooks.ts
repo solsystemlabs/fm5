@@ -1,11 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Filament, MaterialType, Model } from './types'
+import { Filament, MaterialType, Model, Brand, CreateFilamentForm, CreateModelForm, ModelCategory } from './types'
 
 // Query keys
 const QUERY_KEYS = {
   filaments: ['filaments'] as const,
   materialTypes: ['materialTypes'] as const,
   models: ['models'] as const,
+  modelCategories: ['modelCategories'] as const,
+  brands: ['brands'] as const,
 }
 
 // API functions
@@ -34,7 +36,23 @@ const api = {
     return response.json()
   },
 
-  createFilament: async (filament: { color: string; materialTypeId: string; modelIds?: string[] }): Promise<Filament> => {
+  getBrands: async (): Promise<Brand[]> => {
+    const response = await fetch('/api/brands')
+    if (!response.ok) {
+      throw new Error('Failed to fetch brands')
+    }
+    return response.json()
+  },
+
+  getModelCategories: async (): Promise<ModelCategory[]> => {
+    const response = await fetch('/api/model-categories')
+    if (!response.ok) {
+      throw new Error('Failed to fetch model categories')
+    }
+    return response.json()
+  },
+
+  createFilament: async (filament: CreateFilamentForm): Promise<Filament> => {
     const response = await fetch('/api/filaments', {
       method: 'POST',
       headers: {
@@ -44,6 +62,20 @@ const api = {
     })
     if (!response.ok) {
       throw new Error('Failed to create filament')
+    }
+    return response.json()
+  },
+
+  createModel: async (model: CreateModelForm): Promise<Model> => {
+    const response = await fetch('/api/models', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(model),
+    })
+    if (!response.ok) {
+      throw new Error('Failed to create model')
     }
     return response.json()
   },
@@ -71,6 +103,20 @@ export function useModels() {
   })
 }
 
+export function useBrands() {
+  return useQuery({
+    queryKey: QUERY_KEYS.brands,
+    queryFn: api.getBrands,
+  })
+}
+
+export function useModelCategories() {
+  return useQuery({
+    queryKey: QUERY_KEYS.modelCategories,
+    queryFn: api.getModelCategories,
+  })
+}
+
 export function useCreateFilament() {
   const queryClient = useQueryClient()
   
@@ -79,6 +125,18 @@ export function useCreateFilament() {
     onSuccess: () => {
       // Invalidate and refetch filaments after creating a new one
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.filaments })
+    },
+  })
+}
+
+export function useCreateModel() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: api.createModel,
+    onSuccess: () => {
+      // Invalidate and refetch models after creating a new one
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.models })
     },
   })
 }

@@ -12,83 +12,63 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Filament } from "@/lib/types";
+import { Model } from "@/lib/types";
 
-const columnHelper = createColumnHelper<Filament>();
+const columnHelper = createColumnHelper<Model>();
 
 const columns = [
-  columnHelper.accessor("color", {
-    header: "Color",
+  columnHelper.accessor("name", {
+    header: "Name",
     cell: (info) => (
-      <div className="flex items-center space-x-2">
-        <div
-          className="w-4 h-4 rounded border border-gray-300"
-          style={{ backgroundColor: info.getValue().toLowerCase() }}
-        />
-        <span className="font-medium">{info.getValue()}</span>
-      </div>
+      <span className="font-medium">{info.getValue()}</span>
+    ),
+    size: 200,
+  }),
+  columnHelper.accessor("Category.name", {
+    header: "Category",
+    cell: (info) => (
+      <span className="text-sm bg-gray-100 px-2 py-1 rounded">
+        {info.getValue()}
+      </span>
     ),
     size: 120,
   }),
-  columnHelper.accessor("Brand.name", {
-    header: "Brand",
-    cell: (info) => info.getValue(),
-    size: 100,
-  }),
-  columnHelper.accessor("Material.name", {
-    header: "Material",
-    cell: (info) => info.getValue(),
-    size: 80,
-  }),
-  columnHelper.accessor("diameter", {
-    header: "Diameter",
-    cell: (info) => `${info.getValue()}mm`,
-    size: 80,
-  }),
-  columnHelper.accessor("cost", {
-    header: "Cost",
+  columnHelper.accessor((row) => row.Filaments, {
+    id: "filaments",
+    header: "Associated Filaments",
     cell: (info) => {
-      const cost = info.getValue();
-      return cost ? `$${cost.toFixed(2)}` : <span className="text-gray-400">-</span>;
-    },
-    size: 80,
-  }),
-  columnHelper.accessor("grams", {
-    header: "Weight",
-    cell: (info) => {
-      const grams = info.getValue();
-      return grams ? `${grams}g` : <span className="text-gray-400">-</span>;
-    },
-    size: 80,
-  }),
-  columnHelper.accessor("Models", {
-    header: "Associated Models",
-    cell: (info) => {
-      const models = info.getValue();
-      if (!models || models.length === 0) {
+      const filaments = info.getValue();
+      if (!filaments || filaments.length === 0) {
         return <span className="text-gray-400">None</span>;
       }
       return (
         <div className="space-y-1">
-          {models.map((model, index) => (
-            <div key={model.id} className="flex items-center space-x-2">
-              <span className="text-sm">{model.name}</span>
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                {model.Category.name}
-              </span>
+          {filaments.slice(0, 3).map((filament) => (
+            <div key={filament.id} className="flex items-center space-x-2">
+              <div
+                className="w-3 h-3 rounded border border-gray-300"
+                style={{ backgroundColor: filament.color.toLowerCase() }}
+              />
+              <span className="text-sm">{filament.color}</span>
+              <span className="text-xs text-gray-500">{filament.Brand.name}</span>
             </div>
           ))}
+          {filaments.length > 3 && (
+            <div className="text-xs text-gray-500">
+              +{filaments.length - 3} more
+            </div>
+          )}
         </div>
       );
     },
   }),
 ];
 
-interface FilamentsTableProps {
-  data: Filament[];
+interface ModelsTableProps {
+  data: Model[];
 }
 
-export function FilamentsTable({ data }: FilamentsTableProps) {
+export function ModelsTable({ data }: ModelsTableProps) {
   const table = useReactTable({
     data,
     columns,
@@ -146,7 +126,7 @@ export function FilamentsTable({ data }: FilamentsTableProps) {
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No filaments found.
+                No models found.
               </TableCell>
             </TableRow>
           )}
@@ -155,4 +135,3 @@ export function FilamentsTable({ data }: FilamentsTableProps) {
     </div>
   );
 }
-

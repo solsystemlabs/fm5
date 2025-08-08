@@ -38,153 +38,174 @@ async function main() {
 
   console.log('✅ Admin user created:', adminUser.email)
 
-  // Create material types
-  const plaType = await prisma.materialType.upsert({
-    where: { name: 'PLA' },
-    update: {},
-    create: {
-      id: crypto.randomUUID(),
-      name: 'PLA'
-    }
-  })
-
-  const petgType = await prisma.materialType.upsert({
-    where: { name: 'PETG' },
-    update: {},
-    create: {
-      id: crypto.randomUUID(),
-      name: 'PETG'
-    }
-  })
-
-  const absType = await prisma.materialType.upsert({
-    where: { name: 'ABS' },
-    update: {},
-    create: {
-      id: crypto.randomUUID(),
-      name: 'ABS'
-    }
+  // Create material types using createMany
+  await prisma.materialType.createMany({
+    data: [
+      { name: 'PLA' },
+      { name: 'PETG' },
+      { name: 'ABS' },
+      { name: 'TPU' },
+      { name: 'WOOD' },
+      { name: 'CARBON FIBER' }
+    ],
+    skipDuplicates: true
   })
 
   console.log('✅ Material types created')
 
-  // Create model categories
-  const miniatureCategory = await prisma.modelCategory.upsert({
-    where: { name: 'Miniatures' },
-    update: {},
-    create: {
-      id: crypto.randomUUID(),
-      name: 'Miniatures'
-    }
+  // Create brands using createMany
+  await prisma.brand.createMany({
+    data: [
+      { name: 'Hatchbox' },
+      { name: 'Overture' },
+      { name: 'SUNLU' },
+      { name: 'Polymaker' },
+      { name: 'Prusament' },
+      { name: 'eSUN' }
+    ],
+    skipDuplicates: true
   })
 
-  const terrainCategory = await prisma.modelCategory.upsert({
-    where: { name: 'Terrain' },
-    update: {},
-    create: {
-      id: crypto.randomUUID(),
-      name: 'Terrain'
-    }
-  })
+  console.log('✅ Brands created')
 
-  const vehicleCategory = await prisma.modelCategory.upsert({
-    where: { name: 'Vehicles' },
-    update: {},
-    create: {
-      id: crypto.randomUUID(),
-      name: 'Vehicles'
-    }
+  // Create model categories using createMany
+  await prisma.modelCategory.createMany({
+    data: [
+      { name: 'Miniatures' },
+      { name: 'Terrain' },
+      { name: 'Vehicles' },
+      { name: 'Accessories' },
+      { name: 'Tools' },
+      { name: 'Household' }
+    ],
+    skipDuplicates: true
   })
 
   console.log('✅ Model categories created')
 
-  // Create models
-  const dragonModel = await prisma.model.upsert({
-    where: { name: 'Ancient Dragon' },
-    update: {},
-    create: {
-      id: crypto.randomUUID(),
-      name: 'Ancient Dragon',
-      modelCategoryId: miniatureCategory.id
-    }
-  })
+  // Get the created categories and material types for foreign key references
+  const categories = await prisma.modelCategory.findMany()
+  const materials = await prisma.materialType.findMany()
+  const brands = await prisma.brand.findMany()
 
-  const castleModel = await prisma.model.upsert({
-    where: { name: 'Medieval Castle' },
-    update: {},
-    create: {
-      id: crypto.randomUUID(),
-      name: 'Medieval Castle',
-      modelCategoryId: terrainCategory.id
-    }
-  })
+  const miniatureCategory = categories.find(c => c.name === 'Miniatures')!
+  const terrainCategory = categories.find(c => c.name === 'Terrain')!
+  const vehicleCategory = categories.find(c => c.name === 'Vehicles')!
+  const accessoryCategory = categories.find(c => c.name === 'Accessories')!
 
-  const tankModel = await prisma.model.upsert({
-    where: { name: 'Battle Tank' },
-    update: {},
-    create: {
-      id: crypto.randomUUID(),
-      name: 'Battle Tank',
-      modelCategoryId: vehicleCategory.id
-    }
+  const plaType = materials.find(m => m.name === 'PLA')!
+  const petgType = materials.find(m => m.name === 'PETG')!
+  const absType = materials.find(m => m.name === 'ABS')!
+
+  const hatchboxBrand = brands.find(b => b.name === 'Hatchbox')!
+  const overtureBrand = brands.find(b => b.name === 'Overture')!
+  const sunluBrand = brands.find(b => b.name === 'SUNLU')!
+
+  // Create models using createMany
+  await prisma.model.createMany({
+    data: [
+      { name: 'Ancient Dragon', modelCategoryId: miniatureCategory.id },
+      { name: 'Medieval Castle', modelCategoryId: terrainCategory.id },
+      { name: 'Battle Tank', modelCategoryId: vehicleCategory.id },
+      { name: 'Wizard Staff', modelCategoryId: accessoryCategory.id },
+      { name: 'Knight Helmet', modelCategoryId: accessoryCategory.id },
+      { name: 'Stone Bridge', modelCategoryId: terrainCategory.id }
+    ],
+    skipDuplicates: true
   })
 
   console.log('✅ Models created')
 
-  // Create filaments with model associations
-  const redPlaFilament = await prisma.filament.create({
+  // Get created models for associations
+  const models = await prisma.model.findMany()
+  const dragonModel = models.find(m => m.name === 'Ancient Dragon')!
+  const castleModel = models.find(m => m.name === 'Medieval Castle')!
+  const tankModel = models.find(m => m.name === 'Battle Tank')!
+  const staffModel = models.find(m => m.name === 'Wizard Staff')!
+
+  // Create filaments individually with model associations
+  const redFilament = await prisma.filament.create({
     data: {
-      id: crypto.randomUUID(),
       color: 'Red',
       materialTypeId: plaType.id,
-      models: {
+      brandName: hatchboxBrand.name,
+      diameter: 1.75,
+      cost: 22.99,
+      grams: 1000,
+      Models: {
         connect: [{ id: dragonModel.id }]
       }
     }
   })
 
-  const grayPetgFilament = await prisma.filament.create({
+  const blueFilament = await prisma.filament.create({
     data: {
-      id: crypto.randomUUID(),
-      color: 'Gray',
-      materialTypeId: petgType.id,
-      models: {
-        connect: [{ id: castleModel.id }]
-      }
-    }
-  })
-
-  const greenAbsFilament = await prisma.filament.create({
-    data: {
-      id: crypto.randomUUID(),
-      color: 'Green',
-      materialTypeId: absType.id,
-      models: {
-        connect: [{ id: tankModel.id }]
-      }
-    }
-  })
-
-  // Multi-purpose filament that works with multiple models
-  const bluePlaFilament = await prisma.filament.create({
-    data: {
-      id: crypto.randomUUID(),
       color: 'Blue',
       materialTypeId: plaType.id,
-      models: {
+      brandName: hatchboxBrand.name,
+      diameter: 1.75,
+      cost: 22.99,
+      grams: 1000,
+      Models: {
         connect: [{ id: dragonModel.id }, { id: castleModel.id }]
       }
     }
   })
 
-  // Unassociated filament
-  const whitePlaFilament = await prisma.filament.create({
+  const greenFilament = await prisma.filament.create({
     data: {
-      id: crypto.randomUUID(),
-      color: 'White',
-      materialTypeId: plaType.id
+      color: 'Green',
+      materialTypeId: absType.id,
+      brandName: overtureBrand.name,
+      diameter: 1.75,
+      cost: 24.99,
+      grams: 1000,
+      Models: {
+        connect: [{ id: tankModel.id }]
+      }
     }
   })
+
+  const grayFilament = await prisma.filament.create({
+    data: {
+      color: 'Gray',
+      materialTypeId: petgType.id,
+      brandName: sunluBrand.name,
+      diameter: 1.75,
+      cost: 26.99,
+      grams: 1000,
+      Models: {
+        connect: [{ id: castleModel.id }]
+      }
+    }
+  })
+
+  const whiteFilament = await prisma.filament.create({
+    data: {
+      color: 'White',
+      materialTypeId: plaType.id,
+      brandName: hatchboxBrand.name,
+      diameter: 1.75,
+      cost: 22.99,
+      grams: 1000,
+      Models: {
+        connect: [{ id: staffModel.id }]
+      }
+    }
+  })
+
+  const blackFilament = await prisma.filament.create({
+    data: {
+      color: 'Black',
+      materialTypeId: absType.id,
+      brandName: overtureBrand.name,
+      diameter: 1.75,
+      cost: 24.99,
+      grams: 1000
+    }
+  })
+
+  console.log('✅ Filaments created')
 
   console.log('✅ Filaments created')
   console.log('🎉 Database seeded successfully!')

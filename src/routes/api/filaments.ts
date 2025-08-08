@@ -6,8 +6,12 @@ const prisma = new PrismaClient()
 
 const createFilamentSchema = z.object({
   color: z.string().min(1, 'Color is required'),
-  materialTypeId: z.string().min(1, 'Material type is required'),
-  modelIds: z.array(z.string()).optional(),
+  materialTypeId: z.number().min(1, 'Material type is required'),
+  modelIds: z.array(z.number()).optional(),
+  cost: z.number().positive('Cost must be positive').optional(),
+  grams: z.number().positive('Weight must be positive').optional(),
+  brandName: z.string().min(1, 'Brand is required'),
+  diameter: z.number().positive('Diameter must be positive'),
 })
 
 export const ServerRoute = createServerFileRoute('/api/filaments').methods({
@@ -15,10 +19,11 @@ export const ServerRoute = createServerFileRoute('/api/filaments').methods({
     try {
       const filaments = await prisma.filament.findMany({
         include: {
-          material: true,
-          models: {
+          Material: true,
+          Brand: true,
+          Models: {
             include: {
-              category: true,
+              Category: true,
             },
           },
         },
@@ -40,18 +45,22 @@ export const ServerRoute = createServerFileRoute('/api/filaments').methods({
 
       const filament = await prisma.filament.create({
         data: {
-          id: crypto.randomUUID(),
           color: validatedData.color,
           materialTypeId: validatedData.materialTypeId,
-          models: validatedData.modelIds && validatedData.modelIds.length > 0 ? {
+          brandName: validatedData.brandName,
+          diameter: validatedData.diameter,
+          cost: validatedData.cost,
+          grams: validatedData.grams,
+          Models: validatedData.modelIds && validatedData.modelIds.length > 0 ? {
             connect: validatedData.modelIds.map(id => ({ id }))
           } : undefined,
         },
         include: {
-          material: true,
-          models: {
+          Material: true,
+          Brand: true,
+          Models: {
             include: {
-              category: true,
+              Category: true,
             },
           },
         },

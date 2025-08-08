@@ -66,29 +66,40 @@ model Verification {
 }
 
 model ModelCategory {
-  id    String  @id
+  id    Int     @id @unique @default(autoincrement())
   name  String  @unique
   Model Model[]
 }
 
 model Model {
-  id              String        @id
+  id              Int           @id @unique @default(autoincrement())
   name            String        @unique
-  modelCategoryId String
-  category        ModelCategory @relation(fields: [modelCategoryId], references: [id])
-  filaments       Filament[]    @relation("FilamentToModel")
+  modelCategoryId Int
+  Category        ModelCategory @relation(fields: [modelCategoryId], references: [id])
+  Filaments       Filament[]    @relation("FilamentToModel")
 }
 
 model Filament {
-  id             String       @id
+  id             Int          @id @unique @default(autoincrement())
   color          String
-  materialTypeId String
-  material       MaterialType @relation(fields: [materialTypeId], references: [id])
-  models         Model[]      @relation("FilamentToModel")
+  materialTypeId Int
+  Material       MaterialType @relation(fields: [materialTypeId], references: [id])
+  Models         Model[]      @relation("FilamentToModel")
+  cost           Float?
+  grams          Int?
+  Brand          Brand        @relation(fields: [brandName], references: [name])
+  brandName      String
+  diameter       Float
+}
+
+model Brand {
+  id       Int        @id @unique @default(autoincrement())
+  name     String     @unique
+  Filament Filament[]
 }
 
 model MaterialType {
-  id       String     @id
+  id       Int        @id @unique @default(autoincrement())
   name     String     @unique
   Filament Filament[]
 }

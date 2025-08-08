@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { zodValidator } from '@tanstack/zod-form-adapter'
 import { z } from 'zod'
@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { MaterialType, Model } from '@/lib/types'
+import { useMaterialTypes, useModels, useCreateFilament } from '@/lib/api-hooks'
 
 const createFilamentSchema = z.object({
   color: z.string().min(1, 'Color is required'),
@@ -21,30 +21,14 @@ const createFilamentSchema = z.object({
 })
 
 interface AddFilamentDialogProps {
-  onFilamentAdded: () => void
   children: React.ReactNode
 }
 
-export function AddFilamentDialog({ onFilamentAdded, children }: AddFilamentDialogProps) {
+export function AddFilamentDialog({ children }: AddFilamentDialogProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [materialTypes, setMaterialTypes] = useState<MaterialType[]>([])
-  const [models, setModels] = useState<Model[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-
-  useEffect(() => {
-    // Fetch material types and models when dialog opens
-    if (isOpen) {
-      Promise.all([
-        fetch('/api/material-types').then((res) => res.json()),
-        fetch('/api/models').then((res) => res.json())
-      ])
-        .then(([materialTypesData, modelsData]) => {
-          setMaterialTypes(materialTypesData)
-          setModels(modelsData)
-        })
-        .catch((error) => console.error('Error fetching data:', error))
-    }
-  }, [isOpen])
+  const { data: materialTypes = [] } = useMaterialTypes()
+  const { data: models = [] } = useModels()
+  const createFilament = useCreateFilament()
 
   const form = useForm({
     defaultValues: {
@@ -52,33 +36,14 @@ export function AddFilamentDialog({ onFilamentAdded, children }: AddFilamentDial
       materialTypeId: '',
       modelIds: [] as string[],
     },
-    validatorAdapter: zodValidator,
-    validators: {
-      onChange: createFilamentSchema,
-    },
     onSubmit: async ({ value }) => {
-      setIsLoading(true)
       try {
-        const response = await fetch('/api/filaments', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(value),
-        })
-
-        if (!response.ok) {
-          throw new Error('Failed to create filament')
-        }
-
-        // Reset form and close dialog
+        await createFilament.mutateAsync(value)
+        // Reset form and close dialog on success
         form.reset()
         setIsOpen(false)
-        onFilamentAdded()
       } catch (error) {
         console.error('Error creating filament:', error)
-      } finally {
-        setIsLoading(false)
       }
     },
   })
@@ -103,6 +68,14 @@ export function AddFilamentDialog({ onFilamentAdded, children }: AddFilamentDial
           <div>
             <form.Field
               name="color"
+              validators={{
+                onChange: ({ value }) => {
+                  if (!value || value.trim().length === 0) {
+                    return 'Color is required'
+                  }
+                  return undefined
+                },
+              }}
               children={(field) => (
                 <div>
                   <Label htmlFor={field.name}>Color</Label>
@@ -114,9 +87,9 @@ export function AddFilamentDialog({ onFilamentAdded, children }: AddFilamentDial
                     onChange={(e) => field.handleChange(e.target.value)}
                     placeholder="e.g. Red, Blue, Transparent"
                   />
-                  {field.state.meta.touchedErrors ? (
+                  {field.state.meta.errors ? (
                     <p className="text-sm text-red-600 mt-1">
-                      {field.state.meta.touchedErrors[0]}
+                      {field.state.meta.errors[0]}
                     </p>
                   ) : null}
                 </div>
@@ -127,6 +100,14 @@ export function AddFilamentDialog({ onFilamentAdded, children }: AddFilamentDial
           <div>
             <form.Field
               name="materialTypeId"
+              validators={{
+                onChange: ({ value }) => {
+                  if (!value || value.trim().length === 0) {
+                    return 'Material type is required'
+                  }
+                  return undefined
+                },
+              }}
               children={(field) => (
                 <div>
                   <Label htmlFor={field.name}>Material Type</Label>
@@ -145,9 +126,9 @@ export function AddFilamentDialog({ onFilamentAdded, children }: AddFilamentDial
                       </option>
                     ))}
                   </select>
-                  {field.state.meta.touchedErrors ? (
+                  {field.state.meta.errors ? (
                     <p className="text-sm text-red-600 mt-1">
-                      {field.state.meta.touchedErrors[0]}
+                      {field.state.meta.errors[0]}
                     </p>
                   ) : null}
                 </div>
@@ -188,9 +169,9 @@ export function AddFilamentDialog({ onFilamentAdded, children }: AddFilamentDial
                       <p className="text-sm text-gray-500">No models available</p>
                     )}
                   </div>
-                  {field.state.meta.touchedErrors ? (
+                  {field.state.meta.errors ? (
                     <p className="text-sm text-red-600 mt-1">
-                      {field.state.meta.touchedErrors[0]}
+                      {field.state.meta.errors[0]}
                     </p>
                   ) : null}
                 </div>
@@ -206,8 +187,8 @@ export function AddFilamentDialog({ onFilamentAdded, children }: AddFilamentDial
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Adding...' : 'Add Filament'}
+            <Button type="submit" disabled={createFilament.isPending}>
+              {createFilament.isPending ? 'Adding...' : 'Add Filament'}
             </Button>
           </div>
         </form>

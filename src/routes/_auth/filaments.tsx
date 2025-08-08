@@ -1,45 +1,32 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
 import { FilamentsTable } from '@/components/FilamentsTable'
 import { AddFilamentDialog } from '@/components/AddFilamentDialog'
 import { Button } from '@/components/ui/button'
-import { Filament } from '@/lib/types'
+import { useFilaments } from '@/lib/api-hooks'
 
 export const Route = createFileRoute('/_auth/filaments')({
   component: FilamentsPage,
 })
 
 function FilamentsPage() {
-  const context = Route.useRouteContext()
-  const [filaments, setFilaments] = useState<Filament[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { data: filaments = [], isLoading, error } = useFilaments()
 
-  const fetchFilaments = async () => {
-    try {
-      setIsLoading(true)
-      const response = await fetch('/api/filaments')
-      if (response.ok) {
-        const data = await response.json()
-        setFilaments(data)
-      } else {
-        console.error('Failed to fetch filaments')
-      }
-    } catch (error) {
-      console.error('Error fetching filaments:', error)
-    } finally {
-      setIsLoading(false)
-    }
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold text-gray-900">Filaments</h1>
+        <div className="bg-white rounded-lg shadow p-8 text-center">
+          <p className="text-red-600">Error loading filaments: {error.message}</p>
+        </div>
+      </div>
+    )
   }
-
-  useEffect(() => {
-    fetchFilaments()
-  }, [])
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">Filaments</h1>
-        <AddFilamentDialog onFilamentAdded={fetchFilaments}>
+        <AddFilamentDialog>
           <Button>Add Filament</Button>
         </AddFilamentDialog>
       </div>

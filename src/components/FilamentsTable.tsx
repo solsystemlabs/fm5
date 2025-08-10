@@ -30,7 +30,11 @@ export function FilamentsTable({ data }: FilamentsTableProps) {
         cell: (info) => {
           const row = info.row.original;
           return (
-            <ColorLabel color={info.getValue().toLowerCase()} name={row.name} />
+            <ColorLabel 
+              color={info.getValue().toLowerCase()} 
+              name={row.name}
+              filamentId={row.id}
+            />
           );
         },
         size: 160,

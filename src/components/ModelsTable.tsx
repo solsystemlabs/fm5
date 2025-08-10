@@ -57,6 +57,7 @@ export function ModelsTable({ data }: ModelsTableProps) {
                     color={filament.color}
                     name={filament.name}
                     brand={filament.brandName}
+                    filamentId={filament.id}
                   />
                 </div>
               ))}

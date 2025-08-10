@@ -20,7 +20,7 @@ import { Route as AuthInventoryRouteImport } from './routes/_auth/inventory'
 import { Route as AuthFilamentsRouteImport } from './routes/_auth/filaments'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
 import { Route as PublicLoginIndexRouteImport } from './routes/_public/login.index'
-import { Route as AuthFilamentsFilamentIdRouteImport } from './routes/_auth/filaments.$filamentId'
+import { Route as AuthFilamentFilamentIdRouteImport } from './routes/_auth/filament.$filamentId'
 import { ServerRoute as ApiModelsServerRouteImport } from './routes/api/models'
 import { ServerRoute as ApiModelCategoriesServerRouteImport } from './routes/api/model-categories'
 import { ServerRoute as ApiMaterialTypesServerRouteImport } from './routes/api/material-types'
@@ -28,6 +28,7 @@ import { ServerRoute as ApiFilamentsServerRouteImport } from './routes/api/filam
 import { ServerRoute as ApiBrandsServerRouteImport } from './routes/api/brands'
 import { ServerRoute as ApiFilamentsFilamentIdServerRouteImport } from './routes/api/filaments.$filamentId'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
+import { ServerRoute as ApiFilamentsFilamentIdModelsServerRouteImport } from './routes/api/filaments.$filamentId.models'
 
 const rootServerRouteImport = createServerRootRoute()
 
@@ -74,10 +75,10 @@ const PublicLoginIndexRoute = PublicLoginIndexRouteImport.update({
   path: '/login/',
   getParentRoute: () => PublicRoute,
 } as any)
-const AuthFilamentsFilamentIdRoute = AuthFilamentsFilamentIdRouteImport.update({
-  id: '/$filamentId',
-  path: '/$filamentId',
-  getParentRoute: () => AuthFilamentsRoute,
+const AuthFilamentFilamentIdRoute = AuthFilamentFilamentIdRouteImport.update({
+  id: '/filament/$filamentId',
+  path: '/filament/$filamentId',
+  getParentRoute: () => AuthRoute,
 } as any)
 const ApiModelsServerRoute = ApiModelsServerRouteImport.update({
   id: '/api/models',
@@ -116,25 +117,31 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiFilamentsFilamentIdModelsServerRoute =
+  ApiFilamentsFilamentIdModelsServerRouteImport.update({
+    id: '/models',
+    path: '/models',
+    getParentRoute: () => ApiFilamentsFilamentIdServerRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthDashboardRoute
-  '/filaments': typeof AuthFilamentsRouteWithChildren
+  '/filaments': typeof AuthFilamentsRoute
   '/inventory': typeof AuthInventoryRoute
   '/models': typeof AuthModelsRoute
   '/products': typeof AuthProductsRoute
-  '/filaments/$filamentId': typeof AuthFilamentsFilamentIdRoute
+  '/filament/$filamentId': typeof AuthFilamentFilamentIdRoute
   '/login': typeof PublicLoginIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthDashboardRoute
-  '/filaments': typeof AuthFilamentsRouteWithChildren
+  '/filaments': typeof AuthFilamentsRoute
   '/inventory': typeof AuthInventoryRoute
   '/models': typeof AuthModelsRoute
   '/products': typeof AuthProductsRoute
-  '/filaments/$filamentId': typeof AuthFilamentsFilamentIdRoute
+  '/filament/$filamentId': typeof AuthFilamentFilamentIdRoute
   '/login': typeof PublicLoginIndexRoute
 }
 export interface FileRoutesById {
@@ -143,11 +150,11 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteWithChildren
   '/_public': typeof PublicRouteWithChildren
   '/_auth/dashboard': typeof AuthDashboardRoute
-  '/_auth/filaments': typeof AuthFilamentsRouteWithChildren
+  '/_auth/filaments': typeof AuthFilamentsRoute
   '/_auth/inventory': typeof AuthInventoryRoute
   '/_auth/models': typeof AuthModelsRoute
   '/_auth/products': typeof AuthProductsRoute
-  '/_auth/filaments/$filamentId': typeof AuthFilamentsFilamentIdRoute
+  '/_auth/filament/$filamentId': typeof AuthFilamentFilamentIdRoute
   '/_public/login/': typeof PublicLoginIndexRoute
 }
 export interface FileRouteTypes {
@@ -159,7 +166,7 @@ export interface FileRouteTypes {
     | '/inventory'
     | '/models'
     | '/products'
-    | '/filaments/$filamentId'
+    | '/filament/$filamentId'
     | '/login'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -169,7 +176,7 @@ export interface FileRouteTypes {
     | '/inventory'
     | '/models'
     | '/products'
-    | '/filaments/$filamentId'
+    | '/filament/$filamentId'
     | '/login'
   id:
     | '__root__'
@@ -181,7 +188,7 @@ export interface FileRouteTypes {
     | '/_auth/inventory'
     | '/_auth/models'
     | '/_auth/products'
-    | '/_auth/filaments/$filamentId'
+    | '/_auth/filament/$filamentId'
     | '/_public/login/'
   fileRoutesById: FileRoutesById
 }
@@ -197,7 +204,8 @@ export interface FileServerRoutesByFullPath {
   '/api/model-categories': typeof ApiModelCategoriesServerRoute
   '/api/models': typeof ApiModelsServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
-  '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRoute
+  '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRouteWithChildren
+  '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
 }
 export interface FileServerRoutesByTo {
   '/api/brands': typeof ApiBrandsServerRoute
@@ -206,7 +214,8 @@ export interface FileServerRoutesByTo {
   '/api/model-categories': typeof ApiModelCategoriesServerRoute
   '/api/models': typeof ApiModelsServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
-  '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRoute
+  '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRouteWithChildren
+  '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
@@ -216,7 +225,8 @@ export interface FileServerRoutesById {
   '/api/model-categories': typeof ApiModelCategoriesServerRoute
   '/api/models': typeof ApiModelsServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
-  '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRoute
+  '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRouteWithChildren
+  '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
@@ -228,6 +238,7 @@ export interface FileServerRouteTypes {
     | '/api/models'
     | '/api/auth/$'
     | '/api/filaments/$filamentId'
+    | '/api/filaments/$filamentId/models'
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
     | '/api/brands'
@@ -237,6 +248,7 @@ export interface FileServerRouteTypes {
     | '/api/models'
     | '/api/auth/$'
     | '/api/filaments/$filamentId'
+    | '/api/filaments/$filamentId/models'
   id:
     | '__root__'
     | '/api/brands'
@@ -246,6 +258,7 @@ export interface FileServerRouteTypes {
     | '/api/models'
     | '/api/auth/$'
     | '/api/filaments/$filamentId'
+    | '/api/filaments/$filamentId/models'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
@@ -322,12 +335,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicLoginIndexRouteImport
       parentRoute: typeof PublicRoute
     }
-    '/_auth/filaments/$filamentId': {
-      id: '/_auth/filaments/$filamentId'
-      path: '/$filamentId'
-      fullPath: '/filaments/$filamentId'
-      preLoaderRoute: typeof AuthFilamentsFilamentIdRouteImport
-      parentRoute: typeof AuthFilamentsRoute
+    '/_auth/filament/$filamentId': {
+      id: '/_auth/filament/$filamentId'
+      path: '/filament/$filamentId'
+      fullPath: '/filament/$filamentId'
+      preLoaderRoute: typeof AuthFilamentFilamentIdRouteImport
+      parentRoute: typeof AuthRoute
     }
   }
 }
@@ -382,35 +395,32 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiAuthSplatServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/filaments/$filamentId/models': {
+      id: '/api/filaments/$filamentId/models'
+      path: '/models'
+      fullPath: '/api/filaments/$filamentId/models'
+      preLoaderRoute: typeof ApiFilamentsFilamentIdModelsServerRouteImport
+      parentRoute: typeof ApiFilamentsFilamentIdServerRoute
+    }
   }
 }
 
-interface AuthFilamentsRouteChildren {
-  AuthFilamentsFilamentIdRoute: typeof AuthFilamentsFilamentIdRoute
-}
-
-const AuthFilamentsRouteChildren: AuthFilamentsRouteChildren = {
-  AuthFilamentsFilamentIdRoute: AuthFilamentsFilamentIdRoute,
-}
-
-const AuthFilamentsRouteWithChildren = AuthFilamentsRoute._addFileChildren(
-  AuthFilamentsRouteChildren,
-)
-
 interface AuthRouteChildren {
   AuthDashboardRoute: typeof AuthDashboardRoute
-  AuthFilamentsRoute: typeof AuthFilamentsRouteWithChildren
+  AuthFilamentsRoute: typeof AuthFilamentsRoute
   AuthInventoryRoute: typeof AuthInventoryRoute
   AuthModelsRoute: typeof AuthModelsRoute
   AuthProductsRoute: typeof AuthProductsRoute
+  AuthFilamentFilamentIdRoute: typeof AuthFilamentFilamentIdRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthDashboardRoute: AuthDashboardRoute,
-  AuthFilamentsRoute: AuthFilamentsRouteWithChildren,
+  AuthFilamentsRoute: AuthFilamentsRoute,
   AuthInventoryRoute: AuthInventoryRoute,
   AuthModelsRoute: AuthModelsRoute,
   AuthProductsRoute: AuthProductsRoute,
+  AuthFilamentFilamentIdRoute: AuthFilamentFilamentIdRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
@@ -426,12 +436,28 @@ const PublicRouteChildren: PublicRouteChildren = {
 const PublicRouteWithChildren =
   PublicRoute._addFileChildren(PublicRouteChildren)
 
+interface ApiFilamentsFilamentIdServerRouteChildren {
+  ApiFilamentsFilamentIdModelsServerRoute: typeof ApiFilamentsFilamentIdModelsServerRoute
+}
+
+const ApiFilamentsFilamentIdServerRouteChildren: ApiFilamentsFilamentIdServerRouteChildren =
+  {
+    ApiFilamentsFilamentIdModelsServerRoute:
+      ApiFilamentsFilamentIdModelsServerRoute,
+  }
+
+const ApiFilamentsFilamentIdServerRouteWithChildren =
+  ApiFilamentsFilamentIdServerRoute._addFileChildren(
+    ApiFilamentsFilamentIdServerRouteChildren,
+  )
+
 interface ApiFilamentsServerRouteChildren {
-  ApiFilamentsFilamentIdServerRoute: typeof ApiFilamentsFilamentIdServerRoute
+  ApiFilamentsFilamentIdServerRoute: typeof ApiFilamentsFilamentIdServerRouteWithChildren
 }
 
 const ApiFilamentsServerRouteChildren: ApiFilamentsServerRouteChildren = {
-  ApiFilamentsFilamentIdServerRoute: ApiFilamentsFilamentIdServerRoute,
+  ApiFilamentsFilamentIdServerRoute:
+    ApiFilamentsFilamentIdServerRouteWithChildren,
 }
 
 const ApiFilamentsServerRouteWithChildren =

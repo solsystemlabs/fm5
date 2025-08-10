@@ -79,6 +79,34 @@ const api = {
     }
     return response.json()
   },
+
+  createBrand: async (name: string): Promise<Brand> => {
+    const response = await fetch('/api/brands', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name }),
+    })
+    if (!response.ok) {
+      throw new Error('Failed to create brand')
+    }
+    return response.json()
+  },
+
+  createMaterialType: async (name: string): Promise<MaterialType> => {
+    const response = await fetch('/api/material-types', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name }),
+    })
+    if (!response.ok) {
+      throw new Error('Failed to create material type')
+    }
+    return response.json()
+  },
 }
 
 // Hooks
@@ -137,6 +165,38 @@ export function useCreateModel() {
     onSuccess: () => {
       // Invalidate and refetch models after creating a new one
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.models })
+    },
+  })
+}
+
+export function useCreateBrand() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: api.createBrand,
+    onSuccess: (newBrand) => {
+      // Optimistically update the brands cache
+      queryClient.setQueryData(QUERY_KEYS.brands, (oldBrands: Brand[] = []) => {
+        return [...oldBrands, newBrand].sort((a, b) => a.name.localeCompare(b.name))
+      })
+      // Also invalidate to ensure we have the latest data
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.brands })
+    },
+  })
+}
+
+export function useCreateMaterialType() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: api.createMaterialType,
+    onSuccess: (newMaterialType) => {
+      // Optimistically update the material types cache
+      queryClient.setQueryData(QUERY_KEYS.materialTypes, (oldTypes: MaterialType[] = []) => {
+        return [...oldTypes, newMaterialType].sort((a, b) => a.name.localeCompare(b.name))
+      })
+      // Also invalidate to ensure we have the latest data
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.materialTypes })
     },
   })
 }

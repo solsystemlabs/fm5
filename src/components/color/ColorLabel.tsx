@@ -15,7 +15,7 @@ export function ColorLabel({
 
   const handleClick = () => {
     if (filamentId) {
-      navigate({ to: '/filaments/$filamentId', params: { filamentId: filamentId.toString() } })
+      navigate({ to: '/filament/$filamentId', params: { filamentId: filamentId.toString() } })
     }
   }
 

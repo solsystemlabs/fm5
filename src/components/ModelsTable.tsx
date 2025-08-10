@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   createColumnHelper,
   flexRender,
@@ -16,122 +17,145 @@ import { Model } from "@/lib/types";
 
 const columnHelper = createColumnHelper<Model>();
 
-const columns = [
-  columnHelper.accessor("name", {
-    header: "Name",
-    cell: (info) => (
-      <span className="font-medium">{info.getValue()}</span>
-    ),
-    size: 200,
-  }),
-  columnHelper.accessor("Category.name", {
-    header: "Category",
-    cell: (info) => (
-      <span className="text-sm bg-gray-100 px-2 py-1 rounded">
-        {info.getValue()}
-      </span>
-    ),
-    size: 120,
-  }),
-  columnHelper.accessor((row) => row.Filaments, {
-    id: "filaments",
-    header: "Associated Filaments",
-    cell: (info) => {
-      const filaments = info.getValue();
-      if (!filaments || filaments.length === 0) {
-        return <span className="text-gray-400">None</span>;
-      }
-      return (
-        <div className="space-y-1">
-          {filaments.slice(0, 3).map((filament) => (
-            <div key={filament.id} className="flex items-center space-x-2">
-              <div
-                className="w-3 h-3 rounded border border-gray-300"
-                style={{ backgroundColor: filament.color.toLowerCase() }}
-              />
-              <span className="text-sm">{filament.color}</span>
-              <span className="text-xs text-gray-500">{filament.Brand.name}</span>
-            </div>
-          ))}
-          {filaments.length > 3 && (
-            <div className="text-xs text-gray-500">
-              +{filaments.length - 3} more
-            </div>
-          )}
-        </div>
-      );
-    },
-  }),
-];
-
 interface ModelsTableProps {
   data: Model[];
 }
 
 export function ModelsTable({ data }: ModelsTableProps) {
+  const columns = useMemo(() => [
+    columnHelper.accessor("name", {
+      header: "Name",
+      cell: (info) => (
+        <div className="font-medium text-gray-900">{info.getValue()}</div>
+      ),
+      size: 220,
+    }),
+    columnHelper.accessor("Category.name", {
+      header: "Category",
+      cell: (info) => (
+        <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-600/20 ring-inset">
+          {info.getValue()}
+        </span>
+      ),
+      size: 140,
+    }),
+    columnHelper.accessor((row) => row.Filaments, {
+      id: "filaments",
+      header: "Associated Filaments",
+      cell: (info) => {
+        const filaments = info.getValue();
+        if (!filaments || filaments.length === 0) {
+          return <div className="text-gray-500">None</div>;
+        }
+        return (
+          <div className="space-y-2">
+            {filaments.slice(0, 3).map((filament) => (
+              <div key={filament.id} className="flex items-center gap-3">
+                <div
+                  className="size-6 rounded-full border border-gray-200 shrink-0"
+                  style={{ backgroundColor: filament.color.toLowerCase() }}
+                  aria-label={`${filament.color} color indicator`}
+                />
+                <div>
+                  <div className="text-gray-900 font-medium text-sm">{filament.color}</div>
+                  <div className="mt-1 text-gray-500 text-xs">{filament.Brand.name}</div>
+                </div>
+              </div>
+            ))}
+            {filaments.length > 3 && (
+              <div className="text-xs text-gray-500 font-medium mt-2">
+                +{filaments.length - 3} more filaments
+              </div>
+            )}
+          </div>
+        );
+      },
+    }),
+  ], []);
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    columnResizeMode: 'onChange',
+    columnResizeMode: "onChange",
   });
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header, index) => {
-                const isLastColumn = index === headerGroup.headers.length - 1;
-                return (
-                  <TableHead 
-                    key={header.id} 
-                    className={isLastColumn ? "w-full" : ""}
-                    style={isLastColumn ? {} : { width: header.getSize() }}
+    <div className="flow-root">
+      <div className="overflow-x-auto">
+        <div className="inline-block min-w-full align-middle">
+          <Table className="min-w-full divide-y divide-gray-300">
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header, index) => {
+                    const isFirstColumn = index === 0;
+                    const isLastColumn = index === headerGroup.headers.length - 1;
+                    return (
+                      <TableHead
+                        key={header.id}
+                        className={`py-3.5 text-left text-sm font-semibold text-gray-900 ${
+                          isFirstColumn ? "pl-4 pr-3 sm:pl-0" : 
+                          isLastColumn ? "pl-3 pr-4 sm:pr-0" : "px-3"
+                        }`}
+                        style={isLastColumn ? {} : { width: `${header.getSize()}px` }}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody className="divide-y divide-gray-200 bg-white">
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    className="hover:bg-gray-50"
                   >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell, index) => {
-                  const isLastColumn = index === row.getVisibleCells().length - 1;
-                  return (
-                    <TableCell 
-                      key={cell.id}
-                      className={isLastColumn ? "w-full" : ""}
-                      style={isLastColumn ? {} : { width: cell.column.getSize() }}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No models found.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+                    {row.getVisibleCells().map((cell, index) => {
+                      const isLastColumn =
+                        index === row.getVisibleCells().length - 1;
+                      const isFirstColumn = index === 0;
+                      return (
+                        <TableCell
+                          key={cell.id}
+                          className={`py-5 text-sm whitespace-nowrap ${
+                            isFirstColumn ? "pl-4 pr-3 sm:pl-0" : 
+                            isLastColumn ? "pl-3 pr-4 sm:pr-0" : "px-3"
+                          }`}
+                          style={
+                            isLastColumn ? {} : { width: `${cell.column.getSize()}px` }
+                          }
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center text-gray-500">
+                    No models found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
     </div>
   );
 }
+

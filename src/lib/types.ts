@@ -25,6 +25,7 @@ export interface Model {
 
 export interface Filament {
   id: number;
+  name: string;
   color: string;
   materialTypeId: number;
   Material: MaterialType;

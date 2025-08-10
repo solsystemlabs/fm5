@@ -12,6 +12,7 @@ dist/
 *.tgz
 *.tar.gz
 .output/
+.nitro/
 
 # Runtime data
 pids

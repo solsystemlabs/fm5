@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -81,6 +82,7 @@ model Model {
 
 model Filament {
   id             Int          @id @unique @default(autoincrement())
+  name           String
   color          String
   materialTypeId Int
   Material       MaterialType @relation(fields: [materialTypeId], references: [id])

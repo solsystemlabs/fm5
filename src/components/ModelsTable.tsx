@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Model } from "@/lib/types";
+import { ColorLabel } from "./color/ColorLabel";
 
 const columnHelper = createColumnHelper<Model>();
 
@@ -22,56 +23,55 @@ interface ModelsTableProps {
 }
 
 export function ModelsTable({ data }: ModelsTableProps) {
-  const columns = useMemo(() => [
-    columnHelper.accessor("name", {
-      header: "Name",
-      cell: (info) => (
-        <div className="font-medium text-gray-900">{info.getValue()}</div>
-      ),
-      size: 220,
-    }),
-    columnHelper.accessor("Category.name", {
-      header: "Category",
-      cell: (info) => (
-        <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-600/20 ring-inset">
-          {info.getValue()}
-        </span>
-      ),
-      size: 140,
-    }),
-    columnHelper.accessor((row) => row.Filaments, {
-      id: "filaments",
-      header: "Associated Filaments",
-      cell: (info) => {
-        const filaments = info.getValue();
-        if (!filaments || filaments.length === 0) {
-          return <div className="text-gray-500">None</div>;
-        }
-        return (
-          <div className="space-y-2">
-            {filaments.slice(0, 3).map((filament) => (
-              <div key={filament.id} className="flex items-center gap-3">
-                <div
-                  className="size-6 rounded-full border border-gray-200 shrink-0"
-                  style={{ backgroundColor: filament.color.toLowerCase() }}
-                  aria-label={`${filament.color} color indicator`}
-                />
-                <div>
-                  <div className="text-gray-900 font-medium text-sm">{filament.color}</div>
-                  <div className="mt-1 text-gray-500 text-xs">{filament.Brand.name}</div>
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor("name", {
+        header: "Name",
+        cell: (info) => (
+          <div className="font-medium text-gray-900">{info.getValue()}</div>
+        ),
+        size: 220,
+      }),
+      columnHelper.accessor("Category.name", {
+        header: "Category",
+        cell: (info) => (
+          <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-600/20 ring-inset">
+            {info.getValue()}
+          </span>
+        ),
+        size: 140,
+      }),
+      columnHelper.accessor((row) => row.Filaments, {
+        id: "filaments",
+        header: "Associated Filaments",
+        cell: (info) => {
+          const filaments = info.getValue();
+          if (!filaments || filaments.length === 0) {
+            return <div className="text-gray-500">None</div>;
+          }
+          return (
+            <div className="space-y-2">
+              {filaments.slice(0, 3).map((filament) => (
+                <div key={filament.id} className="flex items-center gap-3">
+                  <ColorLabel
+                    color={filament.color}
+                    name={filament.name}
+                    brand={filament.brandName}
+                  />
                 </div>
-              </div>
-            ))}
-            {filaments.length > 3 && (
-              <div className="text-xs text-gray-500 font-medium mt-2">
-                +{filaments.length - 3} more filaments
-              </div>
-            )}
-          </div>
-        );
-      },
-    }),
-  ], []);
+              ))}
+              {filaments.length > 3 && (
+                <div className="text-xs text-gray-500 font-medium mt-2">
+                  +{filaments.length - 3} more filaments
+                </div>
+              )}
+            </div>
+          );
+        },
+      }),
+    ],
+    [],
+  );
 
   const table = useReactTable({
     data,
@@ -90,15 +90,21 @@ export function ModelsTable({ data }: ModelsTableProps) {
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header, index) => {
                     const isFirstColumn = index === 0;
-                    const isLastColumn = index === headerGroup.headers.length - 1;
+                    const isLastColumn =
+                      index === headerGroup.headers.length - 1;
                     return (
                       <TableHead
                         key={header.id}
                         className={`py-3.5 text-left text-sm font-semibold text-gray-900 ${
-                          isFirstColumn ? "pl-4 pr-3 sm:pl-0" : 
-                          isLastColumn ? "pl-3 pr-4 sm:pr-0" : "px-3"
+                          isFirstColumn
+                            ? "pl-4 pr-3 sm:pl-0"
+                            : isLastColumn
+                              ? "pl-3 pr-4 sm:pr-0"
+                              : "px-3"
                         }`}
-                        style={isLastColumn ? {} : { width: `${header.getSize()}px` }}
+                        style={
+                          isLastColumn ? {} : { width: `${header.getSize()}px` }
+                        }
                       >
                         {header.isPlaceholder
                           ? null
@@ -128,11 +134,16 @@ export function ModelsTable({ data }: ModelsTableProps) {
                         <TableCell
                           key={cell.id}
                           className={`py-5 text-sm whitespace-nowrap ${
-                            isFirstColumn ? "pl-4 pr-3 sm:pl-0" : 
-                            isLastColumn ? "pl-3 pr-4 sm:pr-0" : "px-3"
+                            isFirstColumn
+                              ? "pl-4 pr-3 sm:pl-0"
+                              : isLastColumn
+                                ? "pl-3 pr-4 sm:pr-0"
+                                : "px-3"
                           }`}
                           style={
-                            isLastColumn ? {} : { width: `${cell.column.getSize()}px` }
+                            isLastColumn
+                              ? {}
+                              : { width: `${cell.column.getSize()}px` }
                           }
                         >
                           {flexRender(
@@ -146,7 +157,10 @@ export function ModelsTable({ data }: ModelsTableProps) {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center text-gray-500">
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center text-gray-500"
+                  >
                     No models found.
                   </TableCell>
                 </TableRow>
@@ -158,4 +172,3 @@ export function ModelsTable({ data }: ModelsTableProps) {
     </div>
   );
 }
-

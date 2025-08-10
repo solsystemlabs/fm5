@@ -5,18 +5,22 @@ export function ColorLabel({
 }: {
   color: string;
   name: string;
-  brand: string;
+  brand?: string;
 }) {
   return (
-    <span className="inline-flex items-center gap-x-1.5 rounded-md bg-gray-800 px-2 py-1 text-xs font-medium text-gray-600">
-      <svg
-        viewBox="0 0 6 6"
-        aria-hidden="true"
-        className="size-1.5 fill-gray-400"
-      >
-        <circle r={3} cx={3} cy={3} />
-      </svg>
-      Badge
-    </span>
+    <div
+      className="inline-flex items-center gap-x-2 rounded min-w-30 px-3 py-2 text-md  text-gray-600 border-gray-200"
+      style={{ backgroundColor: `${color}40` }}
+    >
+      <div
+        className="size-5 rounded border border-gray-200 shrink-0"
+        style={{ backgroundColor: color }}
+        aria-label={`${name} color indicator`}
+      />
+      <div className="flex flex-col">
+        <div className="font-medium text-gray-900">{name}</div>
+        {brand && <div className="text-gray-600">{brand}</div>}
+      </div>
+    </div>
   );
 }

@@ -17,11 +17,6 @@ export function EditableFormField({
   className, 
   onChange 
 }: EditableFormFieldProps) {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = type === 'number' ? parseFloat(e.target.value) || 0 : e.target.value
-    onChange(newValue)
-  }
-
   return (
     <div className={className}>
       {label && (
@@ -33,7 +28,10 @@ export function EditableFormField({
         <Input
           type={type}
           value={value}
-          onChange={handleChange}
+          onChange={(e) => {
+            const newValue = type === 'number' ? parseFloat(e.target.value) || 0 : e.target.value
+            onChange(newValue)
+          }}
         />
         {suffix && <span className="ml-2 text-sm text-gray-500">{suffix}</span>}
       </div>

@@ -25,21 +25,32 @@ export function EditableModelsFormField({
       <label className="block text-sm font-medium text-gray-700 mb-3">
         {label}
       </label>
-      <div className="border rounded-lg p-3 max-h-48 overflow-y-auto">
-        {allModels.map((model) => (
-          <div key={model.id} className="flex items-center space-x-3 py-2">
-            <input
-              type="checkbox"
-              checked={selectedModelIds.includes(model.id)}
-              onChange={() => toggleModel(model.id)}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <div className="flex-1">
-              <div className="text-sm font-medium text-gray-900">{model.name}</div>
-              <div className="text-xs text-gray-500">{model.Category.name}</div>
-            </div>
+      <div className="bg-gray-50 border rounded-lg p-4 max-h-64 overflow-y-auto">
+        {allModels.length > 0 ? (
+          <div className="space-y-2">
+            {allModels.map((model) => (
+              <label
+                key={model.id}
+                className="flex items-center space-x-3 p-3 bg-white rounded-md cursor-pointer hover:bg-gray-50 transition-colors"
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedModelIds.includes(model.id)}
+                  onChange={() => toggleModel(model.id)}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-gray-900 truncate">{model.name}</div>
+                  <div className="text-xs text-gray-500">{model.Category.name}</div>
+                </div>
+              </label>
+            ))}
           </div>
-        ))}
+        ) : (
+          <div className="text-center text-gray-500 py-8">
+            No models available
+          </div>
+        )}
       </div>
     </div>
   )

@@ -4,6 +4,9 @@
     "dev": "vite dev",
     "build": "vite build",
     "db:seed": "tsx prisma/seed.ts",
+    "db:reset": "tsx scripts/db-reset.ts",
+    "db:reset:force": "tsx scripts/db-reset.ts --force --seed",
+    "db:fresh": "tsx scripts/db-reset.ts --migrate --force --seed",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run"

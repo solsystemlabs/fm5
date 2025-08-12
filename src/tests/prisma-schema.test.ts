@@ -127,13 +127,15 @@ describe('Prisma Schema Validation', () => {
     })
 
     test('should enforce unique name constraint', async () => {
+      const uniqueName = `UniqueBrand-${Date.now()}`
+      
       await prisma.filamentBrand.create({
-        data: { name: 'Hatchbox' }
+        data: { name: uniqueName }
       })
 
       await expect(
         prisma.filamentBrand.create({
-          data: { name: 'Hatchbox' }
+          data: { name: uniqueName }
         })
       ).rejects.toThrow()
     })

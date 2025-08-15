@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/aria/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/aria/card";
+import { Input } from "@/components/aria/input";
+import { Label } from "@/components/aria/label";
+import { Textarea } from "@/components/aria/textarea";
+import { Switch } from "@/components/aria/switch";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import type { UserProfileResponse, UpdateProfileForm } from "@/lib/types";
@@ -363,7 +363,7 @@ export function ProfileInfoForm({ userProfile, onUpdate }: ProfileInfoFormProps)
                 {([canSubmit, isSubmitting]) => (
                   <Button
                     type="submit"
-                    disabled={!canSubmit}
+                    isDisabled={!canSubmit}
                     className="min-w-[120px]"
                   >
                     {isSubmitting ? "Saving..." : "Save Changes"}

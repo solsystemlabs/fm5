@@ -12,7 +12,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/aria/table";
 import { Filament } from "@/lib/types";
 import { ColorLabel } from "./color/ColorLabel";
 

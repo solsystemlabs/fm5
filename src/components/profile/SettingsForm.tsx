@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/aria/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/aria/card";
+import { Label } from "@/components/aria/label";
+import { Switch } from "@/components/aria/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/aria/select";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { Settings, Bell, Eye, Globe, Palette, Mail } from "lucide-react";
@@ -334,8 +334,8 @@ export function SettingsForm({ userProfile, onUpdate }: SettingsFormProps) {
         >
           {([canSubmit, isSubmitting]) => (
             <Button
-              onClick={() => form.handleSubmit()}
-              disabled={!canSubmit}
+              onPress={() => form.handleSubmit()}
+              isDisabled={!canSubmit}
               className="min-w-[120px]"
             >
               {isSubmitting ? "Saving..." : "Save Settings"}

@@ -1,6 +1,6 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/aria/avatar";
+import { Button } from "@/components/aria/button";
+import { Card, CardContent } from "@/components/aria/card";
 import { useState, useRef } from "react";
 import { Upload, Camera, Trash2, User } from "lucide-react";
 
@@ -156,8 +156,8 @@ export function AvatarUpload({ currentImage, onUploadSuccess }: AvatarUploadProp
         <Button
           variant="outline"
           size="sm"
-          onClick={triggerFileSelect}
-          disabled={uploading}
+          onPress={triggerFileSelect}
+          isDisabled={uploading}
           className="flex items-center gap-2"
         >
           <Upload className="w-4 h-4" />
@@ -168,8 +168,8 @@ export function AvatarUpload({ currentImage, onUploadSuccess }: AvatarUploadProp
           <Button
             variant="outline"
             size="sm"
-            onClick={handleDeleteAvatar}
-            disabled={uploading}
+            onPress={handleDeleteAvatar}
+            isDisabled={uploading}
             className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
           >
             <Trash2 className="w-4 h-4" />

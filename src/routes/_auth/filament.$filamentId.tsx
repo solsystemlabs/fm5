@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Edit, Save, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/aria/button";
 import { Filament } from "@/lib/types";
 import {
   useBrands,
@@ -179,17 +179,17 @@ function FilamentDetailsPage() {
           </Link>
           
           {!isEditing ? (
-            <Button onClick={handleEdit} size="lg">
+            <Button onPress={handleEdit} size="lg">
               <Edit className="h-4 w-4 mr-2" />
               Edit Filament
             </Button>
           ) : (
             <div className="flex gap-3">
-              <Button onClick={handleSave} disabled={isLoading} size="lg">
+              <Button onPress={handleSave} isDisabled={isLoading} size="lg">
                 <Save className="h-4 w-4 mr-2" />
                 {isLoading ? "Saving..." : "Save Changes"}
               </Button>
-              <Button variant="outline" onClick={handleCancel} disabled={isLoading} size="lg">
+              <Button variant="outline" onPress={handleCancel} isDisabled={isLoading} size="lg">
                 <X className="h-4 w-4 mr-2" />
                 Cancel
               </Button>

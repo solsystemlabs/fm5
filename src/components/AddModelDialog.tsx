@@ -6,10 +6,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@/components/aria/dialog";
+import { Button } from "@/components/aria/button";
+import { Input } from "@/components/aria/input";
+import { Label } from "@/components/aria/label";
 import {
   useModelCategories,
   useCreateModel,
@@ -131,11 +131,11 @@ export function AddModelDialog({ children }: AddModelDialogProps) {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setIsOpen(false)}
+              onPress={() => setIsOpen(false)}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={createModel.isPending}>
+            <Button type="submit" isDisabled={createModel.isPending}>
               {createModel.isPending ? "Adding..." : "Add Model"}
             </Button>
           </div>

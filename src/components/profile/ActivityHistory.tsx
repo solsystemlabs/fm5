@@ -1,5 +1,5 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/aria/card";
+import { Button } from "@/components/aria/button";
 import { useState, useEffect } from "react";
 import { Activity, Clock, User, Settings, Shield, RefreshCw } from "lucide-react";
 import type { ActivityEntry } from "@/lib/types";
@@ -129,8 +129,8 @@ export function ActivityHistory({ userId }: ActivityHistoryProps) {
           <Button
             variant="outline"
             size="sm"
-            onClick={refresh}
-            disabled={loading}
+            onPress={refresh}
+            isDisabled={loading}
             className="flex items-center gap-2"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
@@ -145,7 +145,7 @@ export function ActivityHistory({ userId }: ActivityHistoryProps) {
               <Activity className="h-8 w-8 mx-auto mb-2" />
               <p className="text-sm">{error}</p>
             </div>
-            <Button variant="outline" size="sm" onClick={refresh}>
+            <Button variant="outline" size="sm" onPress={refresh}>
               Try Again
             </Button>
           </div>
@@ -232,7 +232,7 @@ export function ActivityHistory({ userId }: ActivityHistoryProps) {
             {/* Load more button */}
             {hasMore && !loading && activities.length > 0 && (
               <div className="flex justify-center pt-4">
-                <Button variant="outline" onClick={loadMore}>
+                <Button variant="outline" onPress={loadMore}>
                   Load More Activity
                 </Button>
               </div>

@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/aria/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/aria/card";
+import { Input } from "@/components/aria/input";
+import { Label } from "@/components/aria/label";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { Shield, Mail, Key } from "lucide-react";
@@ -235,7 +235,7 @@ function ChangePasswordCard() {
                 {([canSubmit, isSubmitting]) => (
                   <Button
                     type="submit"
-                    disabled={!canSubmit}
+                    isDisabled={!canSubmit}
                     className="min-w-[140px]"
                   >
                     {isSubmitting ? "Updating..." : "Update Password"}
@@ -392,7 +392,7 @@ function ChangeEmailCard({ currentEmail }: { currentEmail: string }) {
                 {([canSubmit, isSubmitting]) => (
                   <Button
                     type="submit"
-                    disabled={!canSubmit}
+                    isDisabled={!canSubmit}
                     className="min-w-[120px]"
                   >
                     {isSubmitting ? "Updating..." : "Update Email"}

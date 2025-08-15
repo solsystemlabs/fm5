@@ -18,3 +18,19 @@ export {
   type DialogTitleProps,
   type DialogDescriptionProps
 } from "./dialog"
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardAction,
+  CardDescription,
+  CardContent,
+  type CardProps,
+  type CardHeaderProps,
+  type CardFooterProps,
+  type CardTitleProps,
+  type CardActionProps,
+  type CardDescriptionProps,
+  type CardContentProps
+} from "./card"

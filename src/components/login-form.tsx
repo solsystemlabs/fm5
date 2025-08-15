@@ -1,13 +1,13 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/aria/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@/components/aria/card";
+import { Input } from "@/components/aria/input";
+import { Label } from "@/components/aria/label";
 import { cn } from "@/lib/utils";
 import { useForm } from "@tanstack/react-form";
 import { authClient } from "../lib/auth-client";
@@ -159,7 +159,8 @@ export function LoginForm({
                     <Button
                       type="submit"
                       className="w-full"
-                      disabled={!canSubmit}
+                      isDisabled={!canSubmit}
+                      onPress={() => form.handleSubmit()}
                     >
                       {isSubmitting ? "Logging in..." : "Login"}
                     </Button>

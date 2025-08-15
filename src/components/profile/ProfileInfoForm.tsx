@@ -20,15 +20,17 @@ export function ProfileInfoForm({ userProfile, onUpdate }: ProfileInfoFormProps)
   const form = useForm({
     defaultValues: {
       name: userProfile.name || "",
-      firstName: userProfile.profile.firstName || "",
-      lastName: userProfile.profile.lastName || "",
-      bio: userProfile.profile.bio || "",
-      phoneNumber: userProfile.profile.phoneNumber || "",
-      dateOfBirth: userProfile.profile.dateOfBirth || "",
-      location: userProfile.profile.location || "",
-      website: userProfile.profile.website || "",
-      isPublic: userProfile.profile.isPublic || false,
-    } as UpdateProfileForm & { name: string; isPublic: boolean },
+      profile: {
+        firstName: userProfile.profile.firstName || "",
+        lastName: userProfile.profile.lastName || "",
+        bio: userProfile.profile.bio || "",
+        phoneNumber: userProfile.profile.phoneNumber || "",
+        dateOfBirth: userProfile.profile.dateOfBirth || "",
+        location: userProfile.profile.location || "",
+        website: userProfile.profile.website || "",
+        isPublic: userProfile.profile.isPublic || false,
+      }
+    } as UpdateProfileForm,
     onSubmit: async ({ value }) => {
       setUpdateError(null);
       setUpdateSuccess(null);
@@ -42,14 +44,14 @@ export function ProfileInfoForm({ userProfile, onUpdate }: ProfileInfoFormProps)
           body: JSON.stringify({
             name: value.name,
             profile: {
-              firstName: value.firstName,
-              lastName: value.lastName,
-              bio: value.bio,
-              phoneNumber: value.phoneNumber,
-              dateOfBirth: value.dateOfBirth,
-              location: value.location,
-              website: value.website,
-              isPublic: value.isPublic,
+              firstName: value.profile?.firstName,
+              lastName: value.profile?.lastName,
+              bio: value.profile?.bio,
+              phoneNumber: value.profile?.phoneNumber,
+              dateOfBirth: value.profile?.dateOfBirth,
+              location: value.profile?.location,
+              website: value.profile?.website,
+              isPublic: value.profile?.isPublic,
             },
           }),
         });
@@ -128,7 +130,7 @@ export function ProfileInfoForm({ userProfile, onUpdate }: ProfileInfoFormProps)
             {/* Name Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <form.Field
-                name="firstName"
+                name="profile.firstName"
                 validators={{
                   onChange: ({ value }) => {
                     if (value && value.length > 50) return "First name must be less than 50 characters";
@@ -155,7 +157,7 @@ export function ProfileInfoForm({ userProfile, onUpdate }: ProfileInfoFormProps)
               </form.Field>
 
               <form.Field
-                name="lastName"
+                name="profile.lastName"
                 validators={{
                   onChange: ({ value }) => {
                     if (value && value.length > 50) return "Last name must be less than 50 characters";
@@ -184,7 +186,7 @@ export function ProfileInfoForm({ userProfile, onUpdate }: ProfileInfoFormProps)
 
             {/* Bio */}
             <form.Field
-              name="bio"
+              name="profile.bio"
               validators={{
                 onChange: ({ value }) => {
                   if (value && value.length > 500) return "Bio must be less than 500 characters";
@@ -217,7 +219,7 @@ export function ProfileInfoForm({ userProfile, onUpdate }: ProfileInfoFormProps)
             {/* Contact Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <form.Field
-                name="phoneNumber"
+                name="profile.phoneNumber"
                 validators={{
                   onChange: ({ value }) => {
                     if (value && !/^[\+]?[\s\-\(\)]*([0-9][\s\-\(\)]?){10,}$/.test(value)) {
@@ -247,7 +249,7 @@ export function ProfileInfoForm({ userProfile, onUpdate }: ProfileInfoFormProps)
               </form.Field>
 
               <form.Field
-                name="dateOfBirth"
+                name="profile.dateOfBirth"
                 validators={{
                   onChange: ({ value }) => {
                     if (value && new Date(value) > new Date()) {
@@ -279,7 +281,7 @@ export function ProfileInfoForm({ userProfile, onUpdate }: ProfileInfoFormProps)
             {/* Location and Website */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <form.Field
-                name="location"
+                name="profile.location"
                 validators={{
                   onChange: ({ value }) => {
                     if (value && value.length > 100) return "Location must be less than 100 characters";
@@ -306,7 +308,7 @@ export function ProfileInfoForm({ userProfile, onUpdate }: ProfileInfoFormProps)
               </form.Field>
 
               <form.Field
-                name="website"
+                name="profile.website"
                 validators={{
                   onChange: ({ value }) => {
                     if (value && !/^https?:\/\/.+/.test(value)) {
@@ -337,13 +339,13 @@ export function ProfileInfoForm({ userProfile, onUpdate }: ProfileInfoFormProps)
             </div>
 
             {/* Privacy Settings */}
-            <form.Field name="isPublic">
+            <form.Field name="profile.isPublic">
               {(field) => (
                 <div className="flex items-center space-x-2">
                   <Switch
                     id={field.name}
-                    checked={field.state.value}
-                    onCheckedChange={(checked) => field.handleChange(checked)}
+                    isSelected={field.state.value}
+                    onChange={(checked) => field.handleChange(checked)}
                   />
                   <Label htmlFor={field.name} className="text-sm font-medium">
                     Make profile public

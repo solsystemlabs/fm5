@@ -14,6 +14,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PublicRouteImport } from './routes/_public'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthProfileRouteImport } from './routes/_auth/profile'
 import { Route as AuthProductsRouteImport } from './routes/_auth/products'
 import { Route as AuthModelsRouteImport } from './routes/_auth/models'
 import { Route as AuthInventoryRouteImport } from './routes/_auth/inventory'
@@ -23,9 +24,12 @@ import { Route as PublicLoginIndexRouteImport } from './routes/_public/login.ind
 import { Route as AuthFilamentFilamentIdRouteImport } from './routes/_auth/filament.$filamentId'
 import { ServerRoute as ApiModelsServerRouteImport } from './routes/api/models'
 import { ServerRoute as ApiModelCategoriesServerRouteImport } from './routes/api/model-categories'
+import { ServerRoute as ApiMetricsServerRouteImport } from './routes/api/metrics'
 import { ServerRoute as ApiMaterialTypesServerRouteImport } from './routes/api/material-types'
+import { ServerRoute as ApiHealthServerRouteImport } from './routes/api/health'
 import { ServerRoute as ApiFilamentsServerRouteImport } from './routes/api/filaments'
 import { ServerRoute as ApiBrandsServerRouteImport } from './routes/api/brands'
+import { ServerRoute as ApiUsersMeServerRouteImport } from './routes/api/users/me'
 import { ServerRoute as ApiFilamentsFilamentIdServerRouteImport } from './routes/api/filaments.$filamentId'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 import { ServerRoute as ApiFilamentsFilamentIdModelsServerRouteImport } from './routes/api/filaments.$filamentId.models'
@@ -44,6 +48,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthProfileRoute = AuthProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AuthProductsRoute = AuthProductsRouteImport.update({
   id: '/products',
@@ -91,9 +100,19 @@ const ApiModelCategoriesServerRoute =
     path: '/api/model-categories',
     getParentRoute: () => rootServerRouteImport,
   } as any)
+const ApiMetricsServerRoute = ApiMetricsServerRouteImport.update({
+  id: '/api/metrics',
+  path: '/api/metrics',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
 const ApiMaterialTypesServerRoute = ApiMaterialTypesServerRouteImport.update({
   id: '/api/material-types',
   path: '/api/material-types',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiHealthServerRoute = ApiHealthServerRouteImport.update({
+  id: '/api/health',
+  path: '/api/health',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiFilamentsServerRoute = ApiFilamentsServerRouteImport.update({
@@ -104,6 +123,11 @@ const ApiFilamentsServerRoute = ApiFilamentsServerRouteImport.update({
 const ApiBrandsServerRoute = ApiBrandsServerRouteImport.update({
   id: '/api/brands',
   path: '/api/brands',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiUsersMeServerRoute = ApiUsersMeServerRouteImport.update({
+  id: '/api/users/me',
+  path: '/api/users/me',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiFilamentsFilamentIdServerRoute =
@@ -131,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/inventory': typeof AuthInventoryRoute
   '/models': typeof AuthModelsRoute
   '/products': typeof AuthProductsRoute
+  '/profile': typeof AuthProfileRoute
   '/filament/$filamentId': typeof AuthFilamentFilamentIdRoute
   '/login': typeof PublicLoginIndexRoute
 }
@@ -141,6 +166,7 @@ export interface FileRoutesByTo {
   '/inventory': typeof AuthInventoryRoute
   '/models': typeof AuthModelsRoute
   '/products': typeof AuthProductsRoute
+  '/profile': typeof AuthProfileRoute
   '/filament/$filamentId': typeof AuthFilamentFilamentIdRoute
   '/login': typeof PublicLoginIndexRoute
 }
@@ -154,6 +180,7 @@ export interface FileRoutesById {
   '/_auth/inventory': typeof AuthInventoryRoute
   '/_auth/models': typeof AuthModelsRoute
   '/_auth/products': typeof AuthProductsRoute
+  '/_auth/profile': typeof AuthProfileRoute
   '/_auth/filament/$filamentId': typeof AuthFilamentFilamentIdRoute
   '/_public/login/': typeof PublicLoginIndexRoute
 }
@@ -166,6 +193,7 @@ export interface FileRouteTypes {
     | '/inventory'
     | '/models'
     | '/products'
+    | '/profile'
     | '/filament/$filamentId'
     | '/login'
   fileRoutesByTo: FileRoutesByTo
@@ -176,6 +204,7 @@ export interface FileRouteTypes {
     | '/inventory'
     | '/models'
     | '/products'
+    | '/profile'
     | '/filament/$filamentId'
     | '/login'
   id:
@@ -188,6 +217,7 @@ export interface FileRouteTypes {
     | '/_auth/inventory'
     | '/_auth/models'
     | '/_auth/products'
+    | '/_auth/profile'
     | '/_auth/filament/$filamentId'
     | '/_public/login/'
   fileRoutesById: FileRoutesById
@@ -200,32 +230,41 @@ export interface RootRouteChildren {
 export interface FileServerRoutesByFullPath {
   '/api/brands': typeof ApiBrandsServerRoute
   '/api/filaments': typeof ApiFilamentsServerRouteWithChildren
+  '/api/health': typeof ApiHealthServerRoute
   '/api/material-types': typeof ApiMaterialTypesServerRoute
+  '/api/metrics': typeof ApiMetricsServerRoute
   '/api/model-categories': typeof ApiModelCategoriesServerRoute
   '/api/models': typeof ApiModelsServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRouteWithChildren
+  '/api/users/me': typeof ApiUsersMeServerRoute
   '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
 }
 export interface FileServerRoutesByTo {
   '/api/brands': typeof ApiBrandsServerRoute
   '/api/filaments': typeof ApiFilamentsServerRouteWithChildren
+  '/api/health': typeof ApiHealthServerRoute
   '/api/material-types': typeof ApiMaterialTypesServerRoute
+  '/api/metrics': typeof ApiMetricsServerRoute
   '/api/model-categories': typeof ApiModelCategoriesServerRoute
   '/api/models': typeof ApiModelsServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRouteWithChildren
+  '/api/users/me': typeof ApiUsersMeServerRoute
   '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
   '/api/brands': typeof ApiBrandsServerRoute
   '/api/filaments': typeof ApiFilamentsServerRouteWithChildren
+  '/api/health': typeof ApiHealthServerRoute
   '/api/material-types': typeof ApiMaterialTypesServerRoute
+  '/api/metrics': typeof ApiMetricsServerRoute
   '/api/model-categories': typeof ApiModelCategoriesServerRoute
   '/api/models': typeof ApiModelsServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRouteWithChildren
+  '/api/users/me': typeof ApiUsersMeServerRoute
   '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
 }
 export interface FileServerRouteTypes {
@@ -233,41 +272,53 @@ export interface FileServerRouteTypes {
   fullPaths:
     | '/api/brands'
     | '/api/filaments'
+    | '/api/health'
     | '/api/material-types'
+    | '/api/metrics'
     | '/api/model-categories'
     | '/api/models'
     | '/api/auth/$'
     | '/api/filaments/$filamentId'
+    | '/api/users/me'
     | '/api/filaments/$filamentId/models'
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
     | '/api/brands'
     | '/api/filaments'
+    | '/api/health'
     | '/api/material-types'
+    | '/api/metrics'
     | '/api/model-categories'
     | '/api/models'
     | '/api/auth/$'
     | '/api/filaments/$filamentId'
+    | '/api/users/me'
     | '/api/filaments/$filamentId/models'
   id:
     | '__root__'
     | '/api/brands'
     | '/api/filaments'
+    | '/api/health'
     | '/api/material-types'
+    | '/api/metrics'
     | '/api/model-categories'
     | '/api/models'
     | '/api/auth/$'
     | '/api/filaments/$filamentId'
+    | '/api/users/me'
     | '/api/filaments/$filamentId/models'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
   ApiBrandsServerRoute: typeof ApiBrandsServerRoute
   ApiFilamentsServerRoute: typeof ApiFilamentsServerRouteWithChildren
+  ApiHealthServerRoute: typeof ApiHealthServerRoute
   ApiMaterialTypesServerRoute: typeof ApiMaterialTypesServerRoute
+  ApiMetricsServerRoute: typeof ApiMetricsServerRoute
   ApiModelCategoriesServerRoute: typeof ApiModelCategoriesServerRoute
   ApiModelsServerRoute: typeof ApiModelsServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
+  ApiUsersMeServerRoute: typeof ApiUsersMeServerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -292,6 +343,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_auth/profile': {
+      id: '/_auth/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthProfileRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/_auth/products': {
       id: '/_auth/products'
@@ -360,11 +418,25 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiModelCategoriesServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/metrics': {
+      id: '/api/metrics'
+      path: '/api/metrics'
+      fullPath: '/api/metrics'
+      preLoaderRoute: typeof ApiMetricsServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/material-types': {
       id: '/api/material-types'
       path: '/api/material-types'
       fullPath: '/api/material-types'
       preLoaderRoute: typeof ApiMaterialTypesServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/health': {
+      id: '/api/health'
+      path: '/api/health'
+      fullPath: '/api/health'
+      preLoaderRoute: typeof ApiHealthServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/filaments': {
@@ -379,6 +451,13 @@ declare module '@tanstack/react-start/server' {
       path: '/api/brands'
       fullPath: '/api/brands'
       preLoaderRoute: typeof ApiBrandsServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/users/me': {
+      id: '/api/users/me'
+      path: '/api/users/me'
+      fullPath: '/api/users/me'
+      preLoaderRoute: typeof ApiUsersMeServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/filaments/$filamentId': {
@@ -411,6 +490,7 @@ interface AuthRouteChildren {
   AuthInventoryRoute: typeof AuthInventoryRoute
   AuthModelsRoute: typeof AuthModelsRoute
   AuthProductsRoute: typeof AuthProductsRoute
+  AuthProfileRoute: typeof AuthProfileRoute
   AuthFilamentFilamentIdRoute: typeof AuthFilamentFilamentIdRoute
 }
 
@@ -420,6 +500,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthInventoryRoute: AuthInventoryRoute,
   AuthModelsRoute: AuthModelsRoute,
   AuthProductsRoute: AuthProductsRoute,
+  AuthProfileRoute: AuthProfileRoute,
   AuthFilamentFilamentIdRoute: AuthFilamentFilamentIdRoute,
 }
 
@@ -474,10 +555,13 @@ export const routeTree = rootRouteImport
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiBrandsServerRoute: ApiBrandsServerRoute,
   ApiFilamentsServerRoute: ApiFilamentsServerRouteWithChildren,
+  ApiHealthServerRoute: ApiHealthServerRoute,
   ApiMaterialTypesServerRoute: ApiMaterialTypesServerRoute,
+  ApiMetricsServerRoute: ApiMetricsServerRoute,
   ApiModelCategoriesServerRoute: ApiModelCategoriesServerRoute,
   ApiModelsServerRoute: ApiModelsServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
+  ApiUsersMeServerRoute: ApiUsersMeServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport
   ._addFileChildren(rootServerRouteChildren)

@@ -1,0 +1,122 @@
+# Prometheus Alert Rules for FM5 Application
+
+groups:
+  # Application Health Alerts
+  - name: fm5_application
+    rules:
+      - alert: ApplicationDown
+        expr: up{job="fm5-app"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "FM5 Application is down"
+          description: "FM5 application has been down for more than 5 minutes."
+
+      - alert: HighErrorRate
+        expr: rate(fm5_http_requests_total{status=~"5.."}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }} errors per second for the last 5 minutes."
+
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(fm5_http_request_duration_seconds_bucket[5m])) > 2
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time"
+          description: "95th percentile response time is {{ $value }} seconds."
+
+  # Database Alerts
+  - name: fm5_database
+    rules:
+      - alert: DatabaseDown
+        expr: fm5_database_error == 1
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database connection error"
+          description: "Cannot connect to the database for more than 2 minutes."
+
+      - alert: DatabaseConnectionsHigh
+        expr: pg_stat_database_numbackends > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High number of database connections"
+          description: "Database has {{ $value }} active connections."
+
+      - alert: DatabaseSlowQueries
+        expr: rate(pg_stat_statements_mean_time[5m]) > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow database queries detected"
+          description: "Average query time is {{ $value }}ms."
+
+  # System Resource Alerts
+  - name: fm5_system
+    rules:
+      - alert: HighMemoryUsage
+        expr: (nodejs_memory_usage_bytes{type="heap_used"} / nodejs_memory_usage_bytes{type="heap_total"}) * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value }}% of available heap."
+
+      - alert: HighCPUUsage
+        expr: rate(process_cpu_user_seconds_total[5m]) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}%."
+
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < 10
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Low disk space"
+          description: "Disk space is {{ $value }}% full."
+
+  # Business Logic Alerts
+  - name: fm5_business
+    rules:
+      - alert: NoUserRegistrations
+        expr: increase(fm5_users_total[24h]) == 0
+        for: 1h
+        labels:
+          severity: info
+        annotations:
+          summary: "No new user registrations"
+          description: "No new users have registered in the last 24 hours."
+
+      - alert: HighFailedLogins
+        expr: rate(fm5_failed_logins_total[5m]) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High failed login rate"
+          description: "Failed login rate is {{ $value }} per second."
+
+      - alert: UnusualDataActivity
+        expr: rate(fm5_filaments_total[1h]) > 100
+        for: 30m
+        labels:
+          severity: info
+        annotations:
+          summary: "Unusual data creation activity"
+          description: "More than 100 filaments created in the last hour."

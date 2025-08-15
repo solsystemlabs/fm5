@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { FilamentsTable } from '@/components/FilamentsTable'
 import { AddFilamentDialog } from '@/components/AddFilamentDialog'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/aria/button'
 import { useFilaments } from '@/lib/api-hooks'
 
 export const Route = createFileRoute('/_auth/filaments')({

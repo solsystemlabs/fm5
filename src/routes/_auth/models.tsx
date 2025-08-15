@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { ModelsTable } from '@/components/ModelsTable'
 import { AddModelDialog } from '@/components/AddModelDialog'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/aria/button'
 import { useModels } from '@/lib/api-hooks'
 
 export const Route = createFileRoute('/_auth/models')({

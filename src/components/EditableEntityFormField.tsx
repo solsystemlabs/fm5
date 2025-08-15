@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Button } from '@/components/aria/button'
+import { Input } from '@/components/aria/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/aria/select'
 
 interface Entity {
   id: number
@@ -74,16 +74,16 @@ export function EditableEntityFormField({
             disabled={isCreating}
           />
           <Button 
-            onClick={handleCreateNew} 
-            disabled={isCreating || !newEntityName.trim()}
+            onPress={handleCreateNew} 
+            isDisabled={isCreating || !newEntityName.trim()}
             size="sm"
           >
             Add
           </Button>
           <Button 
             variant="outline" 
-            onClick={handleCancelNew} 
-            disabled={isCreating}
+            onPress={handleCancelNew} 
+            isDisabled={isCreating}
             size="sm"
           >
             Cancel

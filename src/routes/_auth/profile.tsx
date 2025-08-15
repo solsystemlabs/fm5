@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/aria/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/aria/tabs';
 import { ProfileInfoForm } from '@/components/profile/ProfileInfoForm';
 import { SecurityForm } from '@/components/profile/SecurityForm';
 import { SettingsForm } from '@/components/profile/SettingsForm';

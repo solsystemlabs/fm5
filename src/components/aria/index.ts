@@ -71,3 +71,4 @@ export {
   type SelectItemProps,
   type SelectValueProps
 } from "./select"
+export { Tabs, TabsList, TabsTrigger, TabsContent } from "./tabs"

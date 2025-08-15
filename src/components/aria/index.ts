@@ -34,3 +34,5 @@ export {
   type CardDescriptionProps,
   type CardContentProps
 } from "./card"
+export { Textarea, textareaVariants, type TextareaProps } from "./textarea"
+export { Switch, switchVariants, type SwitchProps } from "./switch"

@@ -3,12 +3,10 @@ import {
   createRootRoute,
   HeadContent,
   Outlet,
-  redirect,
   Scripts,
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import Header from "../components/layout/Header";
-import { authClient } from "../lib/auth-client";
 import appCss from "../styles/global.css?url";
 
 const queryClient = new QueryClient();
@@ -25,26 +23,6 @@ export const Route = createRootRoute({
       { rel: "stylesheet", href: appCss },
     ],
   }),
-  beforeLoad: async ({ location }) => {
-    // Skip auth check for public routes
-    if (location.pathname === "/login" || location.pathname === "/") {
-      return {};
-    }
-
-    // Check authentication for all other routes
-    const session = await authClient.getSession();
-    if (!session?.data?.session) {
-      throw redirect({
-        to: "/login",
-        search: { redirect: location.pathname },
-      });
-    }
-
-    return {
-      user: session.data.user,
-      session: session.data.session,
-    };
-  },
   component: RootComponent,
   notFoundComponent: () => (
     <div className="flex w-full h-full justify-center items-center text-lg">

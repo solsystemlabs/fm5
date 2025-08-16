@@ -10,6 +10,7 @@ import { Input } from "@/components/aria/input";
 import { Label } from "@/components/aria/label";
 import { cn } from "@/lib/utils";
 import { useForm } from "@tanstack/react-form";
+import { useQueryClient } from "@tanstack/react-query";
 import { authClient } from "../lib/auth-client";
 import { useRouter, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
@@ -24,7 +25,8 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
-  const search = useSearch({ from: "/_public/login/" });
+  const queryClient = useQueryClient();
+  const search = useSearch({ from: "/login" });
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const form = useForm({
@@ -46,8 +48,10 @@ export function LoginForm({
           return;
         }
 
-        // Successful login - redirect to intended page or dashboard
-        const redirectTo = (search as any)?.redirect || "/products";
+        // Successful login - invalidate session cache and redirect
+        await queryClient.invalidateQueries({ queryKey: ["session"] });
+        
+        const redirectTo = (search as any)?.redirect || "/dashboard";
         await router.navigate({ to: redirectTo });
       } catch (err) {
         setLoginError("An unexpected error occurred. Please try again.");

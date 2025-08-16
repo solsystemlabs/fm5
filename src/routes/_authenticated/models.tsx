@@ -4,7 +4,7 @@ import { AddModelDialog } from '@/components/AddModelDialog'
 import { Button } from '@/components/aria/button'
 import { useModels } from '@/lib/api-hooks'
 
-export const Route = createFileRoute('/_auth/models')({
+export const Route = createFileRoute('/_authenticated/models')({
   component: ModelsPage,
 })
 

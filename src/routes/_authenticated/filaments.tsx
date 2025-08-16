@@ -4,7 +4,7 @@ import { AddFilamentDialog } from '@/components/AddFilamentDialog'
 import { Button } from '@/components/aria/button'
 import { useFilaments } from '@/lib/api-hooks'
 
-export const Route = createFileRoute('/_auth/filaments')({
+export const Route = createFileRoute('/_authenticated/filaments')({
   component: FilamentsPage,
 })
 

@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
+import { authClient } from "../lib/auth-client";
 import * as fs from "node:fs";
 const filePath = "count.txt";
 
@@ -16,6 +17,15 @@ const getCount = createServerFn({
 });
 
 export const Route = createFileRoute("/")({
+  beforeLoad: async () => {
+    // Check if user is authenticated
+    const session = await authClient.getSession();
+    
+    if (session?.data?.session) {
+      // User is authenticated, redirect to dashboard
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: Home,
   loader: async () => await getCount(),
 });

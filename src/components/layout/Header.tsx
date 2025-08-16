@@ -3,10 +3,10 @@ import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Link } from "@tanstack/react-router";
 import { authClient } from "../../lib/auth-client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const navigation = [
-  { name: "Home", href: "/dashboard" },
+  { name: "Dashboard", href: "/dashboard" },
   { name: "Products", href: "/products" },
   { name: "Models", href: "/models" },
   { name: "Filaments", href: "/filaments" },
@@ -16,6 +16,7 @@ const navigation = [
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: session, isLoading } = useQuery({
     queryKey: ["session"],
@@ -24,6 +25,8 @@ export default function Header() {
 
   const handleSignOut = async () => {
     await authClient.signOut();
+    // Invalidate session cache after sign out
+    await queryClient.invalidateQueries({ queryKey: ["session"] });
     window.location.href = "/";
   };
 

@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/aria/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/aria/tabs';
 import { ProfileInfoForm } from '@/components/profile/ProfileInfoForm';
@@ -9,17 +9,8 @@ import { AvatarUpload } from '@/components/profile/AvatarUpload';
 import { User, Shield, Settings, Activity } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import type { UserProfileResponse } from '@/lib/types';
-import { authClient } from '@/lib/auth-client';
 
-export const Route = createFileRoute('/_auth/profile')({
-  beforeLoad: async () => {
-    const session = await authClient.getSession();
-    
-    if (!session?.data?.session) {
-      // User is not logged in, redirect to login
-      throw redirect({ to: '/login', search: { redirect: '/profile' } });
-    }
-  },
+export const Route = createFileRoute('/_authenticated/profile')({
   component: ProfilePage,
 });
 

@@ -20,6 +20,10 @@ import { Route as AuthenticatedModelsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
 import { Route as AuthenticatedFilamentsRouteImport } from './routes/_authenticated/filaments'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile/index'
+import { Route as AuthenticatedProfileSettingsRouteImport } from './routes/_authenticated/profile/settings'
+import { Route as AuthenticatedProfileSecurityRouteImport } from './routes/_authenticated/profile/security'
+import { Route as AuthenticatedProfileActivityRouteImport } from './routes/_authenticated/profile/activity'
 import { Route as AuthenticatedFilamentFilamentIdRouteImport } from './routes/_authenticated/filament.$filamentId'
 import { ServerRoute as ApiModelsServerRouteImport } from './routes/api/models'
 import { ServerRoute as ApiModelCategoriesServerRouteImport } from './routes/api/model-categories'
@@ -79,6 +83,30 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedProfileIndexRoute =
+  AuthenticatedProfileIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedProfileRoute,
+  } as any)
+const AuthenticatedProfileSettingsRoute =
+  AuthenticatedProfileSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedProfileRoute,
+  } as any)
+const AuthenticatedProfileSecurityRoute =
+  AuthenticatedProfileSecurityRouteImport.update({
+    id: '/security',
+    path: '/security',
+    getParentRoute: () => AuthenticatedProfileRoute,
+  } as any)
+const AuthenticatedProfileActivityRoute =
+  AuthenticatedProfileActivityRouteImport.update({
+    id: '/activity',
+    path: '/activity',
+    getParentRoute: () => AuthenticatedProfileRoute,
+  } as any)
 const AuthenticatedFilamentFilamentIdRoute =
   AuthenticatedFilamentFilamentIdRouteImport.update({
     id: '/filament/$filamentId',
@@ -152,8 +180,12 @@ export interface FileRoutesByFullPath {
   '/inventory': typeof AuthenticatedInventoryRoute
   '/models': typeof AuthenticatedModelsRoute
   '/products': typeof AuthenticatedProductsRoute
-  '/profile': typeof AuthenticatedProfileRoute
+  '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/filament/$filamentId': typeof AuthenticatedFilamentFilamentIdRoute
+  '/profile/activity': typeof AuthenticatedProfileActivityRoute
+  '/profile/security': typeof AuthenticatedProfileSecurityRoute
+  '/profile/settings': typeof AuthenticatedProfileSettingsRoute
+  '/profile/': typeof AuthenticatedProfileIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -163,8 +195,11 @@ export interface FileRoutesByTo {
   '/inventory': typeof AuthenticatedInventoryRoute
   '/models': typeof AuthenticatedModelsRoute
   '/products': typeof AuthenticatedProductsRoute
-  '/profile': typeof AuthenticatedProfileRoute
   '/filament/$filamentId': typeof AuthenticatedFilamentFilamentIdRoute
+  '/profile/activity': typeof AuthenticatedProfileActivityRoute
+  '/profile/security': typeof AuthenticatedProfileSecurityRoute
+  '/profile/settings': typeof AuthenticatedProfileSettingsRoute
+  '/profile': typeof AuthenticatedProfileIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -176,8 +211,12 @@ export interface FileRoutesById {
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
   '/_authenticated/models': typeof AuthenticatedModelsRoute
   '/_authenticated/products': typeof AuthenticatedProductsRoute
-  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRouteWithChildren
   '/_authenticated/filament/$filamentId': typeof AuthenticatedFilamentFilamentIdRoute
+  '/_authenticated/profile/activity': typeof AuthenticatedProfileActivityRoute
+  '/_authenticated/profile/security': typeof AuthenticatedProfileSecurityRoute
+  '/_authenticated/profile/settings': typeof AuthenticatedProfileSettingsRoute
+  '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -191,6 +230,10 @@ export interface FileRouteTypes {
     | '/products'
     | '/profile'
     | '/filament/$filamentId'
+    | '/profile/activity'
+    | '/profile/security'
+    | '/profile/settings'
+    | '/profile/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -200,8 +243,11 @@ export interface FileRouteTypes {
     | '/inventory'
     | '/models'
     | '/products'
-    | '/profile'
     | '/filament/$filamentId'
+    | '/profile/activity'
+    | '/profile/security'
+    | '/profile/settings'
+    | '/profile'
   id:
     | '__root__'
     | '/'
@@ -214,6 +260,10 @@ export interface FileRouteTypes {
     | '/_authenticated/products'
     | '/_authenticated/profile'
     | '/_authenticated/filament/$filamentId'
+    | '/_authenticated/profile/activity'
+    | '/_authenticated/profile/security'
+    | '/_authenticated/profile/settings'
+    | '/_authenticated/profile/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -380,6 +430,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/profile/': {
+      id: '/_authenticated/profile/'
+      path: '/'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof AuthenticatedProfileIndexRouteImport
+      parentRoute: typeof AuthenticatedProfileRoute
+    }
+    '/_authenticated/profile/settings': {
+      id: '/_authenticated/profile/settings'
+      path: '/settings'
+      fullPath: '/profile/settings'
+      preLoaderRoute: typeof AuthenticatedProfileSettingsRouteImport
+      parentRoute: typeof AuthenticatedProfileRoute
+    }
+    '/_authenticated/profile/security': {
+      id: '/_authenticated/profile/security'
+      path: '/security'
+      fullPath: '/profile/security'
+      preLoaderRoute: typeof AuthenticatedProfileSecurityRouteImport
+      parentRoute: typeof AuthenticatedProfileRoute
+    }
+    '/_authenticated/profile/activity': {
+      id: '/_authenticated/profile/activity'
+      path: '/activity'
+      fullPath: '/profile/activity'
+      preLoaderRoute: typeof AuthenticatedProfileActivityRouteImport
+      parentRoute: typeof AuthenticatedProfileRoute
+    }
     '/_authenticated/filament/$filamentId': {
       id: '/_authenticated/filament/$filamentId'
       path: '/filament/$filamentId'
@@ -471,13 +549,30 @@ declare module '@tanstack/react-start/server' {
   }
 }
 
+interface AuthenticatedProfileRouteChildren {
+  AuthenticatedProfileActivityRoute: typeof AuthenticatedProfileActivityRoute
+  AuthenticatedProfileSecurityRoute: typeof AuthenticatedProfileSecurityRoute
+  AuthenticatedProfileSettingsRoute: typeof AuthenticatedProfileSettingsRoute
+  AuthenticatedProfileIndexRoute: typeof AuthenticatedProfileIndexRoute
+}
+
+const AuthenticatedProfileRouteChildren: AuthenticatedProfileRouteChildren = {
+  AuthenticatedProfileActivityRoute: AuthenticatedProfileActivityRoute,
+  AuthenticatedProfileSecurityRoute: AuthenticatedProfileSecurityRoute,
+  AuthenticatedProfileSettingsRoute: AuthenticatedProfileSettingsRoute,
+  AuthenticatedProfileIndexRoute: AuthenticatedProfileIndexRoute,
+}
+
+const AuthenticatedProfileRouteWithChildren =
+  AuthenticatedProfileRoute._addFileChildren(AuthenticatedProfileRouteChildren)
+
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFilamentsRoute: typeof AuthenticatedFilamentsRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
   AuthenticatedModelsRoute: typeof AuthenticatedModelsRoute
   AuthenticatedProductsRoute: typeof AuthenticatedProductsRoute
-  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRouteWithChildren
   AuthenticatedFilamentFilamentIdRoute: typeof AuthenticatedFilamentFilamentIdRoute
 }
 
@@ -487,7 +582,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
   AuthenticatedModelsRoute: AuthenticatedModelsRoute,
   AuthenticatedProductsRoute: AuthenticatedProductsRoute,
-  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRouteWithChildren,
   AuthenticatedFilamentFilamentIdRoute: AuthenticatedFilamentFilamentIdRoute,
 }
 

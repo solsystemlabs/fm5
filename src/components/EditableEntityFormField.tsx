@@ -90,18 +90,18 @@ export function EditableEntityFormField({
           </Button>
         </div>
       ) : (
-        <Select value={value} onValueChange={handleSelectChange}>
+        <Select selectedKey={value} onSelectionChange={(key) => handleSelectChange(key as string)}>
           <SelectTrigger>
             <SelectValue placeholder={`Select a ${label.toLowerCase()}`} />
           </SelectTrigger>
           <SelectContent>
             {entities.map((entity) => (
-              <SelectItem key={entity.id} value={entity.name}>
+              <SelectItem key={entity.id} id={entity.name}>
                 {entity.name}
               </SelectItem>
             ))}
             {allowCreateNew && (
-              <SelectItem value="CREATE_NEW">
+              <SelectItem id="CREATE_NEW">
                 <div className="flex items-center gap-2">
                   <Plus className="h-4 w-4" />
                   Create new {label.toLowerCase()}

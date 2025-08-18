@@ -140,7 +140,7 @@ class ApplicationMonitoring {
           unit: 'milliseconds'
         })
         
-        logger.performance(name, duration, { error: true })
+        logger.performance(name, duration, { error })
         throw error
       })
   }

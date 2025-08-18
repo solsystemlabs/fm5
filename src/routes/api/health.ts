@@ -9,6 +9,7 @@ export const ServerRoute = createServerFileRoute('/api/health').methods({
       uptime: process.uptime(),
       environment: process.env.NODE_ENV,
       version: process.env.npm_package_version || '1.0.0',
+      memory: {} as any,
       checks: {
         database: 'unknown',
         redis: 'unknown',

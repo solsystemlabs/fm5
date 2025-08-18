@@ -7,7 +7,6 @@ import {
   Heading,
   type DialogProps as AriaDialogProps,
   type DialogTriggerProps as AriaDialogTriggerProps,
-  type ModalProps as AriaModalProps,
   type ModalOverlayProps as AriaModalOverlayProps,
   type HeadingProps
 } from "react-aria-components"
@@ -51,8 +50,8 @@ const descriptionVariants = tv({
   base: "text-sm text-muted-foreground",
 })
 
-export interface DialogProps extends AriaDialogProps {
-  className?: string | ((states: any) => string)
+export interface DialogProps extends AriaDialogTriggerProps {
+  className?: string
 }
 
 export interface DialogTriggerProps extends AriaDialogTriggerProps {}
@@ -61,14 +60,10 @@ export interface ModalOverlayProps extends AriaModalOverlayProps {
   className?: string | ((states: any) => string)
 }
 
-export interface ModalProps extends AriaModalProps {
-  className?: string | ((states: any) => string)
-}
-
-export interface DialogContentProps extends AriaModalProps {
+export interface DialogContentProps extends AriaModalOverlayProps {
   className?: string | ((states: any) => string)
   showCloseButton?: boolean
-  children?: React.ReactNode
+  children?: React.ReactNode | ((props: any) => React.ReactNode)
 }
 
 export interface DialogHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
@@ -76,7 +71,7 @@ export interface DialogHeaderProps extends React.HTMLAttributes<HTMLDivElement> 
 export interface DialogFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export interface DialogTitleProps extends HeadingProps {
-  className?: string | ((states: any) => string)
+  className?: string
 }
 
 export interface DialogDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
@@ -116,15 +111,15 @@ function DialogContent({
         }}
       >
         <AriaDialog className="outline-none">
-          {({ close }) => (
+          {(props) => (
             <>
-              {children}
+              {typeof children === 'function' ? children(props) : children}
               {showCloseButton && (
                 <Button
                   variant="ghost"
                   size="icon"
                   className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none h-6 w-6"
-                  onPress={close}
+                  onPress={props.close}
                 >
                   <XIcon className="h-4 w-4" />
                   <span className="sr-only">Close</span>
@@ -169,13 +164,7 @@ function DialogTitle({
   return (
     <Heading
       slot="title"
-      className={(renderProps) => {
-        const computedClassName = typeof className === "function" 
-          ? className(renderProps)
-          : className
-        
-        return cn(titleVariants(), computedClassName)
-      }}
+      className={cn(titleVariants(), className)}
       {...props}
     />
   )

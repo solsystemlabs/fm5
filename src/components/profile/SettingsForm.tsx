@@ -97,8 +97,8 @@ export function SettingsForm({ userProfile, onUpdate }: SettingsFormProps) {
                       </p>
                     </div>
                     <Switch
-                      checked={field.state.value}
-                      onCheckedChange={(checked) => field.handleChange(checked)}
+                      isSelected={field.state.value}
+                      onChange={(isSelected) => field.handleChange(isSelected)}
                     />
                   </div>
                 )}
@@ -114,8 +114,8 @@ export function SettingsForm({ userProfile, onUpdate }: SettingsFormProps) {
                       </p>
                     </div>
                     <Switch
-                      checked={field.state.value}
-                      onCheckedChange={(checked) => field.handleChange(checked)}
+                      isSelected={field.state.value}
+                      onChange={(isSelected) => field.handleChange(isSelected)}
                     />
                   </div>
                 )}
@@ -134,8 +134,8 @@ export function SettingsForm({ userProfile, onUpdate }: SettingsFormProps) {
                       </div>
                     </div>
                     <Switch
-                      checked={field.state.value}
-                      onCheckedChange={(checked) => field.handleChange(checked)}
+                      isSelected={field.state.value}
+                      onChange={(isSelected) => field.handleChange(isSelected)}
                     />
                   </div>
                 )}
@@ -162,14 +162,14 @@ export function SettingsForm({ userProfile, onUpdate }: SettingsFormProps) {
               <div className="space-y-3">
                 <Label className="text-base">Profile Visibility</Label>
                 <Select
-                  value={field.state.value}
-                  onValueChange={(value) => field.handleChange(value as 'PUBLIC' | 'PRIVATE' | 'FRIENDS_ONLY')}
+                  selectedKey={field.state.value}
+                  onSelectionChange={(key) => field.handleChange(key as 'PUBLIC' | 'PRIVATE' | 'FRIENDS_ONLY')}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="PUBLIC">
+                    <SelectItem id="PUBLIC">
                       <div className="flex items-center gap-2">
                         <Globe className="h-4 w-4" />
                         <div>
@@ -178,7 +178,7 @@ export function SettingsForm({ userProfile, onUpdate }: SettingsFormProps) {
                         </div>
                       </div>
                     </SelectItem>
-                    <SelectItem value="FRIENDS_ONLY">
+                    <SelectItem id="FRIENDS_ONLY">
                       <div className="flex items-center gap-2">
                         <Eye className="h-4 w-4" />
                         <div>
@@ -187,7 +187,7 @@ export function SettingsForm({ userProfile, onUpdate }: SettingsFormProps) {
                         </div>
                       </div>
                     </SelectItem>
-                    <SelectItem value="PRIVATE">
+                    <SelectItem id="PRIVATE">
                       <div className="flex items-center gap-2">
                         <Settings className="h-4 w-4" />
                         <div>
@@ -224,26 +224,26 @@ export function SettingsForm({ userProfile, onUpdate }: SettingsFormProps) {
               <div className="space-y-3">
                 <Label className="text-base">Theme</Label>
                 <Select
-                  value={field.state.value}
-                  onValueChange={(value) => field.handleChange(value as 'LIGHT' | 'DARK' | 'SYSTEM')}
+                  selectedKey={field.state.value}
+                  onSelectionChange={(key) => field.handleChange(key as 'LIGHT' | 'DARK' | 'SYSTEM')}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="LIGHT">
+                    <SelectItem id="LIGHT">
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 bg-white border rounded"></div>
                         Light
                       </div>
                     </SelectItem>
-                    <SelectItem value="DARK">
+                    <SelectItem id="DARK">
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 bg-gray-900 border rounded"></div>
                         Dark
                       </div>
                     </SelectItem>
-                    <SelectItem value="SYSTEM">
+                    <SelectItem id="SYSTEM">
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 bg-gradient-to-r from-white to-gray-900 border rounded"></div>
                         System
@@ -275,21 +275,21 @@ export function SettingsForm({ userProfile, onUpdate }: SettingsFormProps) {
                 <div className="space-y-3">
                   <Label className="text-base">Language</Label>
                   <Select
-                    value={field.state.value}
-                    onValueChange={(value) => field.handleChange(value)}
+                    selectedKey={field.state.value}
+                    onSelectionChange={(key) => field.handleChange(key as string)}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="es">Español</SelectItem>
-                      <SelectItem value="fr">Français</SelectItem>
-                      <SelectItem value="de">Deutsch</SelectItem>
-                      <SelectItem value="it">Italiano</SelectItem>
-                      <SelectItem value="pt">Português</SelectItem>
-                      <SelectItem value="zh">中文</SelectItem>
-                      <SelectItem value="ja">日本語</SelectItem>
+                      <SelectItem id="en">English</SelectItem>
+                      <SelectItem id="es">Español</SelectItem>
+                      <SelectItem id="fr">Français</SelectItem>
+                      <SelectItem id="de">Deutsch</SelectItem>
+                      <SelectItem id="it">Italiano</SelectItem>
+                      <SelectItem id="pt">Português</SelectItem>
+                      <SelectItem id="zh">中文</SelectItem>
+                      <SelectItem id="ja">日本語</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -301,23 +301,23 @@ export function SettingsForm({ userProfile, onUpdate }: SettingsFormProps) {
                 <div className="space-y-3">
                   <Label className="text-base">Timezone</Label>
                   <Select
-                    value={field.state.value}
-                    onValueChange={(value) => field.handleChange(value)}
+                    selectedKey={field.state.value}
+                    onSelectionChange={(key) => field.handleChange(key as string)}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="America/New_York">Eastern Time (ET)</SelectItem>
-                      <SelectItem value="America/Chicago">Central Time (CT)</SelectItem>
-                      <SelectItem value="America/Denver">Mountain Time (MT)</SelectItem>
-                      <SelectItem value="America/Los_Angeles">Pacific Time (PT)</SelectItem>
-                      <SelectItem value="Europe/London">London (GMT)</SelectItem>
-                      <SelectItem value="Europe/Paris">Paris (CET)</SelectItem>
-                      <SelectItem value="Europe/Berlin">Berlin (CET)</SelectItem>
-                      <SelectItem value="Asia/Tokyo">Tokyo (JST)</SelectItem>
-                      <SelectItem value="Asia/Shanghai">Shanghai (CST)</SelectItem>
-                      <SelectItem value="Australia/Sydney">Sydney (AEDT)</SelectItem>
+                      <SelectItem id="America/New_York">Eastern Time (ET)</SelectItem>
+                      <SelectItem id="America/Chicago">Central Time (CT)</SelectItem>
+                      <SelectItem id="America/Denver">Mountain Time (MT)</SelectItem>
+                      <SelectItem id="America/Los_Angeles">Pacific Time (PT)</SelectItem>
+                      <SelectItem id="Europe/London">London (GMT)</SelectItem>
+                      <SelectItem id="Europe/Paris">Paris (CET)</SelectItem>
+                      <SelectItem id="Europe/Berlin">Berlin (CET)</SelectItem>
+                      <SelectItem id="Asia/Tokyo">Tokyo (JST)</SelectItem>
+                      <SelectItem id="Asia/Shanghai">Shanghai (CST)</SelectItem>
+                      <SelectItem id="Australia/Sydney">Sydney (AEDT)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

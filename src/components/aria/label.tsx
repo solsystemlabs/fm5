@@ -23,13 +23,7 @@ function Label({
 }: LabelProps) {
   return (
     <AriaLabel
-      className={(renderProps) => {
-        const computedClassName = typeof className === "function" 
-          ? className(renderProps)
-          : className
-        
-        return cn(labelVariants(), computedClassName)
-      }}
+      className={cn(labelVariants(), typeof className === "string" ? className : undefined)}
       data-slot="label"
       {...props}
     />

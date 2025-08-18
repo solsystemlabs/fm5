@@ -56,24 +56,28 @@ function TextField({
       }}
       {...props}
     >
-      {label && (
-        <Label className={labelClassName}>
-          {label}
-        </Label>
+      {(renderProps) => (
+        <>
+          {label && (
+            <Label className={labelClassName}>
+              {label}
+            </Label>
+          )}
+          <Input 
+            placeholder={placeholder}
+            className={inputClassName}
+          />
+          {description && (
+            <Text className={descriptionVariants()}>
+              {description}
+            </Text>
+          )}
+          <FieldError className={fieldErrorVariants()}>
+            {errorMessage}
+          </FieldError>
+          {typeof children === 'function' ? children(renderProps) : children}
+        </>
       )}
-      <Input 
-        placeholder={placeholder}
-        className={inputClassName}
-      />
-      {description && (
-        <Text className={descriptionVariants()}>
-          {description}
-        </Text>
-      )}
-      <FieldError className={fieldErrorVariants()}>
-        {errorMessage}
-      </FieldError>
-      {children}
     </AriaTextField>
   )
 }

@@ -32,9 +32,8 @@ export function AddModelDialog({ children }: AddModelDialogProps) {
     onSubmit: async ({ value }) => {
       try {
         await createModel.mutateAsync(value);
-        // Reset form and close dialog on success
+        // Reset form on success
         form.reset();
-        setIsOpen(false);
       } catch (error) {
         console.error("Error creating model:", error);
       }
@@ -42,8 +41,8 @@ export function AddModelDialog({ children }: AddModelDialogProps) {
   });
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Dialog>
+      <DialogTrigger>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add New Model</DialogTitle>
@@ -131,7 +130,7 @@ export function AddModelDialog({ children }: AddModelDialogProps) {
             <Button
               type="button"
               variant="outline"
-              onPress={() => setIsOpen(false)}
+              onPress={() => form.reset()}
             >
               Cancel
             </Button>

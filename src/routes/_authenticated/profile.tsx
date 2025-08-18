@@ -53,6 +53,7 @@ function ProfileLayout() {
   const location = useLocation();
   const loaderData = Route.useLoaderData();
   const context = Route.useRouteContext();
+  const [userProfile, setUserProfile] = useState<UserProfileResponse | null>(null);
   
   // Use loader data if available, otherwise fall back to context user
   let profileData;
@@ -63,7 +64,7 @@ function ProfileLayout() {
     profileData = {
       ...context.user,
       profile: {
-        bio: context.user.bio || '',
+        bio: '',
         profileViews: 0,
       },
       settings: {
@@ -74,6 +75,13 @@ function ProfileLayout() {
       }
     };
   }
+  
+  // Set the state if we have profile data
+  useEffect(() => {
+    if (profileData && !userProfile) {
+      setUserProfile(profileData);
+    }
+  }, [profileData, userProfile]);
   
   if (!profileData) {
     return (
@@ -91,7 +99,7 @@ function ProfileLayout() {
   ];
 
   return (
-    <ProfileContext.Provider value={{ userProfile: profileData, setUserProfile: setProfileData }}>
+    <ProfileContext.Provider value={{ userProfile: userProfile || profileData, setUserProfile }}>
       <div className="container mx-auto py-6 max-w-4xl">
         <div className="flex flex-col gap-6">
           {/* Profile Header */}
@@ -101,7 +109,7 @@ function ProfileLayout() {
                 <AvatarUpload
                   currentImage={profileData.image}
                   onUploadSuccess={(imageUrl) => {
-                    setProfileData(prev => prev ? { ...prev, image: imageUrl } : null);
+                    setUserProfile(prev => prev ? { ...prev, image: imageUrl } : null);
                   }}
                 />
                 <div className="flex-1">

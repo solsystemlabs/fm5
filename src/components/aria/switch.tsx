@@ -45,8 +45,12 @@ function Switch({
       data-slot="switch"
       {...props}
     >
-      <div className={switchThumbVariants()} data-slot="switch-thumb" />
-      {children}
+      {(renderProps) => (
+        <>
+          <div className={switchThumbVariants()} data-slot="switch-thumb" />
+          {typeof children === 'function' ? children(renderProps) : children}
+        </>
+      )}
     </AriaSwitch>
   )
 }

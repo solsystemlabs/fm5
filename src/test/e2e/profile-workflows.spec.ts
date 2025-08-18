@@ -65,9 +65,9 @@ test.describe('User Profile Management E2E', () => {
       await page.reload();
       await page.waitForLoadState('networkidle');
 
-      await expect(page.getByDisplayValue(updatedProfile.name)).toBeVisible();
-      await expect(page.getByDisplayValue(updatedProfile.firstName)).toBeVisible();
-      await expect(page.getByDisplayValue(updatedProfile.bio)).toBeVisible();
+      await expect(page.locator(`input[value="${updatedProfile.name}"]`)).toBeVisible();
+      await expect(page.locator(`input[value="${updatedProfile.firstName}"]`)).toBeVisible();
+      await expect(page.locator(`textarea[value="${updatedProfile.bio}"]`)).toBeVisible();
     });
 
     test('should validate form fields and show errors', async ({ page }) => {
@@ -76,7 +76,7 @@ test.describe('User Profile Management E2E', () => {
 
       // Clear required field and trigger validation
       await page.fill('[name="name"]', '');
-      await page.blur('[name="name"]');
+      await page.locator('[name="name"]').blur();
 
       // Verify error message appears
       await expect(page.getByText('Display name is required')).toBeVisible();
@@ -88,19 +88,19 @@ test.describe('User Profile Management E2E', () => {
       // Test field length validation
       const longBio = 'a'.repeat(501);
       await page.fill('[name="bio"]', longBio);
-      await page.blur('[name="bio"]');
+      await page.locator('[name="bio"]').blur();
 
       await expect(page.getByText('Bio must be less than 500 characters')).toBeVisible();
 
       // Test phone number validation
       await page.fill('[name="phoneNumber"]', 'invalid-phone');
-      await page.blur('[name="phoneNumber"]');
+      await page.locator('[name="phoneNumber"]').blur();
 
       await expect(page.getByText('Please enter a valid phone number')).toBeVisible();
 
       // Test website URL validation
       await page.fill('[name="website"]', 'invalid-url');
-      await page.blur('[name="website"]');
+      await page.locator('[name="website"]').blur();
 
       await expect(page.getByText('Website must be a valid URL starting with http:// or https://')).toBeVisible();
     });
@@ -119,7 +119,7 @@ test.describe('User Profile Management E2E', () => {
       await privacySwitch.click();
 
       // Verify the state changed
-      await expect(privacySwitch).toBeChecked(!isCurrentlyChecked);
+      await expect(privacySwitch).toBeChecked({ checked: !isCurrentlyChecked });
 
       // Submit the form to save the change
       await page.click('button:has-text("Save Changes")');
@@ -128,7 +128,7 @@ test.describe('User Profile Management E2E', () => {
       // Reload and verify the setting persists
       await page.reload();
       await page.waitForLoadState('networkidle');
-      await expect(privacySwitch).toBeChecked(!isCurrentlyChecked);
+      await expect(privacySwitch).toBeChecked({ checked: !isCurrentlyChecked });
     });
   });
 
@@ -164,13 +164,13 @@ test.describe('User Profile Management E2E', () => {
 
       // Test weak password validation
       await page.fill('[name="newPassword"]', 'weak');
-      await page.blur('[name="newPassword"]');
+      await page.locator('[name="newPassword"]').blur();
 
       await expect(page.getByText('Password must be at least 8 characters')).toBeVisible();
 
       // Test password without uppercase
       await page.fill('[name="newPassword"]', 'password123');
-      await page.blur('[name="newPassword"]');
+      await page.locator('[name="newPassword"]').blur();
 
       await expect(page.getByText('Password must contain uppercase, lowercase, and number')).toBeVisible();
 
@@ -214,13 +214,13 @@ test.describe('User Profile Management E2E', () => {
 
       // Test invalid email format
       await page.fill('[name="newEmail"]', 'invalid-email');
-      await page.blur('[name="newEmail"]');
+      await page.locator('[name="newEmail"]').blur();
 
       await expect(page.getByText('Please enter a valid email address')).toBeVisible();
 
       // Test same email as current
       await page.fill('[name="newEmail"]', testUser.email);
-      await page.blur('[name="newEmail"]');
+      await page.locator('[name="newEmail"]').blur();
 
       await expect(page.getByText('New email must be different from current email')).toBeVisible();
     });
@@ -249,9 +249,9 @@ test.describe('User Profile Management E2E', () => {
       await marketingSwitch.click();
 
       // Verify states changed
-      await expect(emailSwitch).toBeChecked(!emailCurrentState);
-      await expect(pushSwitch).toBeChecked(!pushCurrentState);
-      await expect(marketingSwitch).toBeChecked(!marketingCurrentState);
+      await expect(emailSwitch).toBeChecked({ checked: !emailCurrentState });
+      await expect(pushSwitch).toBeChecked({ checked: !pushCurrentState });
+      await expect(marketingSwitch).toBeChecked({ checked: !marketingCurrentState });
 
       // Save settings
       await page.click('button:has-text("Save Settings")');
@@ -262,9 +262,9 @@ test.describe('User Profile Management E2E', () => {
       await page.waitForLoadState('networkidle');
       await page.click('button[role="tab"]:has-text("Settings")');
 
-      await expect(emailSwitch).toBeChecked(!emailCurrentState);
-      await expect(pushSwitch).toBeChecked(!pushCurrentState);
-      await expect(marketingSwitch).toBeChecked(!marketingCurrentState);
+      await expect(emailSwitch).toBeChecked({ checked: !emailCurrentState });
+      await expect(pushSwitch).toBeChecked({ checked: !pushCurrentState });
+      await expect(marketingSwitch).toBeChecked({ checked: !marketingCurrentState });
     });
 
     test('should change theme and appearance settings', async ({ page }) => {
@@ -276,7 +276,7 @@ test.describe('User Profile Management E2E', () => {
       await page.click('[role="option"]:has-text("Dark")');
 
       // Verify selection
-      await expect(page.getByDisplayValue('DARK')).toBeVisible();
+      await expect(page.locator('input[value="DARK"], select option[value="DARK"]:checked, [data-value="DARK"]')).toBeVisible();
 
       // Save settings
       await page.click('button:has-text("Save Settings")');
@@ -287,7 +287,7 @@ test.describe('User Profile Management E2E', () => {
       await page.waitForLoadState('networkidle');
       await page.click('button[role="tab"]:has-text("Settings")');
 
-      await expect(page.getByDisplayValue('DARK')).toBeVisible();
+      await expect(page.locator('input[value="DARK"], select option[value="DARK"]:checked, [data-value="DARK"]')).toBeVisible();
     });
 
     test('should change privacy and localization settings', async ({ page }) => {
@@ -315,9 +315,9 @@ test.describe('User Profile Management E2E', () => {
       await page.waitForLoadState('networkidle');
       await page.click('button[role="tab"]:has-text("Settings")');
 
-      await expect(page.getByDisplayValue('PRIVATE')).toBeVisible();
-      await expect(page.getByDisplayValue('es')).toBeVisible();
-      await expect(page.getByDisplayValue('America/New_York')).toBeVisible();
+      await expect(page.locator('input[value="PRIVATE"], select option[value="PRIVATE"]:checked, [data-value="PRIVATE"]')).toBeVisible();
+      await expect(page.locator('input[value="es"], select option[value="es"]:checked, [data-value="es"]')).toBeVisible();
+      await expect(page.locator('input[value="America/New_York"], select option[value="America/New_York"]:checked, [data-value="America/New_York"]')).toBeVisible();
     });
   });
 
@@ -559,8 +559,8 @@ test.describe('User Profile Management E2E', () => {
       await expect(tabs).toHaveCount(4);
 
       // Check form labels
-      await expect(page.getByLabelText('Display Name')).toBeVisible();
-      await expect(page.getByLabelText('First Name')).toBeVisible();
+      await expect(page.locator('label:has-text("Display Name"), input[aria-label="Display Name"]')).toBeVisible();
+      await expect(page.locator('label:has-text("First Name"), input[aria-label="First Name"]')).toBeVisible();
 
       // Check switch labels
       await page.click('button[role="tab"]:has-text("Settings")');

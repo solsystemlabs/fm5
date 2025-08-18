@@ -39,9 +39,8 @@ export function AddFilamentDialog({ children }: AddFilamentDialogProps) {
     onSubmit: async ({ value }) => {
       try {
         await createFilament.mutateAsync(value);
-        // Reset form and close dialog on success
+        // Reset form on success
         form.reset();
-        setIsOpen(false);
       } catch (error) {
         console.error("Error creating filament:", error);
       }
@@ -49,8 +48,8 @@ export function AddFilamentDialog({ children }: AddFilamentDialogProps) {
   });
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Dialog>
+      <DialogTrigger>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add New Filament</DialogTitle>
@@ -276,7 +275,7 @@ export function AddFilamentDialog({ children }: AddFilamentDialogProps) {
             <Button
               type="button"
               variant="outline"
-              onPress={() => setIsOpen(false)}
+              onPress={() => form.reset()}
             >
               Cancel
             </Button>

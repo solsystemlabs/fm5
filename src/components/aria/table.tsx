@@ -177,11 +177,11 @@ function TableCaption({ className, ...props }: TableCaptionProps) {
 }
 
 // React Aria Table components (for interactive tables)
-export interface AriaTableProps extends AriaTableProps {
+export interface ReactAriaTableProps extends AriaTableProps {
   className?: string | ((states: any) => string)
 }
 
-function AriaTableComponent({ className, ...props }: AriaTableProps) {
+function AriaTableComponent({ className, ...props }: ReactAriaTableProps) {
   return (
     <div className="relative w-full overflow-x-auto">
       <AriaTable

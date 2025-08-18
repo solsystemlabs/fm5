@@ -12,11 +12,16 @@ global.ResizeObserver = class ResizeObserver {
 
 // Mock IntersectionObserver for tests
 global.IntersectionObserver = class IntersectionObserver {
+  root = null
+  rootMargin = ''
+  thresholds = []
+  
   constructor() {}
   observe() {}
   unobserve() {}
   disconnect() {}
-};
+  takeRecords() { return [] }
+} as any;
 
 // Mock matchMedia for tests
 Object.defineProperty(window, 'matchMedia', {

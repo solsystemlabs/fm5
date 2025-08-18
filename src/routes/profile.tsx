@@ -20,7 +20,7 @@ export const useProfileContext = () => {
   return context;
 };
 
-export const Route = createFileRoute('/_authenticated/profile')({
+export const Route = createFileRoute('/profile')({
   component: ProfileLayout,
   loader: async () => {
     const response = await fetch('/api/users/me', {

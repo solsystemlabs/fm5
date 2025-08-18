@@ -1,8 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/_authenticated/dashboard')({
+export const Route = createFileRoute("/dashboard")({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
   return (
@@ -10,10 +10,9 @@ function RouteComponent() {
       <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
       <div className="bg-white p-6 rounded-lg shadow">
         <h2 className="text-xl font-semibold mb-2">Welcome to FM5 Manager!</h2>
-        <p className="text-gray-600">
-          You are successfully authenticated and can now access all features of the application.
-        </p>
+        <p className="text-gray-600">Welcome</p>
       </div>
     </div>
-  )
+  );
 }
+

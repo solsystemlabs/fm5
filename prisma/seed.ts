@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { hashPassword } from "better-auth/crypto";
 
 const prisma = new PrismaClient();
 
@@ -16,38 +15,6 @@ async function main() {
   await prisma.account.deleteMany({});
   await prisma.user.deleteMany({});
   console.log("✅ Database cleared");
-
-  // Hash the password using better-auth
-  const hashedPassword = await hashPassword("password");
-
-  // Generate consistent user ID
-  const userId = crypto.randomUUID();
-
-  // Create admin user
-  const adminUser = await prisma.user.upsert({
-    where: { email: "admin@fm.com" },
-    update: {},
-    create: {
-      id: userId,
-      name: "Admin User",
-      email: "admin@fm.com",
-      emailVerified: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      accounts: {
-        create: {
-          id: crypto.randomUUID(),
-          accountId: "admin@fm.com",
-          providerId: "credential",
-          password: hashedPassword,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      },
-    },
-  });
-
-  console.log("✅ Admin user created:", adminUser.email);
 
   // Create material types using createMany
   await prisma.materialType.createMany({
@@ -237,4 +204,3 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
-

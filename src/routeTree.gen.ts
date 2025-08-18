@@ -11,20 +11,14 @@
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ProductsRouteImport } from './routes/products'
+import { Route as ModelsRouteImport } from './routes/models'
+import { Route as InventoryRouteImport } from './routes/inventory'
+import { Route as FilamentsRouteImport } from './routes/filaments'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
-import { Route as AuthenticatedProductsRouteImport } from './routes/_authenticated/products'
-import { Route as AuthenticatedModelsRouteImport } from './routes/_authenticated/models'
-import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
-import { Route as AuthenticatedFilamentsRouteImport } from './routes/_authenticated/filaments'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile/index'
-import { Route as AuthenticatedProfileSettingsRouteImport } from './routes/_authenticated/profile/settings'
-import { Route as AuthenticatedProfileSecurityRouteImport } from './routes/_authenticated/profile/security'
-import { Route as AuthenticatedProfileActivityRouteImport } from './routes/_authenticated/profile/activity'
-import { Route as AuthenticatedFilamentFilamentIdRouteImport } from './routes/_authenticated/filament.$filamentId'
+import { Route as FilamentFilamentIdRouteImport } from './routes/filament.$filamentId'
 import { ServerRoute as ApiModelsServerRouteImport } from './routes/api/models'
 import { ServerRoute as ApiModelCategoriesServerRouteImport } from './routes/api/model-categories'
 import { ServerRoute as ApiMetricsServerRouteImport } from './routes/api/metrics'
@@ -32,20 +26,39 @@ import { ServerRoute as ApiMaterialTypesServerRouteImport } from './routes/api/m
 import { ServerRoute as ApiHealthServerRouteImport } from './routes/api/health'
 import { ServerRoute as ApiFilamentsServerRouteImport } from './routes/api/filaments'
 import { ServerRoute as ApiBrandsServerRouteImport } from './routes/api/brands'
-import { ServerRoute as ApiUsersMeServerRouteImport } from './routes/api/users/me'
 import { ServerRoute as ApiFilamentsFilamentIdServerRouteImport } from './routes/api/filaments.$filamentId'
-import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 import { ServerRoute as ApiFilamentsFilamentIdModelsServerRouteImport } from './routes/api/filaments.$filamentId.models'
 
 const rootServerRouteImport = createServerRootRoute()
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const ProductsRoute = ProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModelsRoute = ModelsRouteImport.update({
+  id: '/models',
+  path: '/models',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InventoryRoute = InventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FilamentsRoute = FilamentsRouteImport.update({
+  id: '/filaments',
+  path: '/filaments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -53,66 +66,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthenticatedRoute,
+const FilamentFilamentIdRoute = FilamentFilamentIdRouteImport.update({
+  id: '/filament/$filamentId',
+  path: '/filament/$filamentId',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedProductsRoute = AuthenticatedProductsRouteImport.update({
-  id: '/products',
-  path: '/products',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedModelsRoute = AuthenticatedModelsRouteImport.update({
-  id: '/models',
-  path: '/models',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedInventoryRoute = AuthenticatedInventoryRouteImport.update({
-  id: '/inventory',
-  path: '/inventory',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedFilamentsRoute = AuthenticatedFilamentsRouteImport.update({
-  id: '/filaments',
-  path: '/filaments',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedProfileIndexRoute =
-  AuthenticatedProfileIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedProfileRoute,
-  } as any)
-const AuthenticatedProfileSettingsRoute =
-  AuthenticatedProfileSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => AuthenticatedProfileRoute,
-  } as any)
-const AuthenticatedProfileSecurityRoute =
-  AuthenticatedProfileSecurityRouteImport.update({
-    id: '/security',
-    path: '/security',
-    getParentRoute: () => AuthenticatedProfileRoute,
-  } as any)
-const AuthenticatedProfileActivityRoute =
-  AuthenticatedProfileActivityRouteImport.update({
-    id: '/activity',
-    path: '/activity',
-    getParentRoute: () => AuthenticatedProfileRoute,
-  } as any)
-const AuthenticatedFilamentFilamentIdRoute =
-  AuthenticatedFilamentFilamentIdRouteImport.update({
-    id: '/filament/$filamentId',
-    path: '/filament/$filamentId',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const ApiModelsServerRoute = ApiModelsServerRouteImport.update({
   id: '/api/models',
   path: '/api/models',
@@ -149,22 +107,12 @@ const ApiBrandsServerRoute = ApiBrandsServerRouteImport.update({
   path: '/api/brands',
   getParentRoute: () => rootServerRouteImport,
 } as any)
-const ApiUsersMeServerRoute = ApiUsersMeServerRouteImport.update({
-  id: '/api/users/me',
-  path: '/api/users/me',
-  getParentRoute: () => rootServerRouteImport,
-} as any)
 const ApiFilamentsFilamentIdServerRoute =
   ApiFilamentsFilamentIdServerRouteImport.update({
     id: '/$filamentId',
     path: '/$filamentId',
     getParentRoute: () => ApiFilamentsServerRoute,
   } as any)
-const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootServerRouteImport,
-} as any)
 const ApiFilamentsFilamentIdModelsServerRoute =
   ApiFilamentsFilamentIdModelsServerRouteImport.update({
     id: '/models',
@@ -174,55 +122,39 @@ const ApiFilamentsFilamentIdModelsServerRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/filaments': typeof AuthenticatedFilamentsRoute
-  '/inventory': typeof AuthenticatedInventoryRoute
-  '/models': typeof AuthenticatedModelsRoute
-  '/products': typeof AuthenticatedProductsRoute
-  '/profile': typeof AuthenticatedProfileRouteWithChildren
-  '/filament/$filamentId': typeof AuthenticatedFilamentFilamentIdRoute
-  '/profile/activity': typeof AuthenticatedProfileActivityRoute
-  '/profile/security': typeof AuthenticatedProfileSecurityRoute
-  '/profile/settings': typeof AuthenticatedProfileSettingsRoute
-  '/profile/': typeof AuthenticatedProfileIndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/filaments': typeof FilamentsRoute
+  '/inventory': typeof InventoryRoute
+  '/models': typeof ModelsRoute
+  '/products': typeof ProductsRoute
+  '/profile': typeof ProfileRoute
+  '/filament/$filamentId': typeof FilamentFilamentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/filaments': typeof AuthenticatedFilamentsRoute
-  '/inventory': typeof AuthenticatedInventoryRoute
-  '/models': typeof AuthenticatedModelsRoute
-  '/products': typeof AuthenticatedProductsRoute
-  '/filament/$filamentId': typeof AuthenticatedFilamentFilamentIdRoute
-  '/profile/activity': typeof AuthenticatedProfileActivityRoute
-  '/profile/security': typeof AuthenticatedProfileSecurityRoute
-  '/profile/settings': typeof AuthenticatedProfileSettingsRoute
-  '/profile': typeof AuthenticatedProfileIndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/filaments': typeof FilamentsRoute
+  '/inventory': typeof InventoryRoute
+  '/models': typeof ModelsRoute
+  '/products': typeof ProductsRoute
+  '/profile': typeof ProfileRoute
+  '/filament/$filamentId': typeof FilamentFilamentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/login': typeof LoginRoute
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/filaments': typeof AuthenticatedFilamentsRoute
-  '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
-  '/_authenticated/models': typeof AuthenticatedModelsRoute
-  '/_authenticated/products': typeof AuthenticatedProductsRoute
-  '/_authenticated/profile': typeof AuthenticatedProfileRouteWithChildren
-  '/_authenticated/filament/$filamentId': typeof AuthenticatedFilamentFilamentIdRoute
-  '/_authenticated/profile/activity': typeof AuthenticatedProfileActivityRoute
-  '/_authenticated/profile/security': typeof AuthenticatedProfileSecurityRoute
-  '/_authenticated/profile/settings': typeof AuthenticatedProfileSettingsRoute
-  '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/filaments': typeof FilamentsRoute
+  '/inventory': typeof InventoryRoute
+  '/models': typeof ModelsRoute
+  '/products': typeof ProductsRoute
+  '/profile': typeof ProfileRoute
+  '/filament/$filamentId': typeof FilamentFilamentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/login'
     | '/dashboard'
     | '/filaments'
     | '/inventory'
@@ -230,46 +162,37 @@ export interface FileRouteTypes {
     | '/products'
     | '/profile'
     | '/filament/$filamentId'
-    | '/profile/activity'
-    | '/profile/security'
-    | '/profile/settings'
-    | '/profile/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/login'
     | '/dashboard'
     | '/filaments'
     | '/inventory'
     | '/models'
     | '/products'
-    | '/filament/$filamentId'
-    | '/profile/activity'
-    | '/profile/security'
-    | '/profile/settings'
     | '/profile'
+    | '/filament/$filamentId'
   id:
     | '__root__'
     | '/'
-    | '/_authenticated'
-    | '/login'
-    | '/_authenticated/dashboard'
-    | '/_authenticated/filaments'
-    | '/_authenticated/inventory'
-    | '/_authenticated/models'
-    | '/_authenticated/products'
-    | '/_authenticated/profile'
-    | '/_authenticated/filament/$filamentId'
-    | '/_authenticated/profile/activity'
-    | '/_authenticated/profile/security'
-    | '/_authenticated/profile/settings'
-    | '/_authenticated/profile/'
+    | '/dashboard'
+    | '/filaments'
+    | '/inventory'
+    | '/models'
+    | '/products'
+    | '/profile'
+    | '/filament/$filamentId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  LoginRoute: typeof LoginRoute
+  DashboardRoute: typeof DashboardRoute
+  FilamentsRoute: typeof FilamentsRoute
+  InventoryRoute: typeof InventoryRoute
+  ModelsRoute: typeof ModelsRoute
+  ProductsRoute: typeof ProductsRoute
+  ProfileRoute: typeof ProfileRoute
+  FilamentFilamentIdRoute: typeof FilamentFilamentIdRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/brands': typeof ApiBrandsServerRoute
@@ -279,9 +202,7 @@ export interface FileServerRoutesByFullPath {
   '/api/metrics': typeof ApiMetricsServerRoute
   '/api/model-categories': typeof ApiModelCategoriesServerRoute
   '/api/models': typeof ApiModelsServerRoute
-  '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRouteWithChildren
-  '/api/users/me': typeof ApiUsersMeServerRoute
   '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
 }
 export interface FileServerRoutesByTo {
@@ -292,9 +213,7 @@ export interface FileServerRoutesByTo {
   '/api/metrics': typeof ApiMetricsServerRoute
   '/api/model-categories': typeof ApiModelCategoriesServerRoute
   '/api/models': typeof ApiModelsServerRoute
-  '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRouteWithChildren
-  '/api/users/me': typeof ApiUsersMeServerRoute
   '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
 }
 export interface FileServerRoutesById {
@@ -306,9 +225,7 @@ export interface FileServerRoutesById {
   '/api/metrics': typeof ApiMetricsServerRoute
   '/api/model-categories': typeof ApiModelCategoriesServerRoute
   '/api/models': typeof ApiModelsServerRoute
-  '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRouteWithChildren
-  '/api/users/me': typeof ApiUsersMeServerRoute
   '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
 }
 export interface FileServerRouteTypes {
@@ -321,9 +238,7 @@ export interface FileServerRouteTypes {
     | '/api/metrics'
     | '/api/model-categories'
     | '/api/models'
-    | '/api/auth/$'
     | '/api/filaments/$filamentId'
-    | '/api/users/me'
     | '/api/filaments/$filamentId/models'
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
@@ -334,9 +249,7 @@ export interface FileServerRouteTypes {
     | '/api/metrics'
     | '/api/model-categories'
     | '/api/models'
-    | '/api/auth/$'
     | '/api/filaments/$filamentId'
-    | '/api/users/me'
     | '/api/filaments/$filamentId/models'
   id:
     | '__root__'
@@ -347,9 +260,7 @@ export interface FileServerRouteTypes {
     | '/api/metrics'
     | '/api/model-categories'
     | '/api/models'
-    | '/api/auth/$'
     | '/api/filaments/$filamentId'
-    | '/api/users/me'
     | '/api/filaments/$filamentId/models'
   fileServerRoutesById: FileServerRoutesById
 }
@@ -361,24 +272,50 @@ export interface RootServerRouteChildren {
   ApiMetricsServerRoute: typeof ApiMetricsServerRoute
   ApiModelCategoriesServerRoute: typeof ApiModelCategoriesServerRoute
   ApiModelsServerRoute: typeof ApiModelsServerRoute
-  ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
-  ApiUsersMeServerRoute: typeof ApiUsersMeServerRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AuthenticatedRouteImport
+    '/products': {
+      id: '/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/models': {
+      id: '/models'
+      path: '/models'
+      fullPath: '/models'
+      preLoaderRoute: typeof ModelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inventory': {
+      id: '/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof InventoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/filaments': {
+      id: '/filaments'
+      path: '/filaments'
+      fullPath: '/filaments'
+      preLoaderRoute: typeof FilamentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -388,82 +325,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/profile': {
-      id: '/_authenticated/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthenticatedProfileRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/products': {
-      id: '/_authenticated/products'
-      path: '/products'
-      fullPath: '/products'
-      preLoaderRoute: typeof AuthenticatedProductsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/models': {
-      id: '/_authenticated/models'
-      path: '/models'
-      fullPath: '/models'
-      preLoaderRoute: typeof AuthenticatedModelsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/inventory': {
-      id: '/_authenticated/inventory'
-      path: '/inventory'
-      fullPath: '/inventory'
-      preLoaderRoute: typeof AuthenticatedInventoryRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/filaments': {
-      id: '/_authenticated/filaments'
-      path: '/filaments'
-      fullPath: '/filaments'
-      preLoaderRoute: typeof AuthenticatedFilamentsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/profile/': {
-      id: '/_authenticated/profile/'
-      path: '/'
-      fullPath: '/profile/'
-      preLoaderRoute: typeof AuthenticatedProfileIndexRouteImport
-      parentRoute: typeof AuthenticatedProfileRoute
-    }
-    '/_authenticated/profile/settings': {
-      id: '/_authenticated/profile/settings'
-      path: '/settings'
-      fullPath: '/profile/settings'
-      preLoaderRoute: typeof AuthenticatedProfileSettingsRouteImport
-      parentRoute: typeof AuthenticatedProfileRoute
-    }
-    '/_authenticated/profile/security': {
-      id: '/_authenticated/profile/security'
-      path: '/security'
-      fullPath: '/profile/security'
-      preLoaderRoute: typeof AuthenticatedProfileSecurityRouteImport
-      parentRoute: typeof AuthenticatedProfileRoute
-    }
-    '/_authenticated/profile/activity': {
-      id: '/_authenticated/profile/activity'
-      path: '/activity'
-      fullPath: '/profile/activity'
-      preLoaderRoute: typeof AuthenticatedProfileActivityRouteImport
-      parentRoute: typeof AuthenticatedProfileRoute
-    }
-    '/_authenticated/filament/$filamentId': {
-      id: '/_authenticated/filament/$filamentId'
+    '/filament/$filamentId': {
+      id: '/filament/$filamentId'
       path: '/filament/$filamentId'
       fullPath: '/filament/$filamentId'
-      preLoaderRoute: typeof AuthenticatedFilamentFilamentIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof FilamentFilamentIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -518,26 +385,12 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiBrandsServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
-    '/api/users/me': {
-      id: '/api/users/me'
-      path: '/api/users/me'
-      fullPath: '/api/users/me'
-      preLoaderRoute: typeof ApiUsersMeServerRouteImport
-      parentRoute: typeof rootServerRouteImport
-    }
     '/api/filaments/$filamentId': {
       id: '/api/filaments/$filamentId'
       path: '/$filamentId'
       fullPath: '/api/filaments/$filamentId'
       preLoaderRoute: typeof ApiFilamentsFilamentIdServerRouteImport
       parentRoute: typeof ApiFilamentsServerRoute
-    }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatServerRouteImport
-      parentRoute: typeof rootServerRouteImport
     }
     '/api/filaments/$filamentId/models': {
       id: '/api/filaments/$filamentId/models'
@@ -548,47 +401,6 @@ declare module '@tanstack/react-start/server' {
     }
   }
 }
-
-interface AuthenticatedProfileRouteChildren {
-  AuthenticatedProfileActivityRoute: typeof AuthenticatedProfileActivityRoute
-  AuthenticatedProfileSecurityRoute: typeof AuthenticatedProfileSecurityRoute
-  AuthenticatedProfileSettingsRoute: typeof AuthenticatedProfileSettingsRoute
-  AuthenticatedProfileIndexRoute: typeof AuthenticatedProfileIndexRoute
-}
-
-const AuthenticatedProfileRouteChildren: AuthenticatedProfileRouteChildren = {
-  AuthenticatedProfileActivityRoute: AuthenticatedProfileActivityRoute,
-  AuthenticatedProfileSecurityRoute: AuthenticatedProfileSecurityRoute,
-  AuthenticatedProfileSettingsRoute: AuthenticatedProfileSettingsRoute,
-  AuthenticatedProfileIndexRoute: AuthenticatedProfileIndexRoute,
-}
-
-const AuthenticatedProfileRouteWithChildren =
-  AuthenticatedProfileRoute._addFileChildren(AuthenticatedProfileRouteChildren)
-
-interface AuthenticatedRouteChildren {
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedFilamentsRoute: typeof AuthenticatedFilamentsRoute
-  AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
-  AuthenticatedModelsRoute: typeof AuthenticatedModelsRoute
-  AuthenticatedProductsRoute: typeof AuthenticatedProductsRoute
-  AuthenticatedProfileRoute: typeof AuthenticatedProfileRouteWithChildren
-  AuthenticatedFilamentFilamentIdRoute: typeof AuthenticatedFilamentFilamentIdRoute
-}
-
-const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedFilamentsRoute: AuthenticatedFilamentsRoute,
-  AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
-  AuthenticatedModelsRoute: AuthenticatedModelsRoute,
-  AuthenticatedProductsRoute: AuthenticatedProductsRoute,
-  AuthenticatedProfileRoute: AuthenticatedProfileRouteWithChildren,
-  AuthenticatedFilamentFilamentIdRoute: AuthenticatedFilamentFilamentIdRoute,
-}
-
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
-)
 
 interface ApiFilamentsFilamentIdServerRouteChildren {
   ApiFilamentsFilamentIdModelsServerRoute: typeof ApiFilamentsFilamentIdModelsServerRoute
@@ -619,8 +431,13 @@ const ApiFilamentsServerRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  LoginRoute: LoginRoute,
+  DashboardRoute: DashboardRoute,
+  FilamentsRoute: FilamentsRoute,
+  InventoryRoute: InventoryRoute,
+  ModelsRoute: ModelsRoute,
+  ProductsRoute: ProductsRoute,
+  ProfileRoute: ProfileRoute,
+  FilamentFilamentIdRoute: FilamentFilamentIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
@@ -633,8 +450,6 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiMetricsServerRoute: ApiMetricsServerRoute,
   ApiModelCategoriesServerRoute: ApiModelCategoriesServerRoute,
   ApiModelsServerRoute: ApiModelsServerRoute,
-  ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
-  ApiUsersMeServerRoute: ApiUsersMeServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport
   ._addFileChildren(rootServerRouteChildren)

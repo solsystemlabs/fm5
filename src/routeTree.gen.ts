@@ -11,14 +11,13 @@
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as ProductsRouteImport } from './routes/products'
-import { Route as ModelsRouteImport } from './routes/models'
-import { Route as InventoryRouteImport } from './routes/inventory'
-import { Route as FilamentsRouteImport } from './routes/filaments'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as FilamentFilamentIdRouteImport } from './routes/filament.$filamentId'
+import { Route as ProductsIndexRouteImport } from './routes/products/index'
+import { Route as ModelsIndexRouteImport } from './routes/models/index'
+import { Route as InventoryIndexRouteImport } from './routes/inventory/index'
+import { Route as FilamentsIndexRouteImport } from './routes/filaments/index'
+import { Route as FilamentsFilamentIdRouteImport } from './routes/filaments/$filamentId'
 import { ServerRoute as ApiModelsServerRouteImport } from './routes/api/models'
 import { ServerRoute as ApiModelCategoriesServerRouteImport } from './routes/api/model-categories'
 import { ServerRoute as ApiMetricsServerRouteImport } from './routes/api/metrics'
@@ -31,31 +30,6 @@ import { ServerRoute as ApiFilamentsFilamentIdModelsServerRouteImport } from './
 
 const rootServerRouteImport = createServerRootRoute()
 
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductsRoute = ProductsRouteImport.update({
-  id: '/products',
-  path: '/products',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ModelsRoute = ModelsRouteImport.update({
-  id: '/models',
-  path: '/models',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InventoryRoute = InventoryRouteImport.update({
-  id: '/inventory',
-  path: '/inventory',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FilamentsRoute = FilamentsRouteImport.update({
-  id: '/filaments',
-  path: '/filaments',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -66,9 +40,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FilamentFilamentIdRoute = FilamentFilamentIdRouteImport.update({
-  id: '/filament/$filamentId',
-  path: '/filament/$filamentId',
+const ProductsIndexRoute = ProductsIndexRouteImport.update({
+  id: '/products/',
+  path: '/products/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModelsIndexRoute = ModelsIndexRouteImport.update({
+  id: '/models/',
+  path: '/models/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InventoryIndexRoute = InventoryIndexRouteImport.update({
+  id: '/inventory/',
+  path: '/inventory/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FilamentsIndexRoute = FilamentsIndexRouteImport.update({
+  id: '/filaments/',
+  path: '/filaments/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FilamentsFilamentIdRoute = FilamentsFilamentIdRouteImport.update({
+  id: '/filaments/$filamentId',
+  path: '/filaments/$filamentId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiModelsServerRoute = ApiModelsServerRouteImport.update({
@@ -123,76 +117,69 @@ const ApiFilamentsFilamentIdModelsServerRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
-  '/filaments': typeof FilamentsRoute
-  '/inventory': typeof InventoryRoute
-  '/models': typeof ModelsRoute
-  '/products': typeof ProductsRoute
-  '/profile': typeof ProfileRoute
-  '/filament/$filamentId': typeof FilamentFilamentIdRoute
+  '/filaments/$filamentId': typeof FilamentsFilamentIdRoute
+  '/filaments': typeof FilamentsIndexRoute
+  '/inventory': typeof InventoryIndexRoute
+  '/models': typeof ModelsIndexRoute
+  '/products': typeof ProductsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
-  '/filaments': typeof FilamentsRoute
-  '/inventory': typeof InventoryRoute
-  '/models': typeof ModelsRoute
-  '/products': typeof ProductsRoute
-  '/profile': typeof ProfileRoute
-  '/filament/$filamentId': typeof FilamentFilamentIdRoute
+  '/filaments/$filamentId': typeof FilamentsFilamentIdRoute
+  '/filaments': typeof FilamentsIndexRoute
+  '/inventory': typeof InventoryIndexRoute
+  '/models': typeof ModelsIndexRoute
+  '/products': typeof ProductsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
-  '/filaments': typeof FilamentsRoute
-  '/inventory': typeof InventoryRoute
-  '/models': typeof ModelsRoute
-  '/products': typeof ProductsRoute
-  '/profile': typeof ProfileRoute
-  '/filament/$filamentId': typeof FilamentFilamentIdRoute
+  '/filaments/$filamentId': typeof FilamentsFilamentIdRoute
+  '/filaments/': typeof FilamentsIndexRoute
+  '/inventory/': typeof InventoryIndexRoute
+  '/models/': typeof ModelsIndexRoute
+  '/products/': typeof ProductsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/filaments/$filamentId'
     | '/filaments'
     | '/inventory'
     | '/models'
     | '/products'
-    | '/profile'
-    | '/filament/$filamentId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard'
+    | '/filaments/$filamentId'
     | '/filaments'
     | '/inventory'
     | '/models'
     | '/products'
-    | '/profile'
-    | '/filament/$filamentId'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
-    | '/filaments'
-    | '/inventory'
-    | '/models'
-    | '/products'
-    | '/profile'
-    | '/filament/$filamentId'
+    | '/filaments/$filamentId'
+    | '/filaments/'
+    | '/inventory/'
+    | '/models/'
+    | '/products/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
-  FilamentsRoute: typeof FilamentsRoute
-  InventoryRoute: typeof InventoryRoute
-  ModelsRoute: typeof ModelsRoute
-  ProductsRoute: typeof ProductsRoute
-  ProfileRoute: typeof ProfileRoute
-  FilamentFilamentIdRoute: typeof FilamentFilamentIdRoute
+  FilamentsFilamentIdRoute: typeof FilamentsFilamentIdRoute
+  FilamentsIndexRoute: typeof FilamentsIndexRoute
+  InventoryIndexRoute: typeof InventoryIndexRoute
+  ModelsIndexRoute: typeof ModelsIndexRoute
+  ProductsIndexRoute: typeof ProductsIndexRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/brands': typeof ApiBrandsServerRoute
@@ -276,41 +263,6 @@ export interface RootServerRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/products': {
-      id: '/products'
-      path: '/products'
-      fullPath: '/products'
-      preLoaderRoute: typeof ProductsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/models': {
-      id: '/models'
-      path: '/models'
-      fullPath: '/models'
-      preLoaderRoute: typeof ModelsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inventory': {
-      id: '/inventory'
-      path: '/inventory'
-      fullPath: '/inventory'
-      preLoaderRoute: typeof InventoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/filaments': {
-      id: '/filaments'
-      path: '/filaments'
-      fullPath: '/filaments'
-      preLoaderRoute: typeof FilamentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -325,11 +277,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/filament/$filamentId': {
-      id: '/filament/$filamentId'
-      path: '/filament/$filamentId'
-      fullPath: '/filament/$filamentId'
-      preLoaderRoute: typeof FilamentFilamentIdRouteImport
+    '/products/': {
+      id: '/products/'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ProductsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/models/': {
+      id: '/models/'
+      path: '/models'
+      fullPath: '/models'
+      preLoaderRoute: typeof ModelsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inventory/': {
+      id: '/inventory/'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof InventoryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/filaments/': {
+      id: '/filaments/'
+      path: '/filaments'
+      fullPath: '/filaments'
+      preLoaderRoute: typeof FilamentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/filaments/$filamentId': {
+      id: '/filaments/$filamentId'
+      path: '/filaments/$filamentId'
+      fullPath: '/filaments/$filamentId'
+      preLoaderRoute: typeof FilamentsFilamentIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -432,12 +412,11 @@ const ApiFilamentsServerRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
-  FilamentsRoute: FilamentsRoute,
-  InventoryRoute: InventoryRoute,
-  ModelsRoute: ModelsRoute,
-  ProductsRoute: ProductsRoute,
-  ProfileRoute: ProfileRoute,
-  FilamentFilamentIdRoute: FilamentFilamentIdRoute,
+  FilamentsFilamentIdRoute: FilamentsFilamentIdRoute,
+  FilamentsIndexRoute: FilamentsIndexRoute,
+  InventoryIndexRoute: InventoryIndexRoute,
+  ModelsIndexRoute: ModelsIndexRoute,
+  ProductsIndexRoute: ProductsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/aria/button";
 import { Input } from "@/components/aria/input";
 import { Label } from "@/components/aria/label";
+import { HexColorInput, validateHexColor } from "@/components/HexColorInput";
 import {
   useMaterialTypes,
   useCreateFilament,
@@ -66,23 +67,18 @@ export function AddFilamentDialog({ children }: AddFilamentDialogProps) {
             <form.Field
               name="color"
               validators={{
-                onChange: ({ value }) => {
-                  if (!value || value.trim().length === 0) {
-                    return "Color is required";
-                  }
-                  return undefined;
-                },
+                onChange: ({ value }) => validateHexColor(value),
               }}
               children={(field) => (
                 <div>
-                  <Label htmlFor={field.name}>Color</Label>
-                  <Input
+                  <Label htmlFor={field.name}>Color (Hex)</Label>
+                  <HexColorInput
                     id={field.name}
                     name={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="e.g. Red, Blue, Transparent"
+                    onChange={(value) => field.handleChange(value)}
+                    placeholder="#FF0000"
                   />
                   {field.state.meta.errors ? (
                     <p className="text-sm text-red-600 mt-1">

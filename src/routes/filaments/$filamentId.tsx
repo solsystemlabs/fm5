@@ -14,7 +14,7 @@ import { EditableColorFormField } from "@/components/EditableColorFormField";
 import { EditableEntityFormField } from "@/components/EditableEntityFormField";
 import { EditableModelsFormField } from "@/components/EditableModelsFormField";
 
-export const Route = createFileRoute("/filament/$filamentId")({
+export const Route = createFileRoute("/filaments/$filamentId")({
   component: FilamentDetailsPage,
   loader: async ({ params }) => {
     const response = await fetch(`/api/filaments/${params.filamentId}`);

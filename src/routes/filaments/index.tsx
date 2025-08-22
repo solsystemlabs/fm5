@@ -1,7 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { FilamentsTable } from "@/components/FilamentsTable";
-import { AddFilamentDialog } from "@/components/AddFilamentDialog";
-import { Button } from "@/components/aria/button";
 import { useFilaments } from "@/lib/api-hooks";
 
 export const Route = createFileRoute("/filaments/")({
@@ -36,16 +33,7 @@ function FilamentsPage() {
             specifications and associated models.
           </p>
         </div>
-        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <AddFilamentDialog>
-            <Button
-              type="button"
-              className="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500"
-            >
-              Add filament
-            </Button>
-          </AddFilamentDialog>
-        </div>
+        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none"></div>
       </div>
 
       {isLoading ? (
@@ -55,9 +43,8 @@ function FilamentsPage() {
           </p>
         </div>
       ) : (
-        <FilamentsTable data={filaments} />
+        <div>Table</div>
       )}
     </div>
   );
 }
-

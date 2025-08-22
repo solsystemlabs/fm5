@@ -12,12 +12,6 @@ export default defineConfig({
     tsConfigPaths(),
     tanstackStart({ customViteReactPlugin: true }),
     viteReact(),
-    tailwindcss({
-      content: [
-        './src/**/*.{js,ts,jsx,tsx}',
-        './app/**/*.{js,ts,jsx,tsx}',
-        './index.html',
-      ],
-    }),
+    tailwindcss(),
   ],
 });

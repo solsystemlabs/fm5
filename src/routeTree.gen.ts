@@ -17,7 +17,6 @@ import { Route as ProductsIndexRouteImport } from './routes/products/index'
 import { Route as ModelsIndexRouteImport } from './routes/models/index'
 import { Route as InventoryIndexRouteImport } from './routes/inventory/index'
 import { Route as FilamentsIndexRouteImport } from './routes/filaments/index'
-import { Route as FilamentsFilamentIdRouteImport } from './routes/filaments/$filamentId'
 import { ServerRoute as ApiModelsServerRouteImport } from './routes/api/models'
 import { ServerRoute as ApiModelCategoriesServerRouteImport } from './routes/api/model-categories'
 import { ServerRoute as ApiMetricsServerRouteImport } from './routes/api/metrics'
@@ -58,11 +57,6 @@ const InventoryIndexRoute = InventoryIndexRouteImport.update({
 const FilamentsIndexRoute = FilamentsIndexRouteImport.update({
   id: '/filaments/',
   path: '/filaments/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FilamentsFilamentIdRoute = FilamentsFilamentIdRouteImport.update({
-  id: '/filaments/$filamentId',
-  path: '/filaments/$filamentId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiModelsServerRoute = ApiModelsServerRouteImport.update({
@@ -117,7 +111,6 @@ const ApiFilamentsFilamentIdModelsServerRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
-  '/filaments/$filamentId': typeof FilamentsFilamentIdRoute
   '/filaments': typeof FilamentsIndexRoute
   '/inventory': typeof InventoryIndexRoute
   '/models': typeof ModelsIndexRoute
@@ -126,7 +119,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
-  '/filaments/$filamentId': typeof FilamentsFilamentIdRoute
   '/filaments': typeof FilamentsIndexRoute
   '/inventory': typeof InventoryIndexRoute
   '/models': typeof ModelsIndexRoute
@@ -136,7 +128,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
-  '/filaments/$filamentId': typeof FilamentsFilamentIdRoute
   '/filaments/': typeof FilamentsIndexRoute
   '/inventory/': typeof InventoryIndexRoute
   '/models/': typeof ModelsIndexRoute
@@ -147,25 +138,16 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
-    | '/filaments/$filamentId'
     | '/filaments'
     | '/inventory'
     | '/models'
     | '/products'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/dashboard'
-    | '/filaments/$filamentId'
-    | '/filaments'
-    | '/inventory'
-    | '/models'
-    | '/products'
+  to: '/' | '/dashboard' | '/filaments' | '/inventory' | '/models' | '/products'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
-    | '/filaments/$filamentId'
     | '/filaments/'
     | '/inventory/'
     | '/models/'
@@ -175,7 +157,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
-  FilamentsFilamentIdRoute: typeof FilamentsFilamentIdRoute
   FilamentsIndexRoute: typeof FilamentsIndexRoute
   InventoryIndexRoute: typeof InventoryIndexRoute
   ModelsIndexRoute: typeof ModelsIndexRoute
@@ -305,13 +286,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FilamentsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/filaments/$filamentId': {
-      id: '/filaments/$filamentId'
-      path: '/filaments/$filamentId'
-      fullPath: '/filaments/$filamentId'
-      preLoaderRoute: typeof FilamentsFilamentIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 declare module '@tanstack/react-start/server' {
@@ -412,7 +386,6 @@ const ApiFilamentsServerRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
-  FilamentsFilamentIdRoute: FilamentsFilamentIdRoute,
   FilamentsIndexRoute: FilamentsIndexRoute,
   InventoryIndexRoute: InventoryIndexRoute,
   ModelsIndexRoute: ModelsIndexRoute,

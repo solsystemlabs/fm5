@@ -1,12 +1,12 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/products/')({
+export const Route = createFileRoute("/products/")({
   component: ProductsPage,
-})
+});
 
 function ProductsPage() {
   const context = Route.useRouteContext();
-  
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -15,10 +15,10 @@ function ProductsPage() {
           Add Product
         </button>
       </div>
-      
+
       <div className="bg-white rounded-lg shadow p-6">
         <p className="text-gray-600">
-          Welcome, {context.user?.email}! This is your products dashboard.
+          Welcome, this is your products dashboard.
         </p>
         <div className="mt-4 text-sm text-gray-500">
           Manage your 3D printing products, models, and inventory here.
@@ -27,3 +27,4 @@ function ProductsPage() {
     </div>
   );
 }
+

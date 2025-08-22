@@ -1,5 +1,5 @@
-import { createServerFileRoute } from "@tanstack/react-start/server";
 import { PrismaClient } from "@prisma/client";
+import { createServerFileRoute } from "@tanstack/react-start/server";
 
 const prisma = new PrismaClient();
 
@@ -67,4 +67,3 @@ export const ServerRoute = createServerFileRoute("/api/models").methods({
     }
   },
 });
-

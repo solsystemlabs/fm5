@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useFilaments } from "@/lib/api-hooks";
+import { createFileRoute } from "@tanstack/react-router";
+import FilamentsTable from "../../components/FilamentsTable";
 
 export const Route = createFileRoute("/filaments/")({
   component: FilamentsPage,
@@ -43,7 +44,7 @@ function FilamentsPage() {
           </p>
         </div>
       ) : (
-        <div>Table</div>
+        <FilamentsTable data={filaments} />
       )}
     </div>
   );

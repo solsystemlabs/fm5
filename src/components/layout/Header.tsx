@@ -60,7 +60,7 @@ export default function Header() {
           {/*   <span className="sr-only">Open main menu</span> */}
           {/*   <Bars3Icon aria-hidden="true" className="size-6" /> */}
           {/* </button> */}
-          <DialogTrigger defaultOpen={false}>
+          <DialogTrigger>
             <Button>
               <Bars3Icon aria-hidden="true" className="size-6" />
             </Button>

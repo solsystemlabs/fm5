@@ -21,7 +21,7 @@ export default function FilamentsTable({
   return (
     <div className="-mx-4 mt-10 ring-1 ring-gray-300 sm:mx-0 sm:rounded-lg dark:ring-white/15">
       <Table className="relative min-w-full divide-y divide-gray-300 dark:divide-white/15">
-        <TableHeader className="bg-gray-200">
+        <TableHeader className="bg-pewter-100">
           <Row className="divide-y divide-gray-300 dark:divide-white/15">
             <Column className="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6 dark:text-white">
               Filament

@@ -43,6 +43,20 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+@theme {
+  --color-pewter-50: #f5f8f6;
+  --color-pewter-100: #e0e7e4;
+  --color-pewter-200: #c0cfc8;
+  --color-pewter-300: #95aca3;
+  --color-pewter-400: #738e84;
+  --color-pewter-500: #59736a;
+  --color-pewter-600: #465b54;
+  --color-pewter-700: #3a4b45;
+  --color-pewter-800: #313e3a;
+  --color-pewter-900: #2c3533;
+  --color-pewter-950: #161d1b;
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);

@@ -9,7 +9,7 @@ export default function FMColumn({
   return (
     <Column
       className={clsx(
-        "px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white",
+        "px-3 py-3.5 text-left text-sm font-semibold text-pewter-900 dark:text-white",
         className,
       )}
     >

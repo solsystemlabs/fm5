@@ -1,7 +1,8 @@
 import { useFilaments } from "@/lib/api-hooks";
 import { createFileRoute } from "@tanstack/react-router";
 import FilamentsTable from "../../components/FilamentsTable";
-import FMButton from "../../components/FMButton";
+import FMButton from "../../components/ui/FMButton";
+import AddFilamentDialog from "../../components/AddFilamentDialog";
 
 export const Route = createFileRoute("/filaments/")({
   component: FilamentsPage,
@@ -35,9 +36,13 @@ function FilamentsPage() {
             specifications and associated models.
           </p>
         </div>
-        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <FMButton size="lg">Add Filament</FMButton>
-        </div>
+        <AddFilamentDialog
+          triggerElement={
+            <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+              <FMButton size="lg">Add Filament</FMButton>
+            </div>
+          }
+        />
       </div>
 
       {isLoading ? (

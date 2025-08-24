@@ -1,17 +1,15 @@
-import type { Filament } from "../lib/types";
 import type { ReactNode } from "react";
 import {
   Cell,
   ColorSwatch,
-  Column,
   Row,
   Table,
   TableBody,
   TableHeader,
 } from "react-aria-components";
-import FMCell from "./table/FMCell";
-import clsx from "clsx";
-import FMColumn from "./table/FMColumn";
+import type { Filament } from "../lib/types";
+import FMCell from "./ui/table/FMCell";
+import FMColumn from "./ui/table/FMColumn";
 
 export default function FilamentsTable({
   data,
@@ -23,18 +21,12 @@ export default function FilamentsTable({
       <Table className="relative min-w-full divide-y divide-gray-300 dark:divide-white/15">
         <TableHeader className="bg-pewter-100">
           <Row className="divide-y divide-gray-300 dark:divide-white/15">
-            <Column className="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6 dark:text-white">
+            <FMColumn className="py-3.5 pr-3 pl-4 text-left sm:pl-6">
               Filament
-            </Column>
-            <Column className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell dark:text-white">
-              Brand
-            </Column>
-            <Column className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell dark:text-white">
-              Material
-            </Column>
-            <Column className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell dark:text-white">
-              Diameter
-            </Column>
+            </FMColumn>
+            <FMColumn className="hidden lg:table-cell">Brand</FMColumn>
+            <FMColumn className="hidden lg:table-cell">Material</FMColumn>
+            <FMColumn className="hidden lg:table-cell">Diameter</FMColumn>
             <FMColumn>Cost</FMColumn>
             <FMColumn>Weight</FMColumn>
             <FMColumn className="">Models</FMColumn>

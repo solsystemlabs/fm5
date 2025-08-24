@@ -4,7 +4,7 @@ import { Button } from "react-aria-components";
 import { twMerge } from "tailwind-merge";
 
 type FMButtonProps = {
-  role?: "primary" | "secondary";
+  secondary?: boolean;
   soft?: boolean;
   rounded?: boolean;
   className?: string;
@@ -12,7 +12,7 @@ type FMButtonProps = {
 } & PropsWithChildren;
 
 export default function FMButton({
-  role = "primary",
+  secondary = false,
   soft,
   rounded,
   children,
@@ -43,11 +43,11 @@ export default function FMButton({
       className={twMerge(
         clsx(
           "rounded-md text-sm font-semibold text-white shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2 dark:shadow-none cursor-pointer",
-          role === "primary"
-            ? "bg-pewter-400 hover:bg-pewter-500 focus-visible:outline-pewter-600 dark:bg-pewter-500 dark:hover:bg-pewter-400 dark:focus-visible:outline-pewter-500"
-            : "bg-white text-gray-900 inset-ring inset-ring-gray-300 hover:bg-gray-50 dark:bg-white/10 dark:inset-ring-white/5 dark:hover:bg-white/20",
+          secondary
+            ? "bg-white text-pewter-900 inset-ring inset-ring-pewter-300 hover:bg-pewter-50 dark:bg-white/10 dark:inset-ring-white/5 dark:hover:bg-white/20"
+            : "bg-pewter-400 hover:bg-pewter-500 focus-visible:outline-pewter-600 dark:bg-pewter-500 dark:hover:bg-pewter-400 dark:focus-visible:outline-pewter-500",
           soft
-            ? "bg-pewter-50 text-pewter-600 hover:bg-pewter-100 dark:bg-pewter-500/20 dark:text-pewter-400 dark:hover:bg-pewter-500/30"
+            ? "bg-pewter-100 text-pewter-700 hover:bg-pewter-200 dark:bg-pewter-500/20 dark:text-pewter-400 dark:hover:bg-pewter-500/30"
             : "",
           rounded ? "rounded-full" : "",
           sizeClass,

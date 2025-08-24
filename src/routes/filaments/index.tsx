@@ -1,7 +1,6 @@
 import { useFilaments } from "@/lib/api-hooks";
 import { createFileRoute } from "@tanstack/react-router";
 import FilamentsTable from "../../components/FilamentsTable";
-import { Button } from "react-aria-components";
 import FMButton from "../../components/FMButton";
 
 export const Route = createFileRoute("/filaments/")({

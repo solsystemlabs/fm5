@@ -17,11 +17,11 @@ export default function FilamentsTable({
   data: Filament[];
 }): ReactNode {
   return (
-    <div className="-mx-4 mt-10 ring-1 ring-gray-300 sm:mx-0 sm:rounded-lg dark:ring-white/15">
-      <Table className="relative min-w-full divide-y divide-gray-300 dark:divide-white/15">
+    <div className="-mx-4 mt-10 ring-1 ring-pewter-300 sm:mx-0 sm:rounded-lg dark:ring-white/15 shadow-lg">
+      <Table className="relative min-w-full divide-y divide-pewter-300 dark:divide-white/15">
         <TableHeader className="bg-pewter-100">
-          <Row className="divide-y divide-gray-300 dark:divide-white/15">
-            <FMColumn className="py-3.5 pr-3 pl-4 text-left sm:pl-6">
+          <Row className="divide-y divide-pewter-300 dark:divide-white/15">
+            <FMColumn className="py-3.5 pr-3 pl-4 text-left sm:pl-6 rounded-tl-lg">
               Filament
             </FMColumn>
             <FMColumn className="hidden lg:table-cell">Brand</FMColumn>
@@ -29,14 +29,14 @@ export default function FilamentsTable({
             <FMColumn className="hidden lg:table-cell">Diameter</FMColumn>
             <FMColumn>Cost</FMColumn>
             <FMColumn>Weight</FMColumn>
-            <FMColumn className="">Models</FMColumn>
+            <FMColumn className="rounded-tr-lg">Models</FMColumn>
           </Row>
         </TableHeader>
         <TableBody>
           {data.map((filament) => (
             <Row
               key={filament.id}
-              className="not-last:border-b border-gray-300"
+              className="not-last:border-b border-pewter-200"
             >
               <Cell className="relative py-4 pr-3 pl-4 text-sm sm:pl-6">
                 <div className="flex items-center gap-x-3">
@@ -45,7 +45,7 @@ export default function FilamentsTable({
                     color={filament.color}
                   />
                   <div className="">
-                    <div className="justify-end font-bold text-md text-gray-900 dark:text-white">
+                    <div className="justify-end font-bold text-md text-pewter-900 dark:text-white">
                       {filament.name}
                     </div>
                     <div className="font-medium text-gray-500 dark:text-white">

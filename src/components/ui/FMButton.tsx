@@ -42,7 +42,7 @@ export default function FMButton({
     <Button
       className={twMerge(
         clsx(
-          "rounded-md text-sm font-semibold text-white shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2 dark:shadow-none cursor-pointer",
+          "rounded-md text-sm font-semibold text-white shadow-md hover:shadow-[0_4px_8px_0_rgba(0,0,0,0.25)] focus-visible:outline-2 focus-visible:outline-offset-2 dark:shadow-none cursor-pointer",
           secondary
             ? "bg-white text-pewter-900 inset-ring inset-ring-pewter-300 hover:bg-pewter-50 dark:bg-white/10 dark:inset-ring-white/5 dark:hover:bg-white/20"
             : "bg-pewter-400 hover:bg-pewter-500 focus-visible:outline-pewter-600 dark:bg-pewter-500 dark:hover:bg-pewter-400 dark:focus-visible:outline-pewter-500",

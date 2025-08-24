@@ -41,9 +41,10 @@ export default function Header() {
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-sm/6 font-semibold text-gray-900 hover:text-gray-600"
+                className="px-2 text-sm/6 font-semibold text-pewter-900 hover:text-pewter-600"
                 activeProps={{
-                  className: "text-sm/6 font-semibold text-indigo-600",
+                  className:
+                    "text-sm/6 font-semibold !text-pewter-100 border border-pewter-500 px-2 bg-pewter-700 rounded-md",
                 }}
               >
                 {item.name}

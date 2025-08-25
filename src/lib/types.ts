@@ -39,6 +39,7 @@ export interface Filament {
 
 // Form types for creating filaments
 export interface CreateFilamentForm {
+  name: string;
   color: string;
   materialTypeId: number;
   modelIds: number[];

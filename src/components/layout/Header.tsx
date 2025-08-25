@@ -41,10 +41,10 @@ export default function Header() {
               <Link
                 key={item.name}
                 to={item.href}
-                className="px-2 text-sm/6 font-semibold text-pewter-900 hover:text-pewter-600"
+                className="text-pewter-900 hover:text-pewter-600 px-2 py-1.5 text-sm/6 font-semibold"
                 activeProps={{
                   className:
-                    "text-sm/6 font-semibold !text-pewter-100 border border-pewter-500 px-2 bg-pewter-700 rounded-md",
+                    "text-sm/6 font-semibold !text-white border border-pewter-500 px-2 bg-pewter-500 rounded-md",
                 }}
               >
                 {item.name}

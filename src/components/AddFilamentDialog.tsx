@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
 import { z } from "zod";
+import { useCreateFilament } from "@/lib/api-hooks";
 import {
   Form,
   TextField,
@@ -57,7 +57,8 @@ const mockMaterialTypes = [
 export default function AddFilamentDialog({
   triggerElement,
 }: AddFilamentDialogProps): ReactNode {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const createFilamentMutation = useCreateFilament();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -70,37 +71,23 @@ export default function AddFilamentDialog({
       grams: 0,
     } as FilamentFormData,
     onSubmit: async ({ value }) => {
-      setIsSubmitting(true);
       try {
-        const response = await fetch("/api/filaments", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...value,
-            cost: value.cost || undefined,
-            grams: value.grams || undefined,
-          }),
+        await createFilamentMutation.mutateAsync({
+          ...value,
+          cost: value.cost || undefined,
+          grams: value.grams || undefined,
+          modelIds: [], // Optional field for model associations
         });
-
-        if (response.ok) {
-          // Reset form
-          form.reset();
-          alert("Filament added successfully!");
-          // TODO: Close modal and refresh data
-        } else {
-          const error = await response.json();
-          alert(`Error: ${error.error || "Failed to add filament"}`);
-        }
-      } catch (error) {
+        
+        // Reset form and close modal on success
+        form.reset();
+        setIsModalOpen(false);
+        // Note: The useCreateFilament hook automatically invalidates the filaments query
+      } catch (error: any) {
         console.error("Error adding filament:", error);
-        alert("Network error: Failed to add filament");
-      } finally {
-        setIsSubmitting(false);
+        alert(`Error: ${error.message || "Failed to add filament"}`);
       }
     },
-    validatorAdapter: zodValidator(),
   });
 
   return (
@@ -109,11 +96,15 @@ export default function AddFilamentDialog({
       title="Add Filament"
       description="Create a new filament entry for your 3D printing inventory."
       primaryAction={{
-        label: isSubmitting ? "Adding..." : "Add Filament",
+        label: createFilamentMutation.isPending ? "Adding..." : "Add Filament",
         onPress: () => form.handleSubmit(),
       }}
       secondaryAction={{
         label: "Cancel",
+        onPress: () => {
+          form.reset();
+          setIsModalOpen(false);
+        },
       }}
     >
       <Form
@@ -123,11 +114,23 @@ export default function AddFilamentDialog({
           form.handleSubmit();
         }}
       >
+        {createFilamentMutation.error && (
+          <div className="rounded-md bg-red-50 p-4 dark:bg-red-900/20">
+            <div className="text-sm text-red-700 dark:text-red-400">
+              Error: {createFilamentMutation.error.message}
+            </div>
+          </div>
+        )}
         {/* Name Field */}
         <form.Field
           name="name"
           validators={{
-            onChange: filamentFormSchema.shape.name,
+            onChange: ({ value }) => {
+              if (!value || value.length < 1) {
+                return "Name is required";
+              }
+              return undefined;
+            },
           }}
         >
           {(field) => (
@@ -155,7 +158,12 @@ export default function AddFilamentDialog({
         <form.Field
           name="color"
           validators={{
-            onChange: filamentFormSchema.shape.color,
+            onChange: ({ value }) => {
+              if (!value || !value.match(/^#[0-9A-Fa-f]{6}$/)) {
+                return "Must be a valid hex color";
+              }
+              return undefined;
+            },
           }}
         >
           {(field) => (
@@ -189,7 +197,12 @@ export default function AddFilamentDialog({
         <form.Field
           name="brandName"
           validators={{
-            onChange: filamentFormSchema.shape.brandName,
+            onChange: ({ value }) => {
+              if (!value || value.length < 1) {
+                return "Brand is required";
+              }
+              return undefined;
+            },
           }}
         >
           {(field) => (
@@ -204,7 +217,11 @@ export default function AddFilamentDialog({
                 isInvalid={field.state.meta.errors.length > 0}
               >
                 <AriaButton className="mt-1 relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-                  <SelectValue className="block truncate" placeholder="Select a brand" />
+                  <SelectValue className="block truncate">
+                    {({ isPlaceholder, selectedText }) => 
+                      isPlaceholder ? "Select a brand" : selectedText
+                    }
+                  </SelectValue>
                   <ChevronDownIcon
                     className="pointer-events-none absolute inset-y-0 right-0 h-5 w-5 text-gray-400 top-1/2 transform -translate-y-1/2 mr-2"
                     aria-hidden="true"
@@ -237,7 +254,12 @@ export default function AddFilamentDialog({
         <form.Field
           name="materialTypeId"
           validators={{
-            onChange: filamentFormSchema.shape.materialTypeId,
+            onChange: ({ value }) => {
+              if (!value || value <= 0) {
+                return "Material type is required";
+              }
+              return undefined;
+            },
           }}
         >
           {(field) => (
@@ -252,7 +274,11 @@ export default function AddFilamentDialog({
                 isInvalid={field.state.meta.errors.length > 0}
               >
                 <AriaButton className="mt-1 relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-                  <SelectValue className="block truncate" placeholder="Select a material type" />
+                  <SelectValue className="block truncate">
+                    {({ isPlaceholder, selectedText }) => 
+                      isPlaceholder ? "Select a material type" : selectedText
+                    }
+                  </SelectValue>
                   <ChevronDownIcon
                     className="pointer-events-none absolute inset-y-0 right-0 h-5 w-5 text-gray-400 top-1/2 transform -translate-y-1/2 mr-2"
                     aria-hidden="true"
@@ -285,7 +311,12 @@ export default function AddFilamentDialog({
         <form.Field
           name="diameter"
           validators={{
-            onChange: filamentFormSchema.shape.diameter,
+            onChange: ({ value }) => {
+              if (!value || value <= 0) {
+                return "Diameter must be positive";
+              }
+              return undefined;
+            },
           }}
         >
           {(field) => (
@@ -331,7 +362,12 @@ export default function AddFilamentDialog({
         <form.Field
           name="cost"
           validators={{
-            onChange: filamentFormSchema.shape.cost,
+            onChange: ({ value }) => {
+              if (value && value < 0) {
+                return "Cost must be positive";
+              }
+              return undefined;
+            },
           }}
         >
           {(field) => (
@@ -363,7 +399,12 @@ export default function AddFilamentDialog({
         <form.Field
           name="grams"
           validators={{
-            onChange: filamentFormSchema.shape.grams,
+            onChange: ({ value }) => {
+              if (value && value < 0) {
+                return "Weight must be positive";
+              }
+              return undefined;
+            },
           }}
         >
           {(field) => (

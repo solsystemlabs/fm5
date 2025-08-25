@@ -14,9 +14,9 @@ function FilamentsPage() {
   if (error) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold text-gray-900">Filaments</h1>
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-red-600">
+        <h1 className="text-3xl font-bold text-foreground">Filaments</h1>
+        <div className="bg-card rounded-lg shadow p-8 text-center">
+          <p className="text-destructive">
             Error loading filaments: {error.message}
           </p>
         </div>
@@ -28,10 +28,10 @@ function FilamentsPage() {
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-base font-semibold text-gray-900 dark:text-white">
+          <h1 className="text-base font-semibold text-foreground">
             Filaments
           </h1>
-          <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+          <p className="mt-2 text-sm text-muted-foreground">
             A complete list of all your 3D printing filaments including their
             specifications and associated models.
           </p>
@@ -47,7 +47,7 @@ function FilamentsPage() {
 
       {isLoading ? (
         <div className="mt-8 p-8 text-center">
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-muted-foreground">
             Loading filaments...
           </p>
         </div>

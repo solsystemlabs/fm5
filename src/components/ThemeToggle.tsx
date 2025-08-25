@@ -35,7 +35,7 @@ export function ThemeToggle() {
 
   return (
     <MenuTrigger>
-      <Button className="relative inline-flex items-center justify-center rounded-md p-2 text-pewter-700 hover:bg-pewter-100 hover:text-pewter-900 focus:outline-none focus:ring-2 focus:ring-pewter-500 focus:ring-offset-2 dark:text-pewter-300 dark:hover:bg-pewter-800 dark:hover:text-pewter-100">
+      <Button className="relative inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
         <span className="sr-only">Toggle theme</span>
         <CurrentIcon className="h-5 w-5" aria-hidden="true" />
       </Button>

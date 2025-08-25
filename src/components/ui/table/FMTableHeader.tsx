@@ -8,7 +8,7 @@ const FMTableHeader = ({
   className,
 }: PropsWithChildren & { className?: string }): ReactNode => {
   return (
-    <TableHeader className={twMerge(clsx("bg-pewter-100", className))}>
+    <TableHeader className={twMerge(clsx("bg-secondary", className))}>
       {children}
     </TableHeader>
   );
@@ -21,7 +21,7 @@ FMTableHeader.Row = ({
   return (
     <Row
       className={twMerge(
-        clsx("divide-pewter-300 divide-y dark:divide-white/15", className),
+        clsx("divide-y divide-border", className),
       )}
     >
       {children}

@@ -15,7 +15,7 @@ export default function FMTable({
     <div
       className={twMerge(
         clsx(
-          "ring-pewter-300 -mx-4 mt-10 rounded-lg shadow-lg ring-1 sm:mx-0 sm:rounded-lg dark:ring-white/15",
+          "-mx-4 mt-10 rounded-lg shadow-lg ring-1 ring-pewter-200 dark:ring-pewter-800 sm:mx-0 sm:rounded-lg",
           wrapperClassName,
         ),
       )}
@@ -23,7 +23,7 @@ export default function FMTable({
       <Table
         className={twMerge(
           clsx(
-            "divide-pewter-300 relative min-w-full divide-y dark:divide-white/15",
+            "relative min-w-full divide-y divide-border",
             tableClassName,
           ),
         )}

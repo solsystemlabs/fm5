@@ -34,7 +34,7 @@ export default function FMInput({
       className={twMerge(
         clsx(
           // Base styles
-          "rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white",
+          "rounded-md border border-input bg-background shadow-sm focus:border-ring focus:ring-ring text-foreground",
           // Width
           fullWidth ? "w-full" : "",
           sizeClass,

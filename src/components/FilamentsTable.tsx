@@ -31,10 +31,7 @@ export default function FilamentsTable({
       </FMTableHeader>
       <TableBody>
         {data.map((filament) => (
-          <FMRow
-            key={filament.id}
-            className="border-pewter-200 not-last:border-b"
-          >
+          <FMRow key={filament.id}>
             <Cell className="relative py-4 pr-3 pl-4 text-sm sm:pl-6">
               <div className="flex items-center gap-x-3">
                 <ColorSwatch
@@ -42,19 +39,19 @@ export default function FilamentsTable({
                   color={filament.color}
                 />
                 <div className="">
-                  <div className="text-md text-pewter-900 justify-end font-bold dark:text-white">
+                  <div className="text-md text-foreground justify-end font-bold">
                     {filament.name}
                   </div>
-                  <div className="font-medium text-gray-500 dark:text-white">
+                  <div className="font-medium text-muted-foreground">
                     {filament.color}
                   </div>
                 </div>
               </div>
-              <div className="mt-1 flex flex-col text-gray-500 sm:block lg:hidden dark:text-gray-400">
+              <div className="mt-1 flex flex-col text-muted-foreground sm:block lg:hidden">
                 <span>{filament.brandName}</span>
-                <span className="hidden text-gray-300 sm:inline"> | </span>
+                <span className="hidden text-muted-foreground/60 sm:inline"> | </span>
                 <span>{filament.Material.name}</span>
-                <span className="hidden text-gray-300 sm:inline"> | </span>
+                <span className="hidden text-muted-foreground/60 sm:inline"> | </span>
                 <span>{filament.diameter}mm</span>
               </div>
             </Cell>
@@ -68,15 +65,15 @@ export default function FilamentsTable({
             <FMCell className="hidden lg:table-cell">
               {filament.diameter}mm
             </FMCell>
-            <FMCell className="px-3 py-3.5 text-sm text-gray-500 dark:text-gray-400">
+            <FMCell>
               <div className="sm:hidden">${filament.cost}</div>
               <div className="hidden sm:block">${filament.cost}</div>
             </FMCell>
-            <FMCell className="px-3 py-3.5 text-sm text-gray-500 dark:text-gray-400">
+            <FMCell>
               {filament.grams}g
             </FMCell>
             <FMCell className="relative py-3.5 pr-4 pl-3 text-sm font-medium sm:pr-6">
-              <div className="text-gray-500 dark:text-gray-400">
+              <div className="text-muted-foreground">
                 {filament.Models && filament.Models.length > 0 ? (
                   <span>
                     {filament.Models.length} model

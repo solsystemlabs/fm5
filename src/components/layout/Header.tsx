@@ -23,7 +23,7 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="w-full bg-white dark:bg-card">
+    <header className="w-full bg-background">
       <nav
         aria-label="Global"
         className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8"
@@ -42,10 +42,10 @@ export default function Header() {
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-pewter-900 hover:text-pewter-600 px-2 py-1.5 text-sm/6 font-semibold dark:text-pewter-100 dark:hover:text-pewter-300"
+                className="text-foreground hover:text-primary px-2 py-1.5 text-sm/6 font-semibold"
                 activeProps={{
                   className:
-                    "text-sm/6 font-semibold !text-white border border-pewter-500 px-2 bg-pewter-500 rounded-md dark:!text-white dark:border-pewter-400 dark:bg-pewter-600",
+                    "text-sm/6 font-semibold text-primary-foreground border border-primary px-2 bg-primary rounded-md",
                 }}
               >
                 {item.name}

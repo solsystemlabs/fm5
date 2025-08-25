@@ -11,9 +11,9 @@ function ModelsPage() {
   if (error) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold text-gray-900">Models</h1>
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-red-600">Error loading models: {error.message}</p>
+        <h1 className="text-3xl font-bold text-foreground">Models</h1>
+        <div className="bg-card rounded-lg shadow p-8 text-center">
+          <p className="text-destructive">Error loading models: {error.message}</p>
         </div>
       </div>
     );
@@ -22,13 +22,13 @@ function ModelsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">Models</h1>
+        <h1 className="text-3xl font-bold text-foreground">Models</h1>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
+      <div className="bg-card rounded-lg shadow">
         {isLoading ? (
           <div className="p-8 text-center">
-            <p className="text-gray-600">Loading models...</p>
+            <p className="text-muted-foreground">Loading models...</p>
           </div>
         ) : (
           <div className="p-6"></div>

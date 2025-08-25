@@ -43,12 +43,12 @@ export default function FMButton({
     <Button
       className={twMerge(
         clsx(
-          "bg-pewter-500 hover:bg-pewter-600 focus-visible:outline-pewter-700 dark:bg-pewter-500 dark:hover:bg-pewter-400 dark:focus-visible:outline-pewter-500 cursor-pointer rounded-md text-sm font-semibold text-white shadow-md hover:shadow-[0_4px_8px_0_rgba(0,0,0,0.25)] focus-visible:outline-2 focus-visible:outline-offset-2 dark:shadow-none",
+          "bg-pewter-700 hover:bg-pewter-800 focus-visible:outline-ring cursor-pointer rounded-md text-sm font-semibold text-white shadow-md hover:shadow-[0_4px_8px_0_rgba(0,0,0,0.25)] focus-visible:outline-2 focus-visible:outline-offset-2 dark:bg-pewter-500 dark:hover:bg-pewter-400 dark:text-pewter-950",
           secondary
-            ? "text-pewter-900 inset-ring-pewter-300 hover:bg-pewter-50 bg-white inset-ring dark:bg-white/10 dark:inset-ring-white/5 dark:hover:bg-white/20"
+            ? "text-pewter-700 bg-pewter-100 hover:bg-pewter-200 border border-pewter-300 dark:text-pewter-200 dark:bg-pewter-800 dark:hover:bg-pewter-700 dark:border-pewter-600"
             : "",
           soft
-            ? "bg-pewter-100 text-pewter-700 hover:bg-pewter-200 dark:bg-pewter-500/20 dark:text-pewter-400 dark:hover:bg-pewter-500/30"
+            ? "bg-satin-linen-200 text-satin-linen-800 hover:bg-satin-linen-300 dark:bg-satin-linen-800 dark:text-satin-linen-200 dark:hover:bg-satin-linen-700"
             : "",
           rounded ? "rounded-full" : "",
           sizeClass,

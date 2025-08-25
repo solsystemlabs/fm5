@@ -10,7 +10,7 @@ export default function FMRow({
   return (
     <Row
       className={twMerge(
-        clsx("border-pewter-200 not-last:border-b", className),
+        clsx("not-last:border-b border-border", className),
       )}
     >
       {children}

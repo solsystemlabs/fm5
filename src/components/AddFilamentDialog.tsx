@@ -134,15 +134,15 @@ export default function AddFilamentDialog({
         }}
       >
         {createFilamentMutation.error && (
-          <div className="rounded-md bg-red-50 p-4 dark:bg-red-900/20">
-            <div className="text-sm text-red-700 dark:text-red-400">
+          <div className="rounded-md bg-destructive/10 p-4">
+            <div className="text-sm text-destructive">
               Error: {createFilamentMutation.error.message}
             </div>
           </div>
         )}
         {(brandsError || materialTypesError || filamentTypesError) && (
-          <div className="rounded-md bg-yellow-50 p-4 dark:bg-yellow-900/20">
-            <div className="text-sm text-yellow-700 dark:text-yellow-400">
+          <div className="rounded-md bg-accent/20 p-4">
+            <div className="text-sm text-accent-foreground">
               Warning: Unable to load some form data. {brandsError?.message}{" "}
               {materialTypesError?.message} {filamentTypesError?.message}
             </div>
@@ -167,11 +167,11 @@ export default function AddFilamentDialog({
               onChange={(value) => field.handleChange(value)}
               isInvalid={field.state.meta.errors.length > 0}
             >
-              <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <Label className="block text-sm font-medium text-foreground">
                 Name *
               </Label>
               <FMInput placeholder="e.g., Hatchbox PLA Red" className="mt-1" />
-              <FieldError className="mt-1 text-sm text-red-600 dark:text-red-400">
+              <FieldError className="mt-1 text-sm text-destructive">
                 {field.state.meta.errors.join(", ")}
               </FieldError>
             </TextField>
@@ -211,7 +211,7 @@ export default function AddFilamentDialog({
                 isInvalid={field.state.meta.errors.length > 0}
                 className="flex flex-col gap-2"
               >
-                <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <Label className="block text-sm font-medium text-foreground">
                   Color *
                 </Label>
                 <div className="flex w-full flex-row items-center gap-2">
@@ -221,7 +221,7 @@ export default function AddFilamentDialog({
                   />
                   <FMInput />
                 </div>
-                <FieldError className="mt-1 text-sm text-red-600 dark:text-red-400">
+                <FieldError className="mt-1 text-sm text-destructive">
                   {field.state.meta.errors.join(", ")}
                 </FieldError>
               </ColorField>
@@ -243,7 +243,7 @@ export default function AddFilamentDialog({
         >
           {(field) => (
             <div>
-              <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <Label className="block text-sm font-medium text-foreground">
                 Brand *
               </Label>
               <Select
@@ -252,24 +252,24 @@ export default function AddFilamentDialog({
                 onSelectionChange={(key) => field.handleChange(key as string)}
                 isInvalid={field.state.meta.errors.length > 0}
               >
-                <AriaButton className="relative mt-1 w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pr-10 pl-3 text-left shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                <AriaButton className="relative mt-1 w-full cursor-default rounded-md border border-input bg-background py-2 pr-10 pl-3 text-left shadow-sm focus:border-ring focus:ring-1 focus:ring-ring focus:outline-none sm:text-sm text-foreground">
                   <SelectValue className="block truncate">
                     {({ isPlaceholder, selectedText }) =>
                       isPlaceholder ? "Select a brand" : selectedText
                     }
                   </SelectValue>
                   <ChevronDownIcon
-                    className="pointer-events-none absolute inset-y-0 top-1/2 right-0 mr-2 h-5 w-5 -translate-y-1/2 transform text-gray-400"
+                    className="pointer-events-none absolute inset-y-0 top-1/2 right-0 mr-2 h-5 w-5 -translate-y-1/2 transform text-muted-foreground"
                     aria-hidden="true"
                   />
                 </AriaButton>
-                <Popover className="ring-opacity-5 mt-1 max-h-60 w-[var(--trigger-width)] overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black focus:outline-none sm:text-sm dark:bg-gray-700 dark:ring-gray-600">
+                <Popover className="ring-opacity-5 mt-1 max-h-60 w-[var(--trigger-width)] overflow-auto rounded-md bg-popover py-1 text-base shadow-lg ring-1 ring-black focus:outline-none sm:text-sm border border-border">
                   <ListBox>
                     {brandsLoading ? (
                       <ListBoxItem
                         key="loading"
                         id="loading"
-                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-gray-400"
+                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-muted-foreground"
                       >
                         Loading brands...
                       </ListBoxItem>
@@ -278,7 +278,7 @@ export default function AddFilamentDialog({
                         <ListBoxItem
                           key={brand.name}
                           id={brand.name}
-                          className="relative cursor-default py-2 pr-9 pl-3 text-gray-900 select-none hover:bg-indigo-600 hover:text-white dark:text-gray-100 dark:hover:bg-indigo-600"
+                          className="relative cursor-default py-2 pr-9 pl-3 text-popover-foreground select-none hover:bg-accent hover:text-accent-foreground "
                         >
                           {brand.name}
                         </ListBoxItem>
@@ -287,7 +287,7 @@ export default function AddFilamentDialog({
                       <ListBoxItem
                         key="no-brands"
                         id="no-brands"
-                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-gray-400"
+                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-muted-foreground"
                       >
                         No brands available
                       </ListBoxItem>
@@ -296,7 +296,7 @@ export default function AddFilamentDialog({
                 </Popover>
               </Select>
               {field.state.meta.errors.length > 0 && (
-                <div className="mt-1 text-sm text-red-600 dark:text-red-400">
+                <div className="mt-1 text-sm text-destructive">
                   {field.state.meta.errors.join(", ")}
                 </div>
               )}
@@ -318,7 +318,7 @@ export default function AddFilamentDialog({
         >
           {(field) => (
             <div>
-              <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <Label className="block text-sm font-medium text-foreground">
                 Material Type *
               </Label>
               <Select
@@ -327,24 +327,24 @@ export default function AddFilamentDialog({
                 onSelectionChange={(key) => field.handleChange(key as number)}
                 isInvalid={field.state.meta.errors.length > 0}
               >
-                <AriaButton className="relative mt-1 w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pr-10 pl-3 text-left shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                <AriaButton className="relative mt-1 w-full cursor-default rounded-md border border-input bg-background py-2 pr-10 pl-3 text-left shadow-sm focus:border-ring focus:ring-1 focus:ring-ring focus:outline-none sm:text-sm text-foreground">
                   <SelectValue className="block truncate">
                     {({ isPlaceholder, selectedText }) =>
                       isPlaceholder ? "Select a material type" : selectedText
                     }
                   </SelectValue>
                   <ChevronDownIcon
-                    className="pointer-events-none absolute inset-y-0 top-1/2 right-0 mr-2 h-5 w-5 -translate-y-1/2 transform text-gray-400"
+                    className="pointer-events-none absolute inset-y-0 top-1/2 right-0 mr-2 h-5 w-5 -translate-y-1/2 transform text-muted-foreground"
                     aria-hidden="true"
                   />
                 </AriaButton>
-                <Popover className="ring-opacity-5 mt-1 max-h-60 w-[var(--trigger-width)] overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black focus:outline-none sm:text-sm dark:bg-gray-700 dark:ring-gray-600">
+                <Popover className="ring-opacity-5 mt-1 max-h-60 w-[var(--trigger-width)] overflow-auto rounded-md bg-popover py-1 text-base shadow-lg ring-1 ring-black focus:outline-none sm:text-sm border border-border">
                   <ListBox>
                     {materialTypesLoading ? (
                       <ListBoxItem
                         key="loading"
                         id="loading"
-                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-gray-400"
+                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-muted-foreground"
                       >
                         Loading material types...
                       </ListBoxItem>
@@ -353,7 +353,7 @@ export default function AddFilamentDialog({
                         <ListBoxItem
                           key={type.id}
                           id={type.id}
-                          className="relative cursor-default py-2 pr-9 pl-3 text-gray-900 select-none hover:bg-indigo-600 hover:text-white dark:text-gray-100 dark:hover:bg-indigo-600"
+                          className="relative cursor-default py-2 pr-9 pl-3 text-popover-foreground select-none hover:bg-accent hover:text-accent-foreground "
                         >
                           {type.name}
                         </ListBoxItem>
@@ -362,7 +362,7 @@ export default function AddFilamentDialog({
                       <ListBoxItem
                         key="no-types"
                         id="no-types"
-                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-gray-400"
+                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-muted-foreground"
                       >
                         No material types available
                       </ListBoxItem>
@@ -371,7 +371,7 @@ export default function AddFilamentDialog({
                 </Popover>
               </Select>
               {field.state.meta.errors.length > 0 && (
-                <div className="mt-1 text-sm text-red-600 dark:text-red-400">
+                <div className="mt-1 text-sm text-destructive">
                   {field.state.meta.errors.join(", ")}
                 </div>
               )}
@@ -393,7 +393,7 @@ export default function AddFilamentDialog({
         >
           {(field) => (
             <div>
-              <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <Label className="block text-sm font-medium text-foreground">
                 Filament Type *
               </Label>
               <Select
@@ -402,24 +402,24 @@ export default function AddFilamentDialog({
                 onSelectionChange={(key) => field.handleChange(key as number)}
                 isInvalid={field.state.meta.errors.length > 0}
               >
-                <AriaButton className="relative mt-1 w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pr-10 pl-3 text-left shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                <AriaButton className="relative mt-1 w-full cursor-default rounded-md border border-input bg-background py-2 pr-10 pl-3 text-left shadow-sm focus:border-ring focus:ring-1 focus:ring-ring focus:outline-none sm:text-sm text-foreground">
                   <SelectValue className="block truncate">
                     {({ isPlaceholder, selectedText }) =>
                       isPlaceholder ? "Select a filament type" : selectedText
                     }
                   </SelectValue>
                   <ChevronDownIcon
-                    className="pointer-events-none absolute inset-y-0 top-1/2 right-0 mr-2 h-5 w-5 -translate-y-1/2 transform text-gray-400"
+                    className="pointer-events-none absolute inset-y-0 top-1/2 right-0 mr-2 h-5 w-5 -translate-y-1/2 transform text-muted-foreground"
                     aria-hidden="true"
                   />
                 </AriaButton>
-                <Popover className="ring-opacity-5 mt-1 max-h-60 w-[var(--trigger-width)] overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black focus:outline-none sm:text-sm dark:bg-gray-700 dark:ring-gray-600">
+                <Popover className="ring-opacity-5 mt-1 max-h-60 w-[var(--trigger-width)] overflow-auto rounded-md bg-popover py-1 text-base shadow-lg ring-1 ring-black focus:outline-none sm:text-sm border border-border">
                   <ListBox>
                     {filamentTypesLoading ? (
                       <ListBoxItem
                         key="loading"
                         id="loading"
-                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-gray-400"
+                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-muted-foreground"
                       >
                         Loading filament types...
                       </ListBoxItem>
@@ -428,7 +428,7 @@ export default function AddFilamentDialog({
                         <ListBoxItem
                           key={type.id}
                           id={type.id}
-                          className="relative cursor-default py-2 pr-9 pl-3 text-gray-900 select-none hover:bg-indigo-600 hover:text-white dark:text-gray-100 dark:hover:bg-indigo-600"
+                          className="relative cursor-default py-2 pr-9 pl-3 text-popover-foreground select-none hover:bg-accent hover:text-accent-foreground "
                         >
                           {type.name}
                         </ListBoxItem>
@@ -437,7 +437,7 @@ export default function AddFilamentDialog({
                       <ListBoxItem
                         key="no-types"
                         id="no-types"
-                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-gray-400"
+                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-muted-foreground"
                       >
                         No filament types available
                       </ListBoxItem>
@@ -446,7 +446,7 @@ export default function AddFilamentDialog({
                 </Popover>
               </Select>
               {field.state.meta.errors.length > 0 && (
-                <div className="mt-1 text-sm text-red-600 dark:text-red-400">
+                <div className="mt-1 text-sm text-destructive">
                   {field.state.meta.errors.join(", ")}
                 </div>
               )}
@@ -480,25 +480,25 @@ export default function AddFilamentDialog({
               }}
               isInvalid={field.state.meta.errors.length > 0}
             >
-              <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <Label className="block text-sm font-medium text-foreground">
                 Diameter (mm) *
               </Label>
-              <Group className="relative mt-1 rounded-md border border-gray-300 dark:border-gray-600">
+              <Group className="relative mt-1 rounded-md border border-input">
                 <AriaButton
                   slot="decrement"
-                  className="absolute top-1/2 left-1 flex h-6 w-6 -translate-y-1/2 transform items-center justify-center text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-200"
+                  className="absolute top-1/2 left-1 flex h-6 w-6 -translate-y-1/2 transform items-center justify-center text-muted-foreground hover:text-gray-600 dark:text-muted-foreground dark:hover:text-gray-200"
                 >
                   −
                 </AriaButton>
                 <FMInput />
                 <AriaButton
                   slot="increment"
-                  className="absolute top-1/2 right-1 flex h-6 w-6 -translate-y-1/2 transform items-center justify-center text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-200"
+                  className="absolute top-1/2 right-1 flex h-6 w-6 -translate-y-1/2 transform items-center justify-center text-muted-foreground hover:text-gray-600 dark:text-muted-foreground dark:hover:text-gray-200"
                 >
                   +
                 </AriaButton>
               </Group>
-              <FieldError className="mt-1 text-sm text-red-600 dark:text-red-400">
+              <FieldError className="mt-1 text-sm text-destructive">
                 {field.state.meta.errors.join(", ")}
               </FieldError>
             </NumberField>
@@ -529,13 +529,13 @@ export default function AddFilamentDialog({
               }}
               isInvalid={field.state.meta.errors.length > 0}
             >
-              <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <Label className="block text-sm font-medium text-foreground">
                 Cost (optional)
               </Label>
               <Group className="mt-1">
                 <FMInput />
               </Group>
-              <FieldError className="mt-1 text-sm text-red-600 dark:text-red-400">
+              <FieldError className="mt-1 text-sm text-destructive">
                 {field.state.meta.errors.join(", ")}
               </FieldError>
             </NumberField>
@@ -562,13 +562,13 @@ export default function AddFilamentDialog({
               step={1}
               isInvalid={field.state.meta.errors.length > 0}
             >
-              <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <Label className="block text-sm font-medium text-foreground">
                 Weight (g) (optional)
               </Label>
               <Group className="mt-1">
                 <FMInput placeholder="1000" />
               </Group>
-              <FieldError className="mt-1 text-sm text-red-600 dark:text-red-400">
+              <FieldError className="mt-1 text-sm text-destructive">
                 {field.state.meta.errors.join(", ")}
               </FieldError>
             </NumberField>

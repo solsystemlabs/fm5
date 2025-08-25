@@ -9,7 +9,7 @@ export default function FMCell({
   return (
     <Cell
       className={clsx(
-        "px-3 py-3.5 text-sm text-gray-500  dark:text-gray-400",
+        "px-3 py-3.5 text-sm text-muted-foreground",
         className,
       )}
     >

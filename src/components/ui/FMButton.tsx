@@ -1,15 +1,15 @@
 import clsx from "clsx";
-import type { PropsWithChildren, ReactNode } from "react";
-import { Button } from "react-aria-components";
+import type { ReactNode } from "react";
+import { Button, type ButtonProps } from "react-aria-components";
 import { twMerge } from "tailwind-merge";
 
-type FMButtonProps = {
+interface FMButtonProps extends Omit<ButtonProps, "className"> {
   secondary?: boolean;
   soft?: boolean;
   rounded?: boolean;
   className?: string;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
-} & PropsWithChildren;
+}
 
 export default function FMButton({
   secondary = false,
@@ -18,6 +18,7 @@ export default function FMButton({
   children,
   className,
   size = "lg",
+  ...props
 }: FMButtonProps): ReactNode {
   let sizeClass = "";
 
@@ -54,6 +55,7 @@ export default function FMButton({
           className,
         ),
       )}
+      {...props}
     >
       {children}
     </Button>

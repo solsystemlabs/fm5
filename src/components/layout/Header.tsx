@@ -8,6 +8,7 @@ import {
   Heading,
   Modal,
 } from "react-aria-components";
+import { ThemeToggle } from "../ThemeToggle";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard" },
@@ -22,7 +23,7 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="w-full bg-white">
+    <header className="w-full bg-white dark:bg-card">
       <nav
         aria-label="Global"
         className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8"
@@ -41,10 +42,10 @@ export default function Header() {
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-pewter-900 hover:text-pewter-600 px-2 py-1.5 text-sm/6 font-semibold"
+                className="text-pewter-900 hover:text-pewter-600 px-2 py-1.5 text-sm/6 font-semibold dark:text-pewter-100 dark:hover:text-pewter-300"
                 activeProps={{
                   className:
-                    "text-sm/6 font-semibold !text-white border border-pewter-500 px-2 bg-pewter-500 rounded-md",
+                    "text-sm/6 font-semibold !text-white border border-pewter-500 px-2 bg-pewter-500 rounded-md dark:!text-white dark:border-pewter-400 dark:bg-pewter-600",
                 }}
               >
                 {item.name}
@@ -52,26 +53,29 @@ export default function Header() {
             ))}
           </div>
         </div>
-        <div className="flex lg:hidden">
-          {/* <button */}
-          {/*   type="button" */}
-          {/*   onClick={() => setMobileMenuOpen(true)} */}
-          {/*   className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700" */}
-          {/* > */}
-          {/*   <span className="sr-only">Open main menu</span> */}
-          {/*   <Bars3Icon aria-hidden="true" className="size-6" /> */}
-          {/* </button> */}
-          <DialogTrigger>
-            <Button>
-              <Bars3Icon aria-hidden="true" className="size-6" />
-            </Button>
-            <Modal>
-              <Dialog>
-                <Heading slot="title" />
-                <Button slot="close" />
-              </Dialog>
-            </Modal>
-          </DialogTrigger>
+        <div className="flex items-center gap-4">
+          <ThemeToggle />
+            <div className="flex lg:hidden">
+            {/* <button */}
+            {/*   type="button" */}
+            {/*   onClick={() => setMobileMenuOpen(true)} */}
+            {/*   className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700" */}
+            {/* > */}
+            {/*   <span className="sr-only">Open main menu</span> */}
+            {/*   <Bars3Icon aria-hidden="true" className="size-6" /> */}
+            {/* </button> */}
+            <DialogTrigger>
+              <Button>
+                <Bars3Icon aria-hidden="true" className="size-6" />
+              </Button>
+              <Modal>
+                <Dialog>
+                  <Heading slot="title" />
+                  <Button slot="close" />
+                </Dialog>
+              </Modal>
+            </DialogTrigger>
+            </div>
         </div>
       </nav>
     </header>

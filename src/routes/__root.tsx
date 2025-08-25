@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import Header from "../components/layout/Header";
+import { ThemeProvider } from "../lib/theme-context";
 import appCss from "../styles/global.css?url";
 
 const queryClient = new QueryClient();
@@ -34,14 +35,16 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <RootDocument>
-      <QueryClientProvider client={queryClient}>
-        <div className="w-full h-full min-h-screen bg-gray-50">
-          <Header />
-          <main className="container mx-auto px-4 py-8">
-            <Outlet />
-          </main>
-        </div>
-      </QueryClientProvider>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <div className="w-full h-full min-h-screen bg-background">
+            <Header />
+            <main className="container mx-auto px-4 py-8">
+              <Outlet />
+            </main>
+          </div>
+        </QueryClientProvider>
+      </ThemeProvider>
     </RootDocument>
   );
 }

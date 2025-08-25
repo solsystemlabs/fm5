@@ -17,13 +17,14 @@ export default function FilamentsTable({
   data: Filament[];
 }): ReactNode {
   return (
-    <div className="-mx-4 mt-10 ring-1 ring-pewter-300 sm:mx-0 sm:rounded-lg dark:ring-white/15 shadow-lg">
-      <Table className="relative min-w-full divide-y divide-pewter-300 dark:divide-white/15">
+    <div className="ring-pewter-300 -mx-4 mt-10 shadow-lg ring-1 sm:mx-0 sm:rounded-lg dark:ring-white/15">
+      <Table className="divide-pewter-300 relative min-w-full divide-y dark:divide-white/15">
         <TableHeader className="bg-pewter-100">
-          <Row className="divide-y divide-pewter-300 dark:divide-white/15">
-            <FMColumn className="py-3.5 pr-3 pl-4 text-left sm:pl-6 rounded-tl-lg">
-              Filament
+          <Row className="divide-pewter-300 divide-y dark:divide-white/15">
+            <FMColumn className="rounded-tl-lg py-3.5 pr-3 pl-4 text-left sm:pl-6">
+              Name & Color
             </FMColumn>
+            <FMColumn>Type</FMColumn>
             <FMColumn className="hidden lg:table-cell">Brand</FMColumn>
             <FMColumn className="hidden lg:table-cell">Material</FMColumn>
             <FMColumn className="hidden lg:table-cell">Diameter</FMColumn>
@@ -36,16 +37,16 @@ export default function FilamentsTable({
           {data.map((filament) => (
             <Row
               key={filament.id}
-              className="not-last:border-b border-pewter-200"
+              className="border-pewter-200 not-last:border-b"
             >
               <Cell className="relative py-4 pr-3 pl-4 text-sm sm:pl-6">
                 <div className="flex items-center gap-x-3">
                   <ColorSwatch
-                    className="h-8 w-8 rounded-sm flex-shrink-0 shadow-[0_4px_6px_0_rgba(50,50,50,0.25)]"
+                    className="h-8 w-8 flex-shrink-0 rounded-sm shadow-[0_4px_6px_0_rgba(50,50,50,0.25)]"
                     color={filament.color}
                   />
                   <div className="">
-                    <div className="justify-end font-bold text-md text-pewter-900 dark:text-white">
+                    <div className="text-md text-pewter-900 justify-end font-bold dark:text-white">
                       {filament.name}
                     </div>
                     <div className="font-medium text-gray-500 dark:text-white">
@@ -55,12 +56,13 @@ export default function FilamentsTable({
                 </div>
                 <div className="mt-1 flex flex-col text-gray-500 sm:block lg:hidden dark:text-gray-400">
                   <span>{filament.brandName}</span>
-                  <span className="hidden sm:inline text-gray-300"> | </span>
+                  <span className="hidden text-gray-300 sm:inline"> | </span>
                   <span>{filament.Material.name}</span>
-                  <span className="hidden sm:inline text-gray-300"> | </span>
+                  <span className="hidden text-gray-300 sm:inline"> | </span>
                   <span>{filament.diameter}mm</span>
                 </div>
               </Cell>
+              <FMCell>{filament.Type.name}</FMCell>
               <FMCell className="hidden lg:table-cell">
                 {filament.brandName}
               </FMCell>
@@ -77,7 +79,7 @@ export default function FilamentsTable({
               <FMCell className="px-3 py-3.5 text-sm text-gray-500 dark:text-gray-400">
                 {filament.grams}g
               </FMCell>
-              <FMCell className="relative py-3.5 pr-4 pl-3  text-sm font-medium sm:pr-6">
+              <FMCell className="relative py-3.5 pr-4 pl-3 text-sm font-medium sm:pr-6">
                 <div className="text-gray-500 dark:text-gray-400">
                   {filament.Models && filament.Models.length > 0 ? (
                     <span>

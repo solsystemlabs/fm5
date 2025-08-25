@@ -26,6 +26,8 @@ model Filament {
   id             Int          @id @unique @default(autoincrement())
   name           String
   color          String
+  filamentTypeId Int
+  Type           FilamentType @relation(fields: [filamentTypeId], references: [id])
   materialTypeId Int
   Material       MaterialType @relation(fields: [materialTypeId], references: [id])
   Models         Model[]      @relation("FilamentToModel")
@@ -34,6 +36,13 @@ model Filament {
   Brand          Brand        @relation(fields: [brandName], references: [name])
   brandName      String
   diameter       Float
+}
+
+model FilamentType {
+  id          Int        @id @unique @default(autoincrement())
+  name        String
+  description String?
+  Filament    Filament[]
 }
 
 model Brand {

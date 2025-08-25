@@ -7,14 +7,17 @@ async function main() {
 
   // Clear existing data
   console.log("🧹 Clearing existing data...");
-  await prisma.filament.deleteMany({});
-  await prisma.model.deleteMany({});
-  await prisma.materialType.deleteMany({});
-  await prisma.brand.deleteMany({});
-  await prisma.modelCategory.deleteMany({});
-  await prisma.account.deleteMany({});
-  await prisma.user.deleteMany({});
-  console.log("✅ Database cleared");
+  try {
+    await prisma.filament.deleteMany({});
+    await prisma.model.deleteMany({});
+    await prisma.materialType.deleteMany({});
+    await prisma.filamentType.deleteMany({});
+    await prisma.brand.deleteMany({});
+    await prisma.modelCategory.deleteMany({});
+    console.log("✅ Database cleared");
+  } catch (error) {
+    console.log("ℹ️  Database tables don't exist yet, skipping cleanup");
+  }
 
   // Create material types using createMany
   await prisma.materialType.createMany({
@@ -30,6 +33,18 @@ async function main() {
   });
 
   console.log("✅ Material types created");
+
+  await prisma.filamentType.createMany({
+    data: [
+      { name: "Basic", description: "Standard finish filament with smooth, glossy surface" },
+      { name: "Sparkle", description: "Filament with metallic flakes that create a sparkling effect" },
+      { name: "Metal", description: "Metal-filled filament with metallic appearance and weight" },
+      { name: "Matte", description: "Low-gloss filament with a smooth, non-reflective finish" },
+    ],
+    skipDuplicates: true,
+  });
+
+  console.log("✅ Filament types created");
 
   // Create brands using createMany
   await prisma.brand.createMany({
@@ -64,6 +79,7 @@ async function main() {
   // Get the created categories and material types for foreign key references
   const categories = await prisma.modelCategory.findMany();
   const materials = await prisma.materialType.findMany();
+  const filamentTypes = await prisma.filamentType.findMany();
   const brands = await prisma.brand.findMany();
 
   const miniatureCategory = categories.find((c) => c.name === "Miniatures")!;
@@ -74,6 +90,11 @@ async function main() {
   const plaType = materials.find((m) => m.name === "PLA")!;
   const petgType = materials.find((m) => m.name === "PETG")!;
   const absType = materials.find((m) => m.name === "ABS")!;
+
+  const basicType = filamentTypes.find((ft) => ft.name === "Basic")!;
+  const sparkleType = filamentTypes.find((ft) => ft.name === "Sparkle")!;
+  const metalType = filamentTypes.find((ft) => ft.name === "Metal")!;
+  const matteType = filamentTypes.find((ft) => ft.name === "Matte")!;
 
   const hatchboxBrand = brands.find((b) => b.name === "Hatchbox")!;
   const overtureBrand = brands.find((b) => b.name === "Overture")!;
@@ -106,6 +127,7 @@ async function main() {
     data: {
       color: "#DC2626",
       name: "Red",
+      filamentTypeId: basicType.id,
       materialTypeId: plaType.id,
       brandName: hatchboxBrand.name,
       diameter: 1.75,
@@ -121,6 +143,7 @@ async function main() {
     data: {
       color: "#2563EB",
       name: "Blue",
+      filamentTypeId: sparkleType.id,
       materialTypeId: plaType.id,
       brandName: hatchboxBrand.name,
       diameter: 1.75,
@@ -136,6 +159,7 @@ async function main() {
     data: {
       color: "#16A34A",
       name: "Green",
+      filamentTypeId: matteType.id,
       materialTypeId: absType.id,
       brandName: overtureBrand.name,
       diameter: 1.75,
@@ -151,6 +175,7 @@ async function main() {
     data: {
       color: "#6B7280",
       name: "Gray",
+      filamentTypeId: metalType.id,
       materialTypeId: petgType.id,
       brandName: sunluBrand.name,
       diameter: 1.75,
@@ -166,6 +191,7 @@ async function main() {
     data: {
       color: "#FFFFFF",
       name: "White",
+      filamentTypeId: basicType.id,
       materialTypeId: plaType.id,
       brandName: hatchboxBrand.name,
       diameter: 1.75,
@@ -181,6 +207,7 @@ async function main() {
     data: {
       color: "#000000",
       name: "Black",
+      filamentTypeId: matteType.id,
       materialTypeId: absType.id,
       brandName: overtureBrand.name,
       diameter: 1.75,

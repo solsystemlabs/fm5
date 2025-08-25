@@ -1,5 +1,7 @@
 // Database types based on Prisma schema
 
+import type { FilamentType } from "@prisma/client";
+
 export interface MaterialType {
   id: number;
   name: string;
@@ -29,6 +31,8 @@ export interface Filament {
   color: string;
   materialTypeId: number;
   Material: MaterialType;
+  filamentTypeId: number;
+  Type: FilamentType;
   Models?: Model[];
   cost: number | null;
   grams: number | null;
@@ -42,6 +46,7 @@ export interface CreateFilamentForm {
   name: string;
   color: string;
   materialTypeId: number;
+  filamentTypeId: number;
   modelIds: number[];
   cost?: number;
   grams?: number;
@@ -77,10 +82,10 @@ export interface UserProfileResponse {
   settings: {
     emailNotifications: boolean;
     pushNotifications: boolean;
-    profileVisibility: 'PUBLIC' | 'PRIVATE' | 'FRIENDS_ONLY';
+    profileVisibility: "PUBLIC" | "PRIVATE" | "FRIENDS_ONLY";
     language: string;
     timezone: string;
-    theme: 'LIGHT' | 'DARK' | 'SYSTEM';
+    theme: "LIGHT" | "DARK" | "SYSTEM";
     marketingEmails: boolean;
   };
   createdAt: string;
@@ -115,10 +120,10 @@ export interface ChangeEmailForm {
 export interface UpdateSettingsForm {
   emailNotifications?: boolean;
   pushNotifications?: boolean;
-  profileVisibility?: 'PUBLIC' | 'PRIVATE' | 'FRIENDS_ONLY';
+  profileVisibility?: "PUBLIC" | "PRIVATE" | "FRIENDS_ONLY";
   language?: string;
   timezone?: string;
-  theme?: 'LIGHT' | 'DARK' | 'SYSTEM';
+  theme?: "LIGHT" | "DARK" | "SYSTEM";
   marketingEmails?: boolean;
 }
 
@@ -129,3 +134,4 @@ export interface ActivityEntry {
   timestamp: string;
   metadata?: Record<string, any>;
 }
+

@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Filament, MaterialType, Model, Brand, CreateFilamentForm, CreateModelForm, ModelCategory } from './types'
+import { FilamentType } from '@prisma/client'
 
 // Query keys
 const QUERY_KEYS = {
   filaments: ['filaments'] as const,
   materialTypes: ['materialTypes'] as const,
+  filamentTypes: ['filamentTypes'] as const,
   models: ['models'] as const,
   modelCategories: ['modelCategories'] as const,
   brands: ['brands'] as const,
@@ -24,6 +26,14 @@ const api = {
     const response = await fetch('/api/material-types')
     if (!response.ok) {
       throw new Error('Failed to fetch material types')
+    }
+    return response.json()
+  },
+
+  getFilamentTypes: async (): Promise<FilamentType[]> => {
+    const response = await fetch('/api/filament-types')
+    if (!response.ok) {
+      throw new Error('Failed to fetch filament types')
     }
     return response.json()
   },
@@ -121,6 +131,13 @@ export function useMaterialTypes() {
   return useQuery({
     queryKey: QUERY_KEYS.materialTypes,
     queryFn: api.getMaterialTypes,
+  })
+}
+
+export function useFilamentTypes() {
+  return useQuery({
+    queryKey: QUERY_KEYS.filamentTypes,
+    queryFn: api.getFilamentTypes,
   })
 }
 

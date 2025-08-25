@@ -23,6 +23,7 @@ import { ServerRoute as ApiMetricsServerRouteImport } from './routes/api/metrics
 import { ServerRoute as ApiMaterialTypesServerRouteImport } from './routes/api/material-types'
 import { ServerRoute as ApiHealthServerRouteImport } from './routes/api/health'
 import { ServerRoute as ApiFilamentsServerRouteImport } from './routes/api/filaments'
+import { ServerRoute as ApiFilamentTypesServerRouteImport } from './routes/api/filament-types'
 import { ServerRoute as ApiBrandsServerRouteImport } from './routes/api/brands'
 import { ServerRoute as ApiFilamentsFilamentIdServerRouteImport } from './routes/api/filaments.$filamentId'
 import { ServerRoute as ApiFilamentsFilamentIdModelsServerRouteImport } from './routes/api/filaments.$filamentId.models'
@@ -88,6 +89,11 @@ const ApiHealthServerRoute = ApiHealthServerRouteImport.update({
 const ApiFilamentsServerRoute = ApiFilamentsServerRouteImport.update({
   id: '/api/filaments',
   path: '/api/filaments',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiFilamentTypesServerRoute = ApiFilamentTypesServerRouteImport.update({
+  id: '/api/filament-types',
+  path: '/api/filament-types',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiBrandsServerRoute = ApiBrandsServerRouteImport.update({
@@ -164,6 +170,7 @@ export interface RootRouteChildren {
 }
 export interface FileServerRoutesByFullPath {
   '/api/brands': typeof ApiBrandsServerRoute
+  '/api/filament-types': typeof ApiFilamentTypesServerRoute
   '/api/filaments': typeof ApiFilamentsServerRouteWithChildren
   '/api/health': typeof ApiHealthServerRoute
   '/api/material-types': typeof ApiMaterialTypesServerRoute
@@ -175,6 +182,7 @@ export interface FileServerRoutesByFullPath {
 }
 export interface FileServerRoutesByTo {
   '/api/brands': typeof ApiBrandsServerRoute
+  '/api/filament-types': typeof ApiFilamentTypesServerRoute
   '/api/filaments': typeof ApiFilamentsServerRouteWithChildren
   '/api/health': typeof ApiHealthServerRoute
   '/api/material-types': typeof ApiMaterialTypesServerRoute
@@ -187,6 +195,7 @@ export interface FileServerRoutesByTo {
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
   '/api/brands': typeof ApiBrandsServerRoute
+  '/api/filament-types': typeof ApiFilamentTypesServerRoute
   '/api/filaments': typeof ApiFilamentsServerRouteWithChildren
   '/api/health': typeof ApiHealthServerRoute
   '/api/material-types': typeof ApiMaterialTypesServerRoute
@@ -200,6 +209,7 @@ export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
   fullPaths:
     | '/api/brands'
+    | '/api/filament-types'
     | '/api/filaments'
     | '/api/health'
     | '/api/material-types'
@@ -211,6 +221,7 @@ export interface FileServerRouteTypes {
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
     | '/api/brands'
+    | '/api/filament-types'
     | '/api/filaments'
     | '/api/health'
     | '/api/material-types'
@@ -222,6 +233,7 @@ export interface FileServerRouteTypes {
   id:
     | '__root__'
     | '/api/brands'
+    | '/api/filament-types'
     | '/api/filaments'
     | '/api/health'
     | '/api/material-types'
@@ -234,6 +246,7 @@ export interface FileServerRouteTypes {
 }
 export interface RootServerRouteChildren {
   ApiBrandsServerRoute: typeof ApiBrandsServerRoute
+  ApiFilamentTypesServerRoute: typeof ApiFilamentTypesServerRoute
   ApiFilamentsServerRoute: typeof ApiFilamentsServerRouteWithChildren
   ApiHealthServerRoute: typeof ApiHealthServerRoute
   ApiMaterialTypesServerRoute: typeof ApiMaterialTypesServerRoute
@@ -332,6 +345,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiFilamentsServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/filament-types': {
+      id: '/api/filament-types'
+      path: '/api/filament-types'
+      fullPath: '/api/filament-types'
+      preLoaderRoute: typeof ApiFilamentTypesServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/brands': {
       id: '/api/brands'
       path: '/api/brands'
@@ -396,6 +416,7 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiBrandsServerRoute: ApiBrandsServerRoute,
+  ApiFilamentTypesServerRoute: ApiFilamentTypesServerRoute,
   ApiFilamentsServerRoute: ApiFilamentsServerRouteWithChildren,
   ApiHealthServerRoute: ApiHealthServerRoute,
   ApiMaterialTypesServerRoute: ApiMaterialTypesServerRoute,

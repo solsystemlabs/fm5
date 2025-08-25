@@ -7,6 +7,7 @@ const prisma = new PrismaClient();
 const createFilamentSchema = z.object({
   color: z.string().min(1, "Color is required"),
   name: z.string().min(1, "Name is required"),
+  filamentTypeId: z.number().min(1, "Filament type is required"),
   materialTypeId: z.number().min(1, "Material type is required"),
   modelIds: z.array(z.number()).optional(),
   cost: z.number().positive("Cost must be positive").optional(),
@@ -21,6 +22,7 @@ export const ServerRoute = createServerFileRoute("/api/filaments").methods({
       const filaments = await prisma.filament.findMany({
         include: {
           Material: true,
+          Type: true,
           Brand: true,
           Models: {
             include: {
@@ -52,6 +54,7 @@ export const ServerRoute = createServerFileRoute("/api/filaments").methods({
           color: validatedData.color,
           name: validatedData.name,
           materialTypeId: validatedData.materialTypeId,
+          filamentTypeId: validatedData.filamentTypeId,
           brandName: validatedData.brandName,
           diameter: validatedData.diameter,
           cost: validatedData.cost,
@@ -65,6 +68,7 @@ export const ServerRoute = createServerFileRoute("/api/filaments").methods({
         },
         include: {
           Material: true,
+          Type: true,
           Brand: true,
           Models: {
             include: {
@@ -90,4 +94,3 @@ export const ServerRoute = createServerFileRoute("/api/filaments").methods({
     }
   },
 });
-

@@ -1,10 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Filament, MaterialType, Model, Brand, CreateFilamentForm, CreateModelForm, ModelCategory } from './types'
+import { Filament, MaterialType, Model, Brand, CreateFilamentForm, CreateModelForm, ModelCategory, GroupedFilaments } from './types'
 import { FilamentType } from '@prisma/client'
 
 // Query keys
 const QUERY_KEYS = {
   filaments: ['filaments'] as const,
+  filamentsGrouped: ['filamentsGrouped'] as const,
   materialTypes: ['materialTypes'] as const,
   filamentTypes: ['filamentTypes'] as const,
   models: ['models'] as const,
@@ -18,6 +19,14 @@ const api = {
     const response = await fetch('/api/filaments')
     if (!response.ok) {
       throw new Error('Failed to fetch filaments')
+    }
+    return response.json()
+  },
+
+  getFilamentsGrouped: async (): Promise<GroupedFilaments> => {
+    const response = await fetch('/api/filaments-grouped')
+    if (!response.ok) {
+      throw new Error('Failed to fetch grouped filaments')
     }
     return response.json()
   },
@@ -124,6 +133,13 @@ export function useFilaments() {
   return useQuery({
     queryKey: QUERY_KEYS.filaments,
     queryFn: api.getFilaments,
+  })
+}
+
+export function useFilamentsGrouped() {
+  return useQuery({
+    queryKey: QUERY_KEYS.filamentsGrouped,
+    queryFn: api.getFilamentsGrouped,
   })
 }
 

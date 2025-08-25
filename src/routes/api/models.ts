@@ -33,7 +33,7 @@ export const ServerRoute = createServerFileRoute("/api/models").methods({
   POST: async ({ request }) => {
     try {
       const body = await request.json();
-      const { name, modelCategoryId } = body;
+      const { name, modelCategoryId, filamentIds = [] } = body;
 
       if (!name || !modelCategoryId) {
         return Response.json(
@@ -46,6 +46,11 @@ export const ServerRoute = createServerFileRoute("/api/models").methods({
         data: {
           name,
           modelCategoryId,
+          ...(filamentIds.length > 0 && {
+            Filaments: {
+              connect: filamentIds.map((id: number) => ({ id })),
+            },
+          }),
         },
         include: {
           Category: true,

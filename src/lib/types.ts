@@ -58,6 +58,12 @@ export interface CreateFilamentForm {
 export interface CreateModelForm {
   name: string;
   modelCategoryId: number;
+  filamentIds?: number[];
+}
+
+// Grouped filaments response type
+export interface GroupedFilaments {
+  [filamentTypeName: string]: Filament[];
 }
 
 // User Profile types

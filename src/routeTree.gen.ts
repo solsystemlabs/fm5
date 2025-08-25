@@ -22,6 +22,7 @@ import { ServerRoute as ApiModelCategoriesServerRouteImport } from './routes/api
 import { ServerRoute as ApiMetricsServerRouteImport } from './routes/api/metrics'
 import { ServerRoute as ApiMaterialTypesServerRouteImport } from './routes/api/material-types'
 import { ServerRoute as ApiHealthServerRouteImport } from './routes/api/health'
+import { ServerRoute as ApiFilamentsGroupedServerRouteImport } from './routes/api/filaments-grouped'
 import { ServerRoute as ApiFilamentsServerRouteImport } from './routes/api/filaments'
 import { ServerRoute as ApiFilamentTypesServerRouteImport } from './routes/api/filament-types'
 import { ServerRoute as ApiBrandsServerRouteImport } from './routes/api/brands'
@@ -86,6 +87,12 @@ const ApiHealthServerRoute = ApiHealthServerRouteImport.update({
   path: '/api/health',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiFilamentsGroupedServerRoute =
+  ApiFilamentsGroupedServerRouteImport.update({
+    id: '/api/filaments-grouped',
+    path: '/api/filaments-grouped',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 const ApiFilamentsServerRoute = ApiFilamentsServerRouteImport.update({
   id: '/api/filaments',
   path: '/api/filaments',
@@ -172,6 +179,7 @@ export interface FileServerRoutesByFullPath {
   '/api/brands': typeof ApiBrandsServerRoute
   '/api/filament-types': typeof ApiFilamentTypesServerRoute
   '/api/filaments': typeof ApiFilamentsServerRouteWithChildren
+  '/api/filaments-grouped': typeof ApiFilamentsGroupedServerRoute
   '/api/health': typeof ApiHealthServerRoute
   '/api/material-types': typeof ApiMaterialTypesServerRoute
   '/api/metrics': typeof ApiMetricsServerRoute
@@ -184,6 +192,7 @@ export interface FileServerRoutesByTo {
   '/api/brands': typeof ApiBrandsServerRoute
   '/api/filament-types': typeof ApiFilamentTypesServerRoute
   '/api/filaments': typeof ApiFilamentsServerRouteWithChildren
+  '/api/filaments-grouped': typeof ApiFilamentsGroupedServerRoute
   '/api/health': typeof ApiHealthServerRoute
   '/api/material-types': typeof ApiMaterialTypesServerRoute
   '/api/metrics': typeof ApiMetricsServerRoute
@@ -197,6 +206,7 @@ export interface FileServerRoutesById {
   '/api/brands': typeof ApiBrandsServerRoute
   '/api/filament-types': typeof ApiFilamentTypesServerRoute
   '/api/filaments': typeof ApiFilamentsServerRouteWithChildren
+  '/api/filaments-grouped': typeof ApiFilamentsGroupedServerRoute
   '/api/health': typeof ApiHealthServerRoute
   '/api/material-types': typeof ApiMaterialTypesServerRoute
   '/api/metrics': typeof ApiMetricsServerRoute
@@ -211,6 +221,7 @@ export interface FileServerRouteTypes {
     | '/api/brands'
     | '/api/filament-types'
     | '/api/filaments'
+    | '/api/filaments-grouped'
     | '/api/health'
     | '/api/material-types'
     | '/api/metrics'
@@ -223,6 +234,7 @@ export interface FileServerRouteTypes {
     | '/api/brands'
     | '/api/filament-types'
     | '/api/filaments'
+    | '/api/filaments-grouped'
     | '/api/health'
     | '/api/material-types'
     | '/api/metrics'
@@ -235,6 +247,7 @@ export interface FileServerRouteTypes {
     | '/api/brands'
     | '/api/filament-types'
     | '/api/filaments'
+    | '/api/filaments-grouped'
     | '/api/health'
     | '/api/material-types'
     | '/api/metrics'
@@ -248,6 +261,7 @@ export interface RootServerRouteChildren {
   ApiBrandsServerRoute: typeof ApiBrandsServerRoute
   ApiFilamentTypesServerRoute: typeof ApiFilamentTypesServerRoute
   ApiFilamentsServerRoute: typeof ApiFilamentsServerRouteWithChildren
+  ApiFilamentsGroupedServerRoute: typeof ApiFilamentsGroupedServerRoute
   ApiHealthServerRoute: typeof ApiHealthServerRoute
   ApiMaterialTypesServerRoute: typeof ApiMaterialTypesServerRoute
   ApiMetricsServerRoute: typeof ApiMetricsServerRoute
@@ -338,6 +352,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiHealthServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/filaments-grouped': {
+      id: '/api/filaments-grouped'
+      path: '/api/filaments-grouped'
+      fullPath: '/api/filaments-grouped'
+      preLoaderRoute: typeof ApiFilamentsGroupedServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/filaments': {
       id: '/api/filaments'
       path: '/api/filaments'
@@ -418,6 +439,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiBrandsServerRoute: ApiBrandsServerRoute,
   ApiFilamentTypesServerRoute: ApiFilamentTypesServerRoute,
   ApiFilamentsServerRoute: ApiFilamentsServerRouteWithChildren,
+  ApiFilamentsGroupedServerRoute: ApiFilamentsGroupedServerRoute,
   ApiHealthServerRoute: ApiHealthServerRoute,
   ApiMaterialTypesServerRoute: ApiMaterialTypesServerRoute,
   ApiMetricsServerRoute: ApiMetricsServerRoute,

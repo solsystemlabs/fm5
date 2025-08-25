@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import {
@@ -76,7 +76,6 @@ export default function AddFilamentDialog({
     isLoading: filamentTypesLoading,
     error: filamentTypesError,
   } = useFilamentTypes();
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -90,22 +89,16 @@ export default function AddFilamentDialog({
       grams: 0,
     } as FilamentFormData,
     onSubmit: async ({ value }) => {
-      try {
-        await createFilamentMutation.mutateAsync({
-          ...value,
-          cost: value.cost || undefined,
-          grams: value.grams || undefined,
-          modelIds: [], // Optional field for model associations
-        });
+      await createFilamentMutation.mutateAsync({
+        ...value,
+        cost: value.cost || undefined,
+        grams: value.grams || undefined,
+        modelIds: [], // Optional field for model associations
+      });
 
-        // Reset form and close modal on success
-        form.reset();
-        setIsModalOpen(false);
-        // Note: The useCreateFilament hook automatically invalidates the filaments query
-      } catch (error: any) {
-        console.error("Error adding filament:", error);
-        alert(`Error: ${error.message || "Failed to add filament"}`);
-      }
+      // Reset form on success
+      form.reset();
+      // Note: The useCreateFilament hook automatically invalidates the filaments query
     },
   });
 
@@ -122,7 +115,6 @@ export default function AddFilamentDialog({
         label: "Cancel",
         onPress: () => {
           form.reset();
-          setIsModalOpen(false);
         },
       }}
     >

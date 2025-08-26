@@ -94,7 +94,7 @@ export default function FMModal({
                         secondary
                         onPress={() => {
                           secondaryAction.onPress?.();
-                          if (!secondaryAction.onPress) close();
+                          close();
                         }}
                       >
                         {secondaryAction.label}

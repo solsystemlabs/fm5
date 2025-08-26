@@ -1,14 +1,14 @@
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useState, useRef } from "react";
 import {
-  Select,
   ListBox,
   ListBoxItem,
-  SelectValue,
   Button as AriaButton,
   Popover,
   Label,
   TextField,
+  OverlayTriggerStateContext,
 } from "react-aria-components";
+import { useOverlayTriggerState } from "react-stately";
 import { ChevronDownIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import FMInput from "./FMInput";
 
@@ -48,6 +48,14 @@ export default function CreatableSelect<T extends CreatableSelectItem>({
 }: CreatableSelectProps<T>): ReactNode {
   const [isCreatingMode, setIsCreatingMode] = useState(false);
   const [createValue, setCreateValue] = useState("");
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  
+  // Use React Aria's overlay trigger state
+  const state = useOverlayTriggerState({});
+
+  // Find the selected item to display its name
+  const selectedItem = items.find(item => item.id === selectedKey);
+  const displayText = selectedItem?.name || placeholder;
 
   const handleCreateSubmit = async () => {
     if (!createValue.trim()) return;
@@ -57,6 +65,7 @@ export default function CreatableSelect<T extends CreatableSelectItem>({
       onSelectionChange(newItem.id);
       setCreateValue("");
       setIsCreatingMode(false);
+      state.close(); // Close the popover after successful creation
     } catch (error) {
       // Error handling is done by the mutation hook
       console.error("Failed to create item:", error);
@@ -66,6 +75,29 @@ export default function CreatableSelect<T extends CreatableSelectItem>({
   const handleCreateCancel = () => {
     setCreateValue("");
     setIsCreatingMode(false);
+    // Don't close the popover, just exit create mode
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && createValue.trim()) {
+      e.preventDefault();
+      handleCreateSubmit();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      handleCreateCancel();
+    }
+  };
+
+  const handleItemSelection = (key: string | number) => {
+    if (key === "CREATE_NEW") {
+      setIsCreatingMode(true);
+      // Don't close the popover when entering create mode
+      return;
+    } else {
+      onSelectionChange(key);
+      setIsCreatingMode(false);
+      state.close(); // Close the popover after selection
+    }
   };
 
   return (
@@ -73,35 +105,46 @@ export default function CreatableSelect<T extends CreatableSelectItem>({
       <Label className="block text-sm font-medium text-foreground">
         {label} {isRequired && "*"}
       </Label>
-      <Select
-        isRequired={isRequired}
-        selectedKey={selectedKey}
-        onSelectionChange={(key) => {
-          if (key === "CREATE_NEW") {
-            setIsCreatingMode(true);
-          } else {
-            onSelectionChange(key as string | number);
-          }
-        }}
-        isInvalid={isInvalid}
-      >
-        <AriaButton className="relative mt-1 w-full cursor-default rounded-md border border-input bg-background py-2 pr-10 pl-3 text-left shadow-sm focus:border-ring focus:ring-1 focus:ring-ring focus:outline-none sm:text-sm text-foreground">
-          <SelectValue className="block truncate">
-            {({ isPlaceholder, selectedText }) =>
-              isPlaceholder ? placeholder : selectedText
-            }
-          </SelectValue>
+      
+      <OverlayTriggerStateContext.Provider value={state}>
+        <AriaButton 
+          ref={triggerRef}
+          className="relative mt-1 w-full cursor-default rounded-md border border-input bg-background py-2 pr-10 pl-3 text-left shadow-sm focus:border-ring focus:ring-1 focus:ring-ring focus:outline-none sm:text-sm text-foreground"
+          onPress={() => state.toggle()}
+        >
+          <span className="block truncate">
+            {displayText}
+          </span>
           <ChevronDownIcon
             className="pointer-events-none absolute inset-y-0 top-1/2 right-0 mr-2 h-5 w-5 -translate-y-1/2 transform text-muted-foreground"
             aria-hidden="true"
           />
         </AriaButton>
-        <Popover className="ring-opacity-5 mt-1 max-h-60 w-[var(--trigger-width)] overflow-auto rounded-md bg-popover py-1 text-base shadow-lg ring-1 ring-black focus:outline-none sm:text-sm border border-border">
-          <ListBox>
+        
+        {state.isOpen && (
+          <Popover 
+            triggerRef={triggerRef}
+            placement="bottom start"
+            className="ring-opacity-5 max-h-60 overflow-auto rounded-md bg-popover py-1 text-base shadow-lg ring-1 ring-black focus:outline-none sm:text-sm border border-border"
+            style={{
+              width: triggerRef.current?.offsetWidth ? `${triggerRef.current.offsetWidth}px` : 'auto'
+            }}
+            onOpenChange={(isOpen) => {
+              if (!isOpen) {
+                setIsCreatingMode(false);
+                setCreateValue("");
+                state.close();
+              }
+            }}
+          >
             {isCreatingMode ? (
               <div className="p-2 space-y-2">
                 <TextField value={createValue} onChange={setCreateValue}>
-                  <FMInput placeholder="Enter name..." autoFocus />
+                  <FMInput 
+                    placeholder="Enter name..." 
+                    autoFocus 
+                    onKeyDown={handleKeyDown}
+                  />
                 </TextField>
                 <div className="flex gap-2 justify-end">
                   <AriaButton
@@ -120,9 +163,11 @@ export default function CreatableSelect<T extends CreatableSelectItem>({
                 </div>
               </div>
             ) : (
-              <>
+              <ListBox 
+                onAction={handleItemSelection}
+                selectionMode="single"
+              >
                 <ListBoxItem
-                  key="CREATE_NEW"
                   id="CREATE_NEW"
                   className="relative cursor-pointer py-2 pr-9 pl-3 text-popover-foreground select-none hover:bg-accent hover:text-accent-foreground border-b border-border font-medium"
                 >
@@ -130,7 +175,6 @@ export default function CreatableSelect<T extends CreatableSelectItem>({
                 </ListBoxItem>
                 {isLoading ? (
                   <ListBoxItem
-                    key="loading"
                     id="loading"
                     className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-muted-foreground"
                   >
@@ -148,18 +192,18 @@ export default function CreatableSelect<T extends CreatableSelectItem>({
                   ))
                 ) : (
                   <ListBoxItem
-                    key="no-items"
                     id="no-items"
                     className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-muted-foreground"
                   >
                     No items available
                   </ListBoxItem>
                 )}
-              </>
+              </ListBox>
             )}
-          </ListBox>
-        </Popover>
-      </Select>
+          </Popover>
+        )}
+      </OverlayTriggerStateContext.Provider>
+      
       {children}
     </div>
   );

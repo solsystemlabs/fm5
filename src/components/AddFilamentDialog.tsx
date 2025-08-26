@@ -1,35 +1,29 @@
-import { type ReactNode } from "react";
-import { useForm } from "@tanstack/react-form";
-import { z } from "zod";
+import CreatableSelect from "@/components/ui/CreatableSelect";
+import FMInput from "@/components/ui/FMInput";
 import {
-  useCreateFilament,
   useBrands,
-  useMaterialTypes,
-  useFilamentTypes,
   useCreateBrand,
-  useCreateMaterialType,
+  useCreateFilament,
   useCreateFilamentType,
+  useCreateMaterialType,
+  useFilamentTypes,
+  useMaterialTypes,
 } from "@/lib/api-hooks";
+import { useForm } from "@tanstack/react-form";
+import { type ReactNode } from "react";
 import {
-  Form,
-  TextField,
-  Label,
-  FieldError,
-  Select,
-  ListBox,
-  ListBoxItem,
-  SelectValue,
   Button as AriaButton,
-  Popover,
-  NumberField,
-  Group,
   ColorField,
   ColorSwatch,
+  FieldError,
+  Form,
+  Group,
+  Label,
+  NumberField,
   parseColor,
+  TextField,
 } from "react-aria-components";
-import FMInput from "@/components/ui/FMInput";
-import CreatableSelect from "@/components/ui/CreatableSelect";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { z } from "zod";
 import FMModal from "./FMModal";
 
 type AddFilamentDialogProps = {
@@ -68,7 +62,7 @@ export default function AddFilamentDialog({
   const createBrandMutation = useCreateBrand();
   const createMaterialTypeMutation = useCreateMaterialType();
   const createFilamentTypeMutation = useCreateFilamentType();
-  
+
   const {
     data: brands = [],
     isLoading: brandsLoading,
@@ -134,15 +128,15 @@ export default function AddFilamentDialog({
         }}
       >
         {createFilamentMutation.error && (
-          <div className="rounded-md bg-destructive/10 p-4">
-            <div className="text-sm text-destructive">
+          <div className="bg-destructive/10 rounded-md p-4">
+            <div className="text-destructive text-sm">
               Error: {createFilamentMutation.error.message}
             </div>
           </div>
         )}
         {(brandsError || materialTypesError || filamentTypesError) && (
-          <div className="rounded-md bg-accent/20 p-4">
-            <div className="text-sm text-accent-foreground">
+          <div className="bg-accent/20 rounded-md p-4">
+            <div className="text-accent-foreground text-sm">
               Warning: Unable to load some form data. {brandsError?.message}{" "}
               {materialTypesError?.message} {filamentTypesError?.message}
             </div>
@@ -167,11 +161,11 @@ export default function AddFilamentDialog({
               onChange={(value) => field.handleChange(value)}
               isInvalid={field.state.meta.errors.length > 0}
             >
-              <Label className="block text-sm font-medium text-foreground">
+              <Label className="text-foreground block text-sm font-medium">
                 Name *
               </Label>
               <FMInput placeholder="e.g., Hatchbox PLA Red" className="mt-1" />
-              <FieldError className="mt-1 text-sm text-destructive">
+              <FieldError className="text-destructive mt-1 text-sm">
                 {field.state.meta.errors.join(", ")}
               </FieldError>
             </TextField>
@@ -211,7 +205,7 @@ export default function AddFilamentDialog({
                 isInvalid={field.state.meta.errors.length > 0}
                 className="flex flex-col gap-2"
               >
-                <Label className="block text-sm font-medium text-foreground">
+                <Label className="text-foreground block text-sm font-medium">
                   Color *
                 </Label>
                 <div className="flex w-full flex-row items-center gap-2">
@@ -221,7 +215,7 @@ export default function AddFilamentDialog({
                   />
                   <FMInput />
                 </div>
-                <FieldError className="mt-1 text-sm text-destructive">
+                <FieldError className="text-destructive mt-1 text-sm">
                   {field.state.meta.errors.join(", ")}
                 </FieldError>
               </ColorField>
@@ -241,27 +235,36 @@ export default function AddFilamentDialog({
             },
           }}
         >
-          {(field) => (
-            <CreatableSelect
-              items={brands}
-              isLoading={brandsLoading}
-              selectedKey={field.state.value || null}
-              onSelectionChange={(key) => field.handleChange(key as string)}
-              onCreateItem={(name) => createBrandMutation.mutateAsync(name)}
-              isCreating={createBrandMutation.isPending}
-              placeholder="Select a brand"
-              label="Brand"
-              isRequired
-              isInvalid={field.state.meta.errors.length > 0}
-              createLabel="Create new brand"
-            >
-              {field.state.meta.errors.length > 0 && (
-                <div className="mt-1 text-sm text-destructive">
-                  {field.state.meta.errors.join(", ")}
-                </div>
-              )}
-            </CreatableSelect>
-          )}
+          {(field) => {
+            // Find the currently selected brand by name to get its ID for the CreatableSelect
+            const selectedBrand = brands.find(brand => brand.name === field.state.value);
+            
+            return (
+              <CreatableSelect
+                items={brands}
+                isLoading={brandsLoading}
+                selectedKey={selectedBrand?.id || null}
+                onSelectionChange={(key) => {
+                  // Convert the selected brand ID back to brand name for the form
+                  const selectedBrandName = brands.find(brand => brand.id === key)?.name || key as string;
+                  field.handleChange(selectedBrandName);
+                }}
+                onCreateItem={(name) => createBrandMutation.mutateAsync(name)}
+                isCreating={createBrandMutation.isPending}
+                placeholder="Select a brand"
+                label="Brand"
+                isRequired
+                isInvalid={field.state.meta.errors.length > 0}
+                createLabel="Create new brand"
+              >
+                {field.state.meta.errors.length > 0 && (
+                  <div className="text-destructive mt-1 text-sm">
+                    {field.state.meta.errors.join(", ")}
+                  </div>
+                )}
+              </CreatableSelect>
+            );
+          }}
         </form.Field>
 
         {/* Material Type Field */}
@@ -282,7 +285,9 @@ export default function AddFilamentDialog({
               isLoading={materialTypesLoading}
               selectedKey={field.state.value}
               onSelectionChange={(key) => field.handleChange(key as number)}
-              onCreateItem={(name) => createMaterialTypeMutation.mutateAsync(name)}
+              onCreateItem={(name) =>
+                createMaterialTypeMutation.mutateAsync(name)
+              }
               isCreating={createMaterialTypeMutation.isPending}
               placeholder="Select a material type"
               label="Material Type"
@@ -291,7 +296,7 @@ export default function AddFilamentDialog({
               createLabel="Create new material type"
             >
               {field.state.meta.errors.length > 0 && (
-                <div className="mt-1 text-sm text-destructive">
+                <div className="text-destructive mt-1 text-sm">
                   {field.state.meta.errors.join(", ")}
                 </div>
               )}
@@ -317,7 +322,9 @@ export default function AddFilamentDialog({
               isLoading={filamentTypesLoading}
               selectedKey={field.state.value}
               onSelectionChange={(key) => field.handleChange(key as number)}
-              onCreateItem={(name) => createFilamentTypeMutation.mutateAsync(name)}
+              onCreateItem={(name) =>
+                createFilamentTypeMutation.mutateAsync(name)
+              }
               isCreating={createFilamentTypeMutation.isPending}
               placeholder="Select a filament type"
               label="Filament Type"
@@ -326,7 +333,7 @@ export default function AddFilamentDialog({
               createLabel="Create new filament type"
             >
               {field.state.meta.errors.length > 0 && (
-                <div className="mt-1 text-sm text-destructive">
+                <div className="text-destructive mt-1 text-sm">
                   {field.state.meta.errors.join(", ")}
                 </div>
               )}
@@ -360,25 +367,25 @@ export default function AddFilamentDialog({
               }}
               isInvalid={field.state.meta.errors.length > 0}
             >
-              <Label className="block text-sm font-medium text-foreground">
+              <Label className="text-foreground block text-sm font-medium">
                 Diameter (mm) *
               </Label>
-              <Group className="relative mt-1 rounded-md border border-input">
+              <Group className="border-input relative mt-1 rounded-md border">
                 <AriaButton
                   slot="decrement"
-                  className="absolute top-1/2 left-1 flex h-6 w-6 -translate-y-1/2 transform items-center justify-center text-muted-foreground hover:text-gray-600 dark:text-muted-foreground dark:hover:text-gray-200"
+                  className="text-muted-foreground dark:text-muted-foreground absolute top-1/2 left-1 flex h-6 w-6 -translate-y-1/2 transform items-center justify-center hover:text-gray-600 dark:hover:text-gray-200"
                 >
                   −
                 </AriaButton>
                 <FMInput />
                 <AriaButton
                   slot="increment"
-                  className="absolute top-1/2 right-1 flex h-6 w-6 -translate-y-1/2 transform items-center justify-center text-muted-foreground hover:text-gray-600 dark:text-muted-foreground dark:hover:text-gray-200"
+                  className="text-muted-foreground dark:text-muted-foreground absolute top-1/2 right-1 flex h-6 w-6 -translate-y-1/2 transform items-center justify-center hover:text-gray-600 dark:hover:text-gray-200"
                 >
                   +
                 </AriaButton>
               </Group>
-              <FieldError className="mt-1 text-sm text-destructive">
+              <FieldError className="text-destructive mt-1 text-sm">
                 {field.state.meta.errors.join(", ")}
               </FieldError>
             </NumberField>
@@ -409,13 +416,13 @@ export default function AddFilamentDialog({
               }}
               isInvalid={field.state.meta.errors.length > 0}
             >
-              <Label className="block text-sm font-medium text-foreground">
+              <Label className="text-foreground block text-sm font-medium">
                 Cost (optional)
               </Label>
               <Group className="mt-1">
                 <FMInput />
               </Group>
-              <FieldError className="mt-1 text-sm text-destructive">
+              <FieldError className="text-destructive mt-1 text-sm">
                 {field.state.meta.errors.join(", ")}
               </FieldError>
             </NumberField>
@@ -442,13 +449,13 @@ export default function AddFilamentDialog({
               step={1}
               isInvalid={field.state.meta.errors.length > 0}
             >
-              <Label className="block text-sm font-medium text-foreground">
+              <Label className="text-foreground block text-sm font-medium">
                 Weight (g) (optional)
               </Label>
               <Group className="mt-1">
                 <FMInput placeholder="1000" />
               </Group>
-              <FieldError className="mt-1 text-sm text-destructive">
+              <FieldError className="text-destructive mt-1 text-sm">
                 {field.state.meta.errors.join(", ")}
               </FieldError>
             </NumberField>

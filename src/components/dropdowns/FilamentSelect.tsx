@@ -35,9 +35,21 @@ export default function FilamentSelect({
   let { contains } = useFilter({ sensitivity: "base" });
   const { data: groupedFilaments, isLoading, error } = useFilamentsGrouped();
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set(selectedFilamentIds.map(String)));
+  const [searchValue, setSearchValue] = useState("");
 
   // Get all filaments in a flat array for easy lookup
   const allFilaments = groupedFilaments ? Object.values(groupedFilaments).flat() : [];
+  
+  // Filter filaments based on search
+  const filteredGroupedFilaments = groupedFilaments ? Object.entries(groupedFilaments).reduce((acc, [typeName, filaments]) => {
+    const filtered = filaments.filter(filament => 
+      searchValue === "" || contains(filament.name, searchValue)
+    );
+    if (filtered.length > 0) {
+      acc[typeName] = filtered;
+    }
+    return acc;
+  }, {} as typeof groupedFilaments) : null;
   
   // Get selected filaments for display
   const selectedFilaments = allFilaments.filter(filament => 
@@ -79,10 +91,15 @@ export default function FilamentSelect({
           <SearchField
             aria-label="Search filaments"
             className="group mx-2 mt-2 flex items-center rounded-md border border-input"
+            value={searchValue}
+            onChange={setSearchValue}
           >
             <SearchIcon aria-hidden className="ml-2 h-4 w-4 text-muted-foreground" />
             <FMInput className="min-w-0 flex-1 border-none px-2 py-1 text-sm" />
-            <Button className="mr-1 flex w-6 items-center justify-center rounded-md border-0 bg-transparent p-1 text-center text-sm transition group-empty:invisible text-muted-foreground hover:text-foreground">
+            <Button 
+              className="mr-1 flex w-6 items-center justify-center rounded-md border-0 bg-transparent p-1 text-center text-sm transition group-empty:invisible text-muted-foreground hover:text-foreground"
+              onPress={() => setSearchValue("")}
+            >
               <XIcon aria-hidden className="h-4 w-4" />
             </Button>
           </SearchField>
@@ -102,12 +119,12 @@ export default function FilamentSelect({
                 Error loading filaments
               </ListBoxItem>
             )}
-            {groupedFilaments && Object.keys(groupedFilaments).length === 0 && (
+            {filteredGroupedFilaments && Object.keys(filteredGroupedFilaments).length === 0 && (
               <ListBoxItem className="text-muted-foreground relative cursor-default py-2 pr-9 pl-3 select-none">
-                No filaments available
+                {searchValue ? `No filaments found matching "${searchValue}"` : "No filaments available"}
               </ListBoxItem>
             )}
-            {groupedFilaments && Object.entries(groupedFilaments).map(([filamentTypeName, filaments]) => (
+            {filteredGroupedFilaments && Object.entries(filteredGroupedFilaments).map(([filamentTypeName, filaments]) => (
               <ListBoxSection key={filamentTypeName}>
                 <Header className="text-muted-foreground px-3 py-2 text-xs font-semibold uppercase tracking-wide border-b border-border">
                   {filamentTypeName}
@@ -116,6 +133,7 @@ export default function FilamentSelect({
                   <ListBoxItem 
                     key={filament.id} 
                     id={filament.id.toString()}
+                    textValue={filament.name}
                     className="text-popover-foreground hover:bg-accent hover:text-accent-foreground data-[selected]:bg-accent data-[selected]:text-accent-foreground data-[focus-visible]:bg-accent data-[focus-visible]:text-accent-foreground relative cursor-default py-2 pr-9 pl-3 select-none"
                   >
                     <div className="flex items-center gap-2">

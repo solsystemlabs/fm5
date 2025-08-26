@@ -4,7 +4,6 @@ import { z } from "zod";
 import {
   useCreateModel,
   useModelCategories,
-  useFilaments,
 } from "@/lib/api-hooks";
 import {
   Form,
@@ -47,13 +46,7 @@ export default function AddModelDialog({
     isLoading: categoriesLoading,
     error: categoriesError,
   } = useModelCategories();
-  const {
-    data: filaments = [],
-    isLoading: filamentsLoading,
-    error: filamentsError,
-  } = useFilaments();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isFilamentsOpen, setIsFilamentsOpen] = useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -107,11 +100,10 @@ export default function AddModelDialog({
             </div>
           </div>
         )}
-        {(categoriesError || filamentsError) && (
+        {categoriesError && (
           <div className="bg-accent/20 rounded-md p-4">
             <div className="text-accent-foreground text-sm">
-              Warning: Unable to load some form data. {categoriesError?.message}{" "}
-              {filamentsError?.message}
+              Warning: Unable to load categories. {categoriesError.message}
             </div>
           </div>
         )}
@@ -219,13 +211,20 @@ export default function AddModelDialog({
 
         {/* Filaments Field */}
         <form.Field name="filamentIds">
-          {(field) => {
-            const selectedCount = field.state.value?.length || 0;
-
-            return (
-              <FilamentSelect label="Available Filaments"></FilamentSelect>
-            );
-          }}
+          {(field) => (
+            <div>
+              <FilamentSelect 
+                label="Available Filaments"
+                selectedFilamentIds={field.state.value || []}
+                onSelectionChange={(filamentIds) => field.handleChange(filamentIds)}
+              />
+              {field.state.meta.errors.length > 0 && (
+                <div className="text-destructive mt-1 text-sm">
+                  {field.state.meta.errors.join(", ")}
+                </div>
+              )}
+            </div>
+          )}
         </form.Field>
       </Form>
     </FMModal>

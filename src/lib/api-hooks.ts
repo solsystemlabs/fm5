@@ -126,6 +126,20 @@ const api = {
     }
     return response.json()
   },
+
+  createFilamentType: async (name: string): Promise<FilamentType> => {
+    const response = await fetch('/api/filament-types', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name }),
+    })
+    if (!response.ok) {
+      throw new Error('Failed to create filament type')
+    }
+    return response.json()
+  },
 }
 
 // Hooks
@@ -230,6 +244,22 @@ export function useCreateMaterialType() {
       })
       // Also invalidate to ensure we have the latest data
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.materialTypes })
+    },
+  })
+}
+
+export function useCreateFilamentType() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: api.createFilamentType,
+    onSuccess: (newFilamentType) => {
+      // Optimistically update the filament types cache
+      queryClient.setQueryData(QUERY_KEYS.filamentTypes, (oldTypes: FilamentType[] = []) => {
+        return [...oldTypes, newFilamentType].sort((a, b) => a.name.localeCompare(b.name))
+      })
+      // Also invalidate to ensure we have the latest data
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.filamentTypes })
     },
   })
 }

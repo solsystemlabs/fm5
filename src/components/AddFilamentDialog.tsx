@@ -6,6 +6,9 @@ import {
   useBrands,
   useMaterialTypes,
   useFilamentTypes,
+  useCreateBrand,
+  useCreateMaterialType,
+  useCreateFilamentType,
 } from "@/lib/api-hooks";
 import {
   Form,
@@ -25,6 +28,7 @@ import {
   parseColor,
 } from "react-aria-components";
 import FMInput from "@/components/ui/FMInput";
+import CreatableSelect from "@/components/ui/CreatableSelect";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import FMModal from "./FMModal";
 
@@ -61,6 +65,10 @@ export default function AddFilamentDialog({
   triggerElement,
 }: AddFilamentDialogProps): ReactNode {
   const createFilamentMutation = useCreateFilament();
+  const createBrandMutation = useCreateBrand();
+  const createMaterialTypeMutation = useCreateMaterialType();
+  const createFilamentTypeMutation = useCreateFilamentType();
+  
   const {
     data: brands = [],
     isLoading: brandsLoading,
@@ -234,65 +242,25 @@ export default function AddFilamentDialog({
           }}
         >
           {(field) => (
-            <div>
-              <Label className="block text-sm font-medium text-foreground">
-                Brand *
-              </Label>
-              <Select
-                isRequired
-                selectedKey={field.state.value || null}
-                onSelectionChange={(key) => field.handleChange(key as string)}
-                isInvalid={field.state.meta.errors.length > 0}
-              >
-                <AriaButton className="relative mt-1 w-full cursor-default rounded-md border border-input bg-background py-2 pr-10 pl-3 text-left shadow-sm focus:border-ring focus:ring-1 focus:ring-ring focus:outline-none sm:text-sm text-foreground">
-                  <SelectValue className="block truncate">
-                    {({ isPlaceholder, selectedText }) =>
-                      isPlaceholder ? "Select a brand" : selectedText
-                    }
-                  </SelectValue>
-                  <ChevronDownIcon
-                    className="pointer-events-none absolute inset-y-0 top-1/2 right-0 mr-2 h-5 w-5 -translate-y-1/2 transform text-muted-foreground"
-                    aria-hidden="true"
-                  />
-                </AriaButton>
-                <Popover className="ring-opacity-5 mt-1 max-h-60 w-[var(--trigger-width)] overflow-auto rounded-md bg-popover py-1 text-base shadow-lg ring-1 ring-black focus:outline-none sm:text-sm border border-border">
-                  <ListBox>
-                    {brandsLoading ? (
-                      <ListBoxItem
-                        key="loading"
-                        id="loading"
-                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-muted-foreground"
-                      >
-                        Loading brands...
-                      </ListBoxItem>
-                    ) : brands.length > 0 ? (
-                      brands.map((brand) => (
-                        <ListBoxItem
-                          key={brand.name}
-                          id={brand.name}
-                          className="relative cursor-default py-2 pr-9 pl-3 text-popover-foreground select-none hover:bg-accent hover:text-accent-foreground "
-                        >
-                          {brand.name}
-                        </ListBoxItem>
-                      ))
-                    ) : (
-                      <ListBoxItem
-                        key="no-brands"
-                        id="no-brands"
-                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-muted-foreground"
-                      >
-                        No brands available
-                      </ListBoxItem>
-                    )}
-                  </ListBox>
-                </Popover>
-              </Select>
+            <CreatableSelect
+              items={brands}
+              isLoading={brandsLoading}
+              selectedKey={field.state.value || null}
+              onSelectionChange={(key) => field.handleChange(key as string)}
+              onCreateItem={(name) => createBrandMutation.mutateAsync(name)}
+              isCreating={createBrandMutation.isPending}
+              placeholder="Select a brand"
+              label="Brand"
+              isRequired
+              isInvalid={field.state.meta.errors.length > 0}
+              createLabel="Create new brand"
+            >
               {field.state.meta.errors.length > 0 && (
                 <div className="mt-1 text-sm text-destructive">
                   {field.state.meta.errors.join(", ")}
                 </div>
               )}
-            </div>
+            </CreatableSelect>
           )}
         </form.Field>
 
@@ -309,65 +277,25 @@ export default function AddFilamentDialog({
           }}
         >
           {(field) => (
-            <div>
-              <Label className="block text-sm font-medium text-foreground">
-                Material Type *
-              </Label>
-              <Select
-                isRequired
-                selectedKey={field.state.value}
-                onSelectionChange={(key) => field.handleChange(key as number)}
-                isInvalid={field.state.meta.errors.length > 0}
-              >
-                <AriaButton className="relative mt-1 w-full cursor-default rounded-md border border-input bg-background py-2 pr-10 pl-3 text-left shadow-sm focus:border-ring focus:ring-1 focus:ring-ring focus:outline-none sm:text-sm text-foreground">
-                  <SelectValue className="block truncate">
-                    {({ isPlaceholder, selectedText }) =>
-                      isPlaceholder ? "Select a material type" : selectedText
-                    }
-                  </SelectValue>
-                  <ChevronDownIcon
-                    className="pointer-events-none absolute inset-y-0 top-1/2 right-0 mr-2 h-5 w-5 -translate-y-1/2 transform text-muted-foreground"
-                    aria-hidden="true"
-                  />
-                </AriaButton>
-                <Popover className="ring-opacity-5 mt-1 max-h-60 w-[var(--trigger-width)] overflow-auto rounded-md bg-popover py-1 text-base shadow-lg ring-1 ring-black focus:outline-none sm:text-sm border border-border">
-                  <ListBox>
-                    {materialTypesLoading ? (
-                      <ListBoxItem
-                        key="loading"
-                        id="loading"
-                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-muted-foreground"
-                      >
-                        Loading material types...
-                      </ListBoxItem>
-                    ) : materialTypes.length > 0 ? (
-                      materialTypes.map((type) => (
-                        <ListBoxItem
-                          key={type.id}
-                          id={type.id}
-                          className="relative cursor-default py-2 pr-9 pl-3 text-popover-foreground select-none hover:bg-accent hover:text-accent-foreground "
-                        >
-                          {type.name}
-                        </ListBoxItem>
-                      ))
-                    ) : (
-                      <ListBoxItem
-                        key="no-types"
-                        id="no-types"
-                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-muted-foreground"
-                      >
-                        No material types available
-                      </ListBoxItem>
-                    )}
-                  </ListBox>
-                </Popover>
-              </Select>
+            <CreatableSelect
+              items={materialTypes}
+              isLoading={materialTypesLoading}
+              selectedKey={field.state.value}
+              onSelectionChange={(key) => field.handleChange(key as number)}
+              onCreateItem={(name) => createMaterialTypeMutation.mutateAsync(name)}
+              isCreating={createMaterialTypeMutation.isPending}
+              placeholder="Select a material type"
+              label="Material Type"
+              isRequired
+              isInvalid={field.state.meta.errors.length > 0}
+              createLabel="Create new material type"
+            >
               {field.state.meta.errors.length > 0 && (
                 <div className="mt-1 text-sm text-destructive">
                   {field.state.meta.errors.join(", ")}
                 </div>
               )}
-            </div>
+            </CreatableSelect>
           )}
         </form.Field>
 
@@ -384,65 +312,25 @@ export default function AddFilamentDialog({
           }}
         >
           {(field) => (
-            <div>
-              <Label className="block text-sm font-medium text-foreground">
-                Filament Type *
-              </Label>
-              <Select
-                isRequired
-                selectedKey={field.state.value}
-                onSelectionChange={(key) => field.handleChange(key as number)}
-                isInvalid={field.state.meta.errors.length > 0}
-              >
-                <AriaButton className="relative mt-1 w-full cursor-default rounded-md border border-input bg-background py-2 pr-10 pl-3 text-left shadow-sm focus:border-ring focus:ring-1 focus:ring-ring focus:outline-none sm:text-sm text-foreground">
-                  <SelectValue className="block truncate">
-                    {({ isPlaceholder, selectedText }) =>
-                      isPlaceholder ? "Select a filament type" : selectedText
-                    }
-                  </SelectValue>
-                  <ChevronDownIcon
-                    className="pointer-events-none absolute inset-y-0 top-1/2 right-0 mr-2 h-5 w-5 -translate-y-1/2 transform text-muted-foreground"
-                    aria-hidden="true"
-                  />
-                </AriaButton>
-                <Popover className="ring-opacity-5 mt-1 max-h-60 w-[var(--trigger-width)] overflow-auto rounded-md bg-popover py-1 text-base shadow-lg ring-1 ring-black focus:outline-none sm:text-sm border border-border">
-                  <ListBox>
-                    {filamentTypesLoading ? (
-                      <ListBoxItem
-                        key="loading"
-                        id="loading"
-                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-muted-foreground"
-                      >
-                        Loading filament types...
-                      </ListBoxItem>
-                    ) : filamentTypes.length > 0 ? (
-                      filamentTypes.map((type) => (
-                        <ListBoxItem
-                          key={type.id}
-                          id={type.id}
-                          className="relative cursor-default py-2 pr-9 pl-3 text-popover-foreground select-none hover:bg-accent hover:text-accent-foreground "
-                        >
-                          {type.name}
-                        </ListBoxItem>
-                      ))
-                    ) : (
-                      <ListBoxItem
-                        key="no-types"
-                        id="no-types"
-                        className="relative cursor-default py-2 pr-9 pl-3 text-gray-500 select-none dark:text-muted-foreground"
-                      >
-                        No filament types available
-                      </ListBoxItem>
-                    )}
-                  </ListBox>
-                </Popover>
-              </Select>
+            <CreatableSelect
+              items={filamentTypes}
+              isLoading={filamentTypesLoading}
+              selectedKey={field.state.value}
+              onSelectionChange={(key) => field.handleChange(key as number)}
+              onCreateItem={(name) => createFilamentTypeMutation.mutateAsync(name)}
+              isCreating={createFilamentTypeMutation.isPending}
+              placeholder="Select a filament type"
+              label="Filament Type"
+              isRequired
+              isInvalid={field.state.meta.errors.length > 0}
+              createLabel="Create new filament type"
+            >
               {field.state.meta.errors.length > 0 && (
                 <div className="mt-1 text-sm text-destructive">
                   {field.state.meta.errors.join(", ")}
                 </div>
               )}
-            </div>
+            </CreatableSelect>
           )}
         </form.Field>
 

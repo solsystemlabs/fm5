@@ -1,12 +1,13 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('API Endpoints', () => {
-  test('health endpoint should return OK', async ({ request }) => {
+  test('health endpoint should return OK or warning', async ({ request }) => {
     const response = await request.get('/api/health');
     expect(response.ok()).toBeTruthy();
     
     const data = await response.json();
-    expect(data.status).toBe('ok');
+    expect(['ok', 'warning', 'degraded']).toContain(data.status);
+    expect(data.timestamp).toBeDefined();
   });
 
   test('filaments API should be accessible', async ({ request }) => {

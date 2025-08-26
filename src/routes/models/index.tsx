@@ -2,7 +2,7 @@ import { useModels } from "@/lib/api-hooks";
 import { createFileRoute } from "@tanstack/react-router";
 import ModelsTable from "../../components/tables/ModelsTable";
 import FMButton from "../../components/ui/FMButton";
-import AddModelDialog from "../../components/AddModelDialog";
+import AddModelDialog from "../../components/dialogs/AddModelDialog";
 
 export const Route = createFileRoute("/models/")({
   component: ModelsPage,

@@ -24,7 +24,7 @@ import {
   TextField,
 } from "react-aria-components";
 import { z } from "zod";
-import FMModal from "./FMModal";
+import FMModal from "../FMModal";
 
 type AddFilamentDialogProps = {
   triggerElement: ReactNode;
@@ -237,8 +237,10 @@ export default function AddFilamentDialog({
         >
           {(field) => {
             // Find the currently selected brand by name to get its ID for the CreatableSelect
-            const selectedBrand = brands.find(brand => brand.name === field.state.value);
-            
+            const selectedBrand = brands.find(
+              (brand) => brand.name === field.state.value,
+            );
+
             return (
               <CreatableSelect
                 items={brands}
@@ -246,7 +248,9 @@ export default function AddFilamentDialog({
                 selectedKey={selectedBrand?.id || null}
                 onSelectionChange={(key) => {
                   // Convert the selected brand ID back to brand name for the form
-                  const selectedBrandName = brands.find(brand => brand.id === key)?.name || key as string;
+                  const selectedBrandName =
+                    brands.find((brand) => brand.id === key)?.name ||
+                    (key as string);
                   field.handleChange(selectedBrandName);
                 }}
                 onCreateItem={(name) => createBrandMutation.mutateAsync(name)}

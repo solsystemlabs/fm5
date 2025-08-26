@@ -140,6 +140,20 @@ const api = {
     }
     return response.json()
   },
+
+  createModelCategory: async (name: string): Promise<ModelCategory> => {
+    const response = await fetch('/api/model-categories', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name }),
+    })
+    if (!response.ok) {
+      throw new Error('Failed to create model category')
+    }
+    return response.json()
+  },
 }
 
 // Hooks
@@ -260,6 +274,22 @@ export function useCreateFilamentType() {
       })
       // Also invalidate to ensure we have the latest data
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.filamentTypes })
+    },
+  })
+}
+
+export function useCreateModelCategory() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: api.createModelCategory,
+    onSuccess: (newModelCategory) => {
+      // Optimistically update the model categories cache
+      queryClient.setQueryData(QUERY_KEYS.modelCategories, (oldCategories: ModelCategory[] = []) => {
+        return [...oldCategories, newModelCategory].sort((a, b) => a.name.localeCompare(b.name))
+      })
+      // Also invalidate to ensure we have the latest data
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.modelCategories })
     },
   })
 }

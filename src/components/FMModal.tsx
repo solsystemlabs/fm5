@@ -78,12 +78,12 @@ export default function FMModal({
                   </div>
                 </div>
                 {(primaryAction || secondaryAction) && (
-                  <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                  <div className="mt-5 gap-2 sm:mt-4 sm:flex sm:flex-row-reverse">
                     {primaryAction && (
                       <FMButton
                         onPress={() => {
                           primaryAction.onPress?.();
-                          if (!primaryAction.onPress) close();
+                          close();
                         }}
                       >
                         {primaryAction.label}

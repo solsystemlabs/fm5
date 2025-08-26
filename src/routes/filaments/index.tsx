@@ -2,7 +2,7 @@ import { useFilaments } from "@/lib/api-hooks";
 import { createFileRoute } from "@tanstack/react-router";
 import FilamentsTable from "../../components/tables/FilamentsTable";
 import FMButton from "../../components/ui/FMButton";
-import AddFilamentDialog from "../../components/AddFilamentDialog";
+import AddFilamentDialog from "../../components/dialogs/AddFilamentDialog";
 
 export const Route = createFileRoute("/filaments/")({
   component: FilamentsPage,

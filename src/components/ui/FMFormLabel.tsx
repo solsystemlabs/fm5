@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import type { PropsWithChildren, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Label, LabelProps } from "react-aria-components";
 import { twMerge } from "tailwind-merge";
 
@@ -11,7 +11,7 @@ export default function FMFormLabel({
   className,
   children,
   ...props
-}: FMFormLabelProps & PropsWithChildren): ReactNode {
+}: FMFormLabelProps): ReactNode {
   return (
     <Label
       className={twMerge(

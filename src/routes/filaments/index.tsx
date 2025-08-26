@@ -1,6 +1,6 @@
 import { useFilaments } from "@/lib/api-hooks";
 import { createFileRoute } from "@tanstack/react-router";
-import FilamentsTable from "../../components/FilamentsTable";
+import FilamentsTable from "../../components/tables/FilamentsTable";
 import FMButton from "../../components/ui/FMButton";
 import AddFilamentDialog from "../../components/AddFilamentDialog";
 
@@ -14,8 +14,8 @@ function FilamentsPage() {
   if (error) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold text-foreground">Filaments</h1>
-        <div className="bg-card rounded-lg shadow p-8 text-center">
+        <h1 className="text-foreground text-3xl font-bold">Filaments</h1>
+        <div className="bg-card rounded-lg p-8 text-center shadow">
           <p className="text-destructive">
             Error loading filaments: {error.message}
           </p>
@@ -28,10 +28,8 @@ function FilamentsPage() {
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-base font-semibold text-foreground">
-            Filaments
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <h1 className="text-foreground text-base font-semibold">Filaments</h1>
+          <p className="text-muted-foreground mt-2 text-sm">
             A complete list of all your 3D printing filaments including their
             specifications and associated models.
           </p>
@@ -47,9 +45,7 @@ function FilamentsPage() {
 
       {isLoading ? (
         <div className="mt-8 p-8 text-center">
-          <p className="text-muted-foreground">
-            Loading filaments...
-          </p>
+          <p className="text-muted-foreground">Loading filaments...</p>
         </div>
       ) : (
         <FilamentsTable data={filaments} />

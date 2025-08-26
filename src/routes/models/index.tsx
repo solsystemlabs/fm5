@@ -1,6 +1,6 @@
 import { useModels } from "@/lib/api-hooks";
 import { createFileRoute } from "@tanstack/react-router";
-import ModelsTable from "../../components/ModelsTable";
+import ModelsTable from "../../components/tables/ModelsTable";
 import FMButton from "../../components/ui/FMButton";
 import AddModelDialog from "../../components/AddModelDialog";
 
@@ -14,8 +14,8 @@ function ModelsPage() {
   if (error) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold text-foreground">Models</h1>
-        <div className="bg-card rounded-lg shadow p-8 text-center">
+        <h1 className="text-foreground text-3xl font-bold">Models</h1>
+        <div className="bg-card rounded-lg p-8 text-center shadow">
           <p className="text-destructive">
             Error loading models: {error.message}
           </p>
@@ -28,10 +28,8 @@ function ModelsPage() {
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-base font-semibold text-foreground">
-            Models
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <h1 className="text-foreground text-base font-semibold">Models</h1>
+          <p className="text-muted-foreground mt-2 text-sm">
             A complete list of all your 3D models organized by category and
             associated filaments.
           </p>
@@ -47,9 +45,7 @@ function ModelsPage() {
 
       {isLoading ? (
         <div className="mt-8 p-8 text-center">
-          <p className="text-muted-foreground">
-            Loading models...
-          </p>
+          <p className="text-muted-foreground">Loading models...</p>
         </div>
       ) : (
         <ModelsTable data={models} />
@@ -57,4 +53,3 @@ function ModelsPage() {
     </div>
   );
 }
-

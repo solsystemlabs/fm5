@@ -1,12 +1,11 @@
+import type { Filament } from "@prisma/client";
 import type { ReactNode } from "react";
 import { Cell, ColorSwatch, TableBody } from "react-aria-components";
-import type { Filament } from "../lib/types";
-import FMCell from "./ui/table/FMCell";
-import FMColumn from "./ui/table/FMColumn";
-import FMRow from "./ui/table/FMRow";
-import FMTable from "./ui/table/FMTable";
-import FMTableHeader from "./ui/table/FMTableHeader";
-import FMTableWrapper from "./ui/table/FMTableWrapper";
+import FMCell from "../ui/table/FMCell";
+import FMColumn from "../ui/table/FMColumn";
+import FMRow from "../ui/table/FMRow";
+import FMTable from "../ui/table/FMTable";
+import FMTableHeader from "../ui/table/FMTableHeader";
 
 export default function FilamentsTable({
   data,
@@ -42,16 +41,22 @@ export default function FilamentsTable({
                   <div className="text-md text-foreground justify-end font-bold">
                     {filament.name}
                   </div>
-                  <div className="font-medium text-muted-foreground">
+                  <div className="text-muted-foreground font-medium">
                     {filament.color}
                   </div>
                 </div>
               </div>
-              <div className="mt-1 flex flex-col text-muted-foreground sm:block lg:hidden">
+              <div className="text-muted-foreground mt-1 flex flex-col sm:block lg:hidden">
                 <span>{filament.brandName}</span>
-                <span className="hidden text-muted-foreground/60 sm:inline"> | </span>
+                <span className="text-muted-foreground/60 hidden sm:inline">
+                  {" "}
+                  |{" "}
+                </span>
                 <span>{filament.Material.name}</span>
-                <span className="hidden text-muted-foreground/60 sm:inline"> | </span>
+                <span className="text-muted-foreground/60 hidden sm:inline">
+                  {" "}
+                  |{" "}
+                </span>
                 <span>{filament.diameter}mm</span>
               </div>
             </Cell>
@@ -69,9 +74,7 @@ export default function FilamentsTable({
               <div className="sm:hidden">${filament.cost}</div>
               <div className="hidden sm:block">${filament.cost}</div>
             </FMCell>
-            <FMCell>
-              {filament.grams}g
-            </FMCell>
+            <FMCell>{filament.grams}g</FMCell>
             <FMCell className="relative py-3.5 pr-4 pl-3 text-sm font-medium sm:pr-6">
               <div className="text-muted-foreground">
                 {filament.Models && filament.Models.length > 0 ? (

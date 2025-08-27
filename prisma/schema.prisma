@@ -81,10 +81,35 @@ model SlicedFileFilament {
   slicedFileId    Int
   filamentIndex   Int        // 0, 1, 2, etc. for multi-filament prints
   
-  // Per-filament usage
-  lengthUsed      Float?     // length in mm for this specific filament
-  volumeUsed      Float?     // volume in cm³ for this specific filament  
-  weightUsed      Float?     // weight in grams for this specific filament
+  // Per-filament total usage
+  lengthUsed      Float?     // total length in mm for this specific filament
+  volumeUsed      Float?     // total volume in cm³ for this specific filament  
+  weightUsed      Float?     // total weight in grams for this specific filament
+  
+  // Usage breakdown by purpose (when available from slicer)
+  modelLength     Float?     // length used for actual model parts
+  modelVolume     Float?     // volume used for actual model parts
+  modelWeight     Float?     // weight used for actual model parts
+  
+  supportLength   Float?     // length used for support structures
+  supportVolume   Float?     // volume used for support structures
+  supportWeight   Float?     // weight used for support structures
+  
+  towerLength     Float?     // length used for purge/prime tower
+  towerVolume     Float?     // volume used for purge/prime tower
+  towerWeight     Float?     // weight used for purge/prime tower
+  
+  wasteLength     Float?     // length used for waste/purge operations
+  wasteVolume     Float?     // volume used for waste/purge operations
+  wasteWeight     Float?     // weight used for waste/purge operations
+  
+  infillLength    Float?     // length used for infill (subset of model)
+  infillVolume    Float?     // volume used for infill (subset of model)
+  infillWeight    Float?     // weight used for infill (subset of model)
+  
+  wallLength      Float?     // length used for walls/perimeters (subset of model)
+  wallVolume      Float?     // volume used for walls/perimeters (subset of model)
+  wallWeight      Float?     // weight used for walls/perimeters (subset of model)
   
   // Filament properties at slice time
   filamentType    String?    // PLA, ABS, PETG, etc.

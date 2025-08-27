@@ -1,5 +1,5 @@
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { parse3MFMetadata, type Parsed3MFMetadata } from "@/lib/3mf-parser";
 import { logger } from "@/lib/logger";
 import { upload3MFFile } from "@/lib/s3-service";
@@ -79,14 +79,38 @@ export const ServerRoute = createServerFileRoute("/api/sliced-files").methods({
 
       logger.info("Processing 3MF file upload", { name, size: file.size, modelId });
 
-      // Upload file to S3 first
+      // Upload file to S3 first with performance monitoring
+      const uploadStartTime = Date.now();
       let s3UploadResult;
       try {
-        s3UploadResult = await upload3MFFile(file, validation.data.modelId);
+        s3UploadResult = await upload3MFFile(file, validation.data.modelId, {
+          onProgress: (progress) => {
+            const now = Date.now();
+            const elapsedTime = now - uploadStartTime;
+            const speed = progress.loaded / elapsedTime * 1000; // bytes/sec
+            const estimatedTimeRemaining = (progress.total - progress.loaded) / speed / 1000; // seconds
+            
+            logger.info('Upload progress', {
+              filename: name,
+              percentage: progress.percentage,
+              uploaded: `${(progress.loaded / 1024 / 1024).toFixed(2)} MB`,
+              total: `${(progress.total / 1024 / 1024).toFixed(2)} MB`,
+              speed: `${(speed / 1024 / 1024).toFixed(2)} MB/s`,
+              estimatedTimeRemaining: `${Math.round(estimatedTimeRemaining)}s`
+            });
+          }
+        });
+        
+        const uploadTotalTime = Date.now() - uploadStartTime;
+        const averageSpeed = file.size / uploadTotalTime * 1000; // bytes/sec
+        
         logger.info("S3 upload successful", {
           s3Key: s3UploadResult.s3Key,
           s3Url: s3UploadResult.s3Url,
-          size: s3UploadResult.size
+          size: s3UploadResult.size,
+          uploadTime: `${uploadTotalTime}ms`,
+          averageSpeed: `${(averageSpeed / 1024 / 1024).toFixed(2)} MB/s`,
+          fileSize: `${(file.size / 1024 / 1024).toFixed(2)} MB`
         });
       } catch (error) {
         logger.error("S3 upload failed", { name, error });
@@ -210,6 +234,17 @@ export const ServerRoute = createServerFileRoute("/api/sliced-files").methods({
       return Response.json(result, { status: 201 });
     } catch (error) {
       logger.error("Error creating sliced file:", error);
+      
+      // Handle Prisma unique constraint violation for name field
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002' && error.meta?.target?.includes('name')) {
+          return Response.json(
+            { error: "A sliced file with this name already exists. Please choose a different name." },
+            { status: 400 },
+          );
+        }
+      }
+      
       return Response.json(
         { error: "Failed to create sliced file" },
         { status: 500 },

@@ -1,4 +1,4 @@
-import { useModels, useUploadSlicedFile } from "@/lib/api-hooks";
+import { useModels, useUploadSlicedFileWithProgress } from "@/lib/api-hooks";
 import { useForm } from "@tanstack/react-form";
 import { type ReactNode, useState } from "react";
 import {
@@ -32,13 +32,24 @@ const uploadFormSchema = z.object({
 
 type UploadFormData = z.infer<typeof uploadFormSchema>;
 
+interface UploadProgress {
+  loaded: number;
+  total: number;
+  percentage: number;
+  speed?: string;
+  timeRemaining?: string;
+}
+
 export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   
   const { data: models = [], isLoading: modelsLoading } = useModels();
-  const uploadMutation = useUploadSlicedFile();
+  const { uploadWithProgress } = useUploadSlicedFileWithProgress();
+  const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<UploadFormData>({
     defaultValues: {
@@ -48,17 +59,29 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
     },
     onSubmit: async ({ value }) => {
       try {
+        setIsUploading(true);
+        setUploadError(null);
+        setUploadProgress({ loaded: 0, total: value.file.size, percentage: 0 });
+        
         const formData = new FormData();
         formData.append("file", value.file);
         formData.append("name", value.name);
         formData.append("modelId", value.modelId.toString());
 
-        await uploadMutation.mutateAsync(formData);
+        await uploadWithProgress(formData, (progress) => {
+          setUploadProgress(progress);
+        });
+        
+        setUploadProgress(null);
+        setIsUploading(false);
         setIsOpen(false);
         form.reset();
         setSelectedFile(null);
       } catch (error) {
         console.error("Upload failed:", error);
+        setUploadError(error instanceof Error ? error.message : 'Upload failed');
+        setUploadProgress(null);
+        setIsUploading(false);
       }
     },
     validators: {
@@ -247,29 +270,59 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
           )}
         </form.Field>
 
+        {/* Upload Progress */}
+        {uploadProgress && (
+          <div className="space-y-3 p-4 bg-muted/50 rounded-lg border">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-medium">Uploading file...</span>
+              <span className="text-muted-foreground">{uploadProgress.percentage}%</span>
+            </div>
+            
+            {/* Progress Bar */}
+            <div className="w-full bg-muted rounded-full h-2">
+              <div 
+                className="bg-primary h-2 rounded-full transition-all duration-300 ease-out"
+                style={{ width: `${uploadProgress.percentage}%` }}
+              />
+            </div>
+            
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>
+                {(uploadProgress.loaded / (1024 * 1024)).toFixed(1)} MB of{' '}
+                {(uploadProgress.total / (1024 * 1024)).toFixed(1)} MB
+              </span>
+              {uploadProgress.speed && (
+                <span>
+                  {uploadProgress.speed}
+                  {uploadProgress.timeRemaining && ` • ${uploadProgress.timeRemaining} remaining`}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Submit Button */}
         <div className="flex items-center justify-end gap-x-4 pt-4 border-t">
           <FMButton
             variant="outline"
             onPress={() => setIsOpen(false)}
-            disabled={uploadMutation.isPending}
+            disabled={isUploading}
           >
             Cancel
           </FMButton>
           <FMButton
             type="submit"
-            disabled={uploadMutation.isPending || !selectedFile}
+            disabled={isUploading || !selectedFile}
             className="min-w-[120px]"
           >
-            {uploadMutation.isPending ? "Uploading..." : "Upload & Process"}
+            {isUploading ? "Uploading..." : "Upload & Process"}
           </FMButton>
         </div>
 
-        {/* Upload Status */}
-        {uploadMutation.error && (
+        {/* Upload Error */}
+        {uploadError && (
           <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
-            Upload failed: {uploadMutation.error.message}
+            Upload failed: {uploadError}
           </div>
         )}
       </Form>

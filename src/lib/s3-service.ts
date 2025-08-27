@@ -1,4 +1,13 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { 
+  S3Client, 
+  PutObjectCommand, 
+  DeleteObjectCommand, 
+  GetObjectCommand,
+  CreateMultipartUploadCommand,
+  UploadPartCommand,
+  CompleteMultipartUploadCommand,
+  AbortMultipartUploadCommand,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { logger } from './logger';
 
@@ -94,6 +103,18 @@ export interface UploadResult {
   s3Key: string;
   s3Url: string;
   size: number;
+}
+
+export interface UploadProgress {
+  loaded: number;
+  total: number;
+  percentage: number;
+}
+
+export interface StreamingUploadOptions {
+  onProgress?: (progress: UploadProgress) => void;
+  partSize?: number; // Size in bytes, defaults to 5MB
+  maxConcurrentParts?: number; // Max concurrent uploads, defaults to 3
 }
 
 export async function uploadFileToS3(
@@ -233,10 +254,12 @@ export async function deleteFileFromS3(s3Key: string): Promise<void> {
 
 /**
  * Upload 3MF file with automatic content type detection and key generation
+ * Automatically uses multipart upload for large files (>5MB)
  */
 export async function upload3MFFile(
   file: File,
-  modelId: number
+  modelId: number,
+  options: StreamingUploadOptions = {}
 ): Promise<UploadResult> {
   // Validate file type
   if (!file.name.endsWith('.3mf') && !file.name.endsWith('.gcode.3mf')) {
@@ -254,10 +277,12 @@ export async function upload3MFFile(
     size: file.size,
     modelId,
     s3Key,
-    contentType
+    contentType,
+    useMultipart: file.size > (options.partSize || 5 * 1024 * 1024)
   });
 
-  return await uploadFileToS3(file, s3Key, contentType);
+  // Use smart upload that chooses method based on file size
+  return await uploadWithProgress(file, s3Key, contentType, options);
 }
 
 /**
@@ -286,4 +311,218 @@ export function validateS3Config(): { isValid: boolean; errors: string[] } {
     isValid: errors.length === 0,
     errors
   };
+}
+
+/**
+ * Advanced streaming upload with multipart support for large files
+ */
+export async function uploadLargeFileToS3(
+  file: File,
+  s3Key: string,
+  contentType?: string,
+  options: StreamingUploadOptions = {}
+): Promise<UploadResult> {
+  const config = getS3Config();
+  const { partSize = 5 * 1024 * 1024, maxConcurrentParts = 3, onProgress } = options; // 5MB default part size
+  
+  // For files smaller than partSize, use regular upload
+  if (file.size <= partSize) {
+    return uploadFileToS3(file, s3Key, contentType);
+  }
+
+  logger.info('Starting multipart upload', {
+    filename: file.name,
+    size: file.size,
+    s3Key,
+    partSize,
+    totalParts: Math.ceil(file.size / partSize)
+  });
+
+  let uploadId: string;
+  
+  try {
+    // Step 1: Initiate multipart upload
+    const createCommand = new CreateMultipartUploadCommand({
+      Bucket: config.bucketName,
+      Key: s3Key,
+      ContentType: contentType || 'application/octet-stream',
+      Metadata: {
+        originalFileName: file.name,
+        uploadedAt: new Date().toISOString(),
+      },
+    });
+
+    const createResponse = await s3Client.send(createCommand);
+    uploadId = createResponse.UploadId!;
+    
+    logger.info('Multipart upload initiated', { uploadId, s3Key });
+
+    // Step 2: Upload parts concurrently
+    const parts: { ETag: string; PartNumber: number }[] = [];
+    const totalParts = Math.ceil(file.size / partSize);
+    let uploadedBytes = 0;
+
+    // Create semaphore for concurrent uploads
+    const semaphore = new Array(maxConcurrentParts).fill(null);
+    const uploadPromises: Promise<void>[] = [];
+
+    for (let partNumber = 1; partNumber <= totalParts; partNumber++) {
+      const start = (partNumber - 1) * partSize;
+      const end = Math.min(start + partSize, file.size);
+      const partData = file.slice(start, end);
+
+      const uploadPromise = (async () => {
+        // Wait for available slot
+        await new Promise<void>((resolve) => {
+          const checkSlot = () => {
+            const availableIndex = semaphore.findIndex(slot => slot === null);
+            if (availableIndex !== -1) {
+              semaphore[availableIndex] = partNumber;
+              resolve();
+            } else {
+              setTimeout(checkSlot, 10);
+            }
+          };
+          checkSlot();
+        });
+
+        try {
+          logger.debug('Uploading part', { partNumber, size: partData.size });
+
+          const partCommand = new UploadPartCommand({
+            Bucket: config.bucketName,
+            Key: s3Key,
+            PartNumber: partNumber,
+            UploadId: uploadId,
+            Body: new Uint8Array(await partData.arrayBuffer()),
+          });
+
+          const partResponse = await s3Client.send(partCommand);
+          
+          parts[partNumber - 1] = {
+            ETag: partResponse.ETag!,
+            PartNumber: partNumber,
+          };
+
+          uploadedBytes += partData.size;
+
+          // Report progress
+          if (onProgress) {
+            onProgress({
+              loaded: uploadedBytes,
+              total: file.size,
+              percentage: Math.round((uploadedBytes / file.size) * 100)
+            });
+          }
+
+          logger.debug('Part uploaded successfully', { 
+            partNumber, 
+            etag: partResponse.ETag,
+            progress: `${uploadedBytes}/${file.size} bytes` 
+          });
+
+        } finally {
+          // Release semaphore slot
+          const slotIndex = semaphore.findIndex(slot => slot === partNumber);
+          if (slotIndex !== -1) {
+            semaphore[slotIndex] = null;
+          }
+        }
+      })();
+
+      uploadPromises.push(uploadPromise);
+    }
+
+    // Wait for all parts to complete
+    await Promise.all(uploadPromises);
+
+    // Step 3: Complete multipart upload
+    const completeCommand = new CompleteMultipartUploadCommand({
+      Bucket: config.bucketName,
+      Key: s3Key,
+      UploadId: uploadId,
+      MultipartUpload: {
+        Parts: parts.sort((a, b) => a.PartNumber - b.PartNumber),
+      },
+    });
+
+    const completeResponse = await s3Client.send(completeCommand);
+    
+    const s3Url = config.baseUrl 
+      ? `${config.baseUrl}/${s3Key}` 
+      : `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${s3Key}`;
+
+    logger.info('Multipart upload completed successfully', {
+      s3Key,
+      location: completeResponse.Location,
+      etag: completeResponse.ETag,
+      totalParts,
+      fileSize: file.size
+    });
+
+    return {
+      s3Key,
+      s3Url,
+      size: file.size,
+    };
+
+  } catch (error) {
+    // Abort multipart upload on error
+    if (uploadId) {
+      try {
+        const abortCommand = new AbortMultipartUploadCommand({
+          Bucket: config.bucketName,
+          Key: s3Key,
+          UploadId: uploadId,
+        });
+        await s3Client.send(abortCommand);
+        logger.info('Multipart upload aborted due to error', { uploadId, s3Key });
+      } catch (abortError) {
+        logger.error('Failed to abort multipart upload', { 
+          uploadId, 
+          s3Key,
+          errorMessage: abortError instanceof Error ? abortError.message : 'Unknown error'
+        });
+      }
+    }
+
+    logger.error('Multipart upload failed', {
+      s3Key,
+      bucket: config.bucketName,
+      errorMessage: error instanceof Error ? error.message : 'Unknown error'
+    });
+
+    throw new Error(`Failed to upload large file to S3: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+/**
+ * Smart upload function that chooses the appropriate upload method based on file size
+ */
+export async function uploadWithProgress(
+  file: File,
+  s3Key: string,
+  contentType?: string,
+  options: StreamingUploadOptions = {}
+): Promise<UploadResult> {
+  const { partSize = 5 * 1024 * 1024 } = options;
+  
+  // Use multipart upload for files larger than partSize
+  if (file.size > partSize) {
+    return uploadLargeFileToS3(file, s3Key, contentType, options);
+  } else {
+    // For smaller files, use simple upload
+    const result = await uploadFileToS3(file, s3Key, contentType);
+    
+    // Simulate progress for consistency
+    if (options.onProgress) {
+      options.onProgress({
+        loaded: file.size,
+        total: file.size,
+        percentage: 100
+      });
+    }
+    
+    return result;
+  }
 }

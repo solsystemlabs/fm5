@@ -235,11 +235,133 @@ npx prisma migrate dev --name add_s3_key_to_sliced_file
 npm run dev
 ```
 
+---
+
+## Phase 3: Advanced Features & Performance Optimization
+
+### 3.1 Multipart Upload for Large Files
+The S3 service now automatically uses multipart upload for files larger than 5MB:
+
+```typescript
+// Enhanced upload with progress tracking
+const result = await upload3MFFile(file, modelId, {
+  onProgress: (progress) => {
+    console.log(`Upload progress: ${progress.percentage}%`);
+    // Update UI progress bar
+  },
+  partSize: 10 * 1024 * 1024, // 10MB parts
+  maxConcurrentParts: 5 // Upload 5 parts simultaneously
+});
+```
+
+### 3.2 CloudFront CDN Configuration
+
+#### 3.2.1 Create CloudFront Distribution
+1. **AWS Console**: Navigate to CloudFront service
+2. **Create Distribution**:
+   - **Origin Domain**: Select your S3 bucket
+   - **Origin Access**: Choose "Origin Access Control (recommended)"
+   - **Origin Access Control**: Create new OAC
+   - **Name**: `fm5-manager-s3-oac`
+   - **Signing behavior**: Sign requests (recommended)
+
+3. **Distribution Settings**:
+   - **Price class**: Use all edge locations (best performance)
+   - **Alternate domain name (CNAME)**: `files.yourdomain.com` (optional)
+   - **Custom SSL certificate**: Upload/use ACM certificate if using CNAME
+
+#### 3.2.2 Update S3 Bucket Policy
+After creating the distribution, update your S3 bucket policy to allow CloudFront access:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowCloudFrontServicePrincipalReadOnly",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "cloudfront.amazonaws.com"
+      },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::your-bucket-name/*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceArn": "arn:aws:cloudfront::ACCOUNT-ID:distribution/DISTRIBUTION-ID"
+        }
+      }
+    }
+  ]
+}
+```
+
+#### 3.2.3 Environment Configuration
+Update your `.env` file:
+
+```env
+# CDN Configuration
+AWS_S3_BASE_URL=https://d1234567890123.cloudfront.net
+# Or with custom domain:
+AWS_S3_BASE_URL=https://files.yourdomain.com
+```
+
+#### 3.2.4 Cache Behaviors
+Recommended CloudFront behaviors for 3MF files:
+
+| Path Pattern | TTL | Compress | Allowed Methods |
+|-------------|-----|----------|----------------|
+| `*/slicedFiles/*` | 1 year | Yes | GET, HEAD |
+| `*/slicedFiles/dev/*` | 1 hour | Yes | GET, HEAD |
+
+### 3.3 Performance Monitoring
+
+#### 3.3.1 Upload Performance Metrics
+Monitor these metrics in your application:
+
+```typescript
+// Add to upload process
+const startTime = Date.now();
+let lastProgressTime = startTime;
+
+const result = await upload3MFFile(file, modelId, {
+  onProgress: (progress) => {
+    const now = Date.now();
+    const speed = (progress.loaded / (now - startTime)) * 1000; // bytes/sec
+    const timeRemaining = (progress.total - progress.loaded) / speed; // seconds
+    
+    logger.info('Upload progress', {
+      percentage: progress.percentage,
+      speed: `${(speed / 1024 / 1024).toFixed(2)} MB/s`,
+      timeRemaining: `${Math.round(timeRemaining)}s`,
+      uploaded: `${(progress.loaded / 1024 / 1024).toFixed(2)} MB`,
+      total: `${(progress.total / 1024 / 1024).toFixed(2)} MB`
+    });
+  }
+});
+
+const totalTime = Date.now() - startTime;
+logger.info('Upload completed', { 
+  totalTime: `${totalTime}ms`,
+  averageSpeed: `${(file.size / totalTime * 1000 / 1024 / 1024).toFixed(2)} MB/s`
+});
+```
+
+#### 3.3.2 S3 Costs Optimization
+- **Lifecycle Rules**: Archive old files to S3 IA or Glacier
+- **Storage Class**: Use S3 Standard-IA for files older than 30 days
+- **Monitoring**: Set up CloudWatch alarms for storage costs
+
+---
+
 ## Success Criteria
-- [ ] Files uploaded to correct S3 hierarchy
-- [ ] Database stores S3 URLs and keys
-- [ ] Download links generate signed URLs
-- [ ] Upload UI removes manual URL input
-- [ ] Existing 3MF parsing and metadata extraction unchanged
-- [ ] Cost estimation and UI features continue working
-- [ ] Error handling for S3 failures implemented
+- [x] Files uploaded to correct S3 hierarchy
+- [x] Database stores S3 URLs and keys
+- [x] Download links generate signed URLs
+- [x] Upload UI removes manual URL input
+- [x] Existing 3MF parsing and metadata extraction unchanged
+- [x] Cost estimation and UI features continue working
+- [x] Error handling for S3 failures implemented
+- [x] **Phase 3**: Multipart upload for large files (>5MB)
+- [x] **Phase 3**: Progress tracking during uploads
+- [x] **Phase 3**: Streaming uploads to prevent memory issues
+- [x] **Phase 3**: CloudFront CDN configuration guide

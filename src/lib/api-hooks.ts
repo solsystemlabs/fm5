@@ -198,6 +198,63 @@ const api = {
     }
     return response.json()
   },
+
+  uploadSlicedFileWithProgress: (
+    formData: FormData,
+    onProgress?: (progress: { loaded: number; total: number; percentage: number; speed?: string; timeRemaining?: string }) => void
+  ): Promise<SlicedFile> => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest()
+      const startTime = Date.now()
+      
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable && onProgress) {
+          const now = Date.now()
+          const elapsedTime = now - startTime
+          const speed = event.loaded / elapsedTime * 1000 // bytes/sec
+          const timeRemaining = (event.total - event.loaded) / speed / 1000 // seconds
+          
+          onProgress({
+            loaded: event.loaded,
+            total: event.total,
+            percentage: Math.round((event.loaded / event.total) * 100),
+            speed: `${(speed / 1024 / 1024).toFixed(1)} MB/s`,
+            timeRemaining: `${Math.round(timeRemaining)}s`
+          })
+        }
+      })
+      
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const result = JSON.parse(xhr.responseText)
+            resolve(result)
+          } catch (error) {
+            reject(new Error('Failed to parse server response'))
+          }
+        } else {
+          try {
+            const error = JSON.parse(xhr.responseText)
+            reject(new Error(error.error || `Upload failed with status ${xhr.status}`))
+          } catch {
+            reject(new Error(`Upload failed with status ${xhr.status}`))
+          }
+        }
+      })
+      
+      xhr.addEventListener('error', () => {
+        reject(new Error('Network error during upload'))
+      })
+      
+      xhr.addEventListener('timeout', () => {
+        reject(new Error('Upload timed out'))
+      })
+      
+      xhr.open('POST', '/api/sliced-files')
+      xhr.timeout = 10 * 60 * 1000 // 10 minutes timeout
+      xhr.send(formData)
+    })
+  },
 }
 
 // Hooks
@@ -374,4 +431,21 @@ export function useUploadSlicedFile() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.slicedFiles })
     },
   })
+}
+
+export function useUploadSlicedFileWithProgress() {
+  const queryClient = useQueryClient()
+  
+  return {
+    uploadWithProgress: (
+      formData: FormData,
+      onProgress?: (progress: { loaded: number; total: number; percentage: number; speed?: string; timeRemaining?: string }) => void
+    ) => {
+      return api.uploadSlicedFileWithProgress(formData, onProgress).then((result) => {
+        // Invalidate and refetch sliced files after uploading a new one
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.slicedFiles })
+        return result
+      })
+    }
+  }
 }

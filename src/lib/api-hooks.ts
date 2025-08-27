@@ -186,6 +186,18 @@ const api = {
     }
     return response.json()
   },
+
+  uploadSlicedFile: async (formData: FormData): Promise<SlicedFile> => {
+    const response = await fetch('/api/sliced-files', {
+      method: 'POST',
+      body: formData,
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to upload sliced file')
+    }
+    return response.json()
+  },
 }
 
 // Hooks
@@ -349,5 +361,17 @@ export function useSlicedFiles() {
   return useQuery({
     queryKey: QUERY_KEYS.slicedFiles,
     queryFn: api.getSlicedFiles,
+  })
+}
+
+export function useUploadSlicedFile() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: api.uploadSlicedFile,
+    onSuccess: () => {
+      // Invalidate and refetch sliced files after uploading a new one
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.slicedFiles })
+    },
   })
 }

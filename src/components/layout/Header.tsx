@@ -14,6 +14,7 @@ const navigation = [
   { name: "Products", href: "/products" },
   { name: "Models", href: "/models" },
   { name: "Filaments", href: "/filaments" },
+  { name: "3MF Files", href: "/sliced-files" },
   { name: "Inventory", href: "/inventory" },
 ];
 

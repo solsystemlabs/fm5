@@ -25,6 +25,47 @@ export interface Model {
   Filaments?: Filament[];
 }
 
+export interface SlicedFileFilament {
+  id: number;
+  slicedFileId: number;
+  filamentIndex: number;
+  
+  // Total usage
+  lengthUsed?: number;
+  volumeUsed?: number;
+  weightUsed?: number;
+  
+  // Usage breakdown by purpose (when available)
+  modelLength?: number;
+  modelVolume?: number;
+  modelWeight?: number;
+  supportLength?: number;
+  supportVolume?: number;
+  supportWeight?: number;
+  towerLength?: number;
+  towerVolume?: number;
+  towerWeight?: number;
+  wasteLength?: number;
+  wasteVolume?: number;
+  wasteWeight?: number;
+  infillLength?: number;
+  infillVolume?: number;
+  infillWeight?: number;
+  wallLength?: number;
+  wallVolume?: number;
+  wallWeight?: number;
+  
+  // Filament properties
+  filamentType?: string;
+  filamentColor?: string;
+  filamentVendor?: string;
+  density?: number;
+  diameter?: number;
+  nozzleTemp?: number;
+  bedTemp?: number;
+  filamentId?: number;
+}
+
 export interface SlicedFile {
   id: number;
   name: string;
@@ -32,6 +73,36 @@ export interface SlicedFile {
   url: string;
   size: number;
   modelFileId?: number;
+  
+  // Basic print information
+  printTimeMinutes?: number;
+  totalTimeMinutes?: number;
+  layerCount?: number;
+  layerHeight?: number;
+  maxZHeight?: number;
+  
+  // Slicer information
+  slicerName?: string;
+  slicerVersion?: string;
+  profileName?: string;
+  
+  // Printer settings
+  nozzleDiameter?: number;
+  bedType?: string;
+  bedTemperature?: number;
+  
+  // Filament totals (aggregated across all filaments)
+  totalFilamentLength?: number;
+  totalFilamentVolume?: number;
+  totalFilamentWeight?: number;
+  
+  // Timestamps
+  createdAt: string;
+  updatedAt: string;
+  
+  // Relationships
+  SlicedFileFilaments?: SlicedFileFilament[];
+  ModelFile?: any; // Can be expanded later if needed
 }
 
 export interface Product {

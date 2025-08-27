@@ -13,6 +13,7 @@ import { createServerRootRoute } from '@tanstack/react-start/server'
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SlicedFilesIndexRouteImport } from './routes/sliced-files/index'
 import { Route as ProductsIndexRouteImport } from './routes/products/index'
 import { Route as ModelsIndexRouteImport } from './routes/models/index'
 import { Route as InventoryIndexRouteImport } from './routes/inventory/index'
@@ -41,6 +42,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlicedFilesIndexRoute = SlicedFilesIndexRouteImport.update({
+  id: '/sliced-files/',
+  path: '/sliced-files/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductsIndexRoute = ProductsIndexRouteImport.update({
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/inventory': typeof InventoryIndexRoute
   '/models': typeof ModelsIndexRoute
   '/products': typeof ProductsIndexRoute
+  '/sliced-files': typeof SlicedFilesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/inventory': typeof InventoryIndexRoute
   '/models': typeof ModelsIndexRoute
   '/products': typeof ProductsIndexRoute
+  '/sliced-files': typeof SlicedFilesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -157,6 +165,7 @@ export interface FileRoutesById {
   '/inventory/': typeof InventoryIndexRoute
   '/models/': typeof ModelsIndexRoute
   '/products/': typeof ProductsIndexRoute
+  '/sliced-files/': typeof SlicedFilesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -167,8 +176,16 @@ export interface FileRouteTypes {
     | '/inventory'
     | '/models'
     | '/products'
+    | '/sliced-files'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/filaments' | '/inventory' | '/models' | '/products'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/filaments'
+    | '/inventory'
+    | '/models'
+    | '/products'
+    | '/sliced-files'
   id:
     | '__root__'
     | '/'
@@ -177,6 +194,7 @@ export interface FileRouteTypes {
     | '/inventory/'
     | '/models/'
     | '/products/'
+    | '/sliced-files/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -186,6 +204,7 @@ export interface RootRouteChildren {
   InventoryIndexRoute: typeof InventoryIndexRoute
   ModelsIndexRoute: typeof ModelsIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
+  SlicedFilesIndexRoute: typeof SlicedFilesIndexRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/brands': typeof ApiBrandsServerRoute
@@ -309,6 +328,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sliced-files/': {
+      id: '/sliced-files/'
+      path: '/sliced-files'
+      fullPath: '/sliced-files'
+      preLoaderRoute: typeof SlicedFilesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/products/': {
@@ -471,6 +497,7 @@ const rootRouteChildren: RootRouteChildren = {
   InventoryIndexRoute: InventoryIndexRoute,
   ModelsIndexRoute: ModelsIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,
+  SlicedFilesIndexRoute: SlicedFilesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

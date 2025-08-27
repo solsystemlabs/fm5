@@ -36,34 +36,95 @@ model ModelFile {
 }
 
 model SlicedFile {
-  id          Int        @id @unique @default(autoincrement())
-  name        String     @unique
-  modelId     Int
-  url         String
-  size        Int
-  ModelFile   ModelFile? @relation(fields: [modelFileId], references: [id])
-  modelFileId Int?
-  Product     Product[]
+  id                    Int                    @id @unique @default(autoincrement())
+  name                  String                 @unique
+  modelId               Int
+  url                   String
+  size                  Int
+  
+  // Basic print information
+  printTimeMinutes      Int?                   // from "model printing time"
+  totalTimeMinutes      Int?                   // from "total estimated time"  
+  layerCount           Int?                   // from "total layer number"
+  layerHeight          Float?                 // from layer_height config
+  maxZHeight           Float?                 // from "max_z_height"
+  
+  // Slicer information
+  slicerName           String?                // e.g., "BambuStudio"
+  slicerVersion        String?                // e.g., "02.01.01.52"
+  profileName          String?                // from filament_settings_id
+  
+  // Printer settings
+  nozzleDiameter       Float?                 // from nozzle_diameter
+  bedType              String?                // from bed_type
+  bedTemperature       Int?                   // from hot_plate_temp
+  
+  // Filament totals (aggregated across all filaments)
+  totalFilamentLength  Float?                 // total length in mm
+  totalFilamentVolume  Float?                 // total volume in cm³ 
+  totalFilamentWeight  Float?                 // total weight in grams
+  
+  // File metadata
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  
+  // Relationships
+  ModelFile            ModelFile?             @relation(fields: [modelFileId], references: [id])
+  modelFileId          Int?
+  Product              Product[]
+  SlicedFileFilaments  SlicedFileFilament[]   // Junction table for multi-filament
+}
+
+// Junction table for multi-filament support
+model SlicedFileFilament {
+  id              Int        @id @unique @default(autoincrement())
+  slicedFileId    Int
+  filamentIndex   Int        // 0, 1, 2, etc. for multi-filament prints
+  
+  // Per-filament usage
+  lengthUsed      Float?     // length in mm for this specific filament
+  volumeUsed      Float?     // volume in cm³ for this specific filament  
+  weightUsed      Float?     // weight in grams for this specific filament
+  
+  // Filament properties at slice time
+  filamentType    String?    // PLA, ABS, PETG, etc.
+  filamentColor   String?    // hex color code
+  filamentVendor  String?    // brand name
+  density         Float?     // density value
+  diameter        Float?     // filament diameter
+  
+  // Temperature settings
+  nozzleTemp      Int?       // nozzle temperature for this filament
+  bedTemp         Int?       // bed temperature for this filament
+  
+  // Optional relationship to existing Filament record
+  filamentId      Int?       // Link to existing Filament if identified
+  filament        Filament?  @relation(fields: [filamentId], references: [id])
+  
+  slicedFile      SlicedFile @relation(fields: [slicedFileId], references: [id])
+  
+  @@unique([slicedFileId, filamentIndex])
 }
 
 model Filament {
-  id             Int          @id @unique @default(autoincrement())
-  name           String
-  color          String
-  filamentTypeId Int
-  Type           FilamentType @relation(fields: [filamentTypeId], references: [id])
-  materialTypeId Int
-  Material       MaterialType @relation(fields: [materialTypeId], references: [id])
-  Models         Model[]      @relation("FilamentToModel")
-  cost           Float?
-  grams          Int?
-  Brand          Brand        @relation(fields: [brandName], references: [name])
-  brandName      String
-  diameter       Float
-  ModelFile      ModelFile?   @relation(fields: [modelFileId], references: [id])
-  modelFileId    Int?
-  Product        Product?     @relation(fields: [productId], references: [id])
-  productId      Int?
+  id                    Int                   @id @unique @default(autoincrement())
+  name                  String
+  color                 String
+  filamentTypeId        Int
+  Type                  FilamentType          @relation(fields: [filamentTypeId], references: [id])
+  materialTypeId        Int
+  Material              MaterialType          @relation(fields: [materialTypeId], references: [id])
+  Models                Model[]               @relation("FilamentToModel")
+  cost                  Float?
+  grams                 Int?
+  Brand                 Brand                 @relation(fields: [brandName], references: [name])
+  brandName             String
+  diameter              Float
+  ModelFile             ModelFile?            @relation(fields: [modelFileId], references: [id])
+  modelFileId           Int?
+  Product               Product?              @relation(fields: [productId], references: [id])
+  productId             Int?
+  SlicedFileFilaments   SlicedFileFilament[]  // Relationship to junction table
 }
 
 model Product {

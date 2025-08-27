@@ -1,6 +1,5 @@
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
 import {
   Button,
   Dialog,
@@ -16,14 +15,11 @@ const navigation = [
   { name: "Models", href: "/models" },
   { name: "Filaments", href: "/filaments" },
   { name: "Inventory", href: "/inventory" },
-  { name: "Profile", href: "/profile" },
 ];
 
 export default function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   return (
-    <header className="w-full bg-background">
+    <header className="bg-background w-full">
       <nav
         aria-label="Global"
         className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8"
@@ -55,7 +51,7 @@ export default function Header() {
         </div>
         <div className="flex items-center gap-4">
           <ThemeToggle />
-            <div className="flex lg:hidden">
+          <div className="flex lg:hidden">
             {/* <button */}
             {/*   type="button" */}
             {/*   onClick={() => setMobileMenuOpen(true)} */}
@@ -75,7 +71,7 @@ export default function Header() {
                 </Dialog>
               </Modal>
             </DialogTrigger>
-            </div>
+          </div>
         </div>
       </nav>
     </header>

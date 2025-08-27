@@ -2,6 +2,7 @@ import { createServerFileRoute } from "@tanstack/react-start/server";
 import { PrismaClient } from "@prisma/client";
 import { parse3MFMetadata, type Parsed3MFMetadata } from "@/lib/3mf-parser";
 import { logger } from "@/lib/logger";
+import { upload3MFFile } from "@/lib/s3-service";
 import { z } from "zod";
 
 const prisma = new PrismaClient();
@@ -10,7 +11,6 @@ const prisma = new PrismaClient();
 const uploadSchema = z.object({
   name: z.string().min(1, "Name is required"),
   modelId: z.number().int().positive("Valid model ID is required"),
-  url: z.string().url("Valid URL is required"),
   size: z.number().int().positive("Valid file size is required"),
 });
 
@@ -47,13 +47,11 @@ export const ServerRoute = createServerFileRoute("/api/sliced-files").methods({
       const file = formData.get("file") as File;
       const name = formData.get("name") as string;
       const modelId = parseInt(formData.get("modelId") as string);
-      const url = formData.get("url") as string;
       
       // Validate required fields
       const validation = uploadSchema.safeParse({
         name,
         modelId,
-        url,
         size: file?.size || 0
       });
 
@@ -81,6 +79,23 @@ export const ServerRoute = createServerFileRoute("/api/sliced-files").methods({
 
       logger.info("Processing 3MF file upload", { name, size: file.size, modelId });
 
+      // Upload file to S3 first
+      let s3UploadResult;
+      try {
+        s3UploadResult = await upload3MFFile(file, validation.data.modelId);
+        logger.info("S3 upload successful", {
+          s3Key: s3UploadResult.s3Key,
+          s3Url: s3UploadResult.s3Url,
+          size: s3UploadResult.size
+        });
+      } catch (error) {
+        logger.error("S3 upload failed", { name, error });
+        return Response.json(
+          { error: "Failed to upload file to storage" },
+          { status: 500 }
+        );
+      }
+
       // Parse 3MF metadata
       const buffer = Buffer.from(await file.arrayBuffer());
       let metadata: Parsed3MFMetadata;
@@ -102,8 +117,9 @@ export const ServerRoute = createServerFileRoute("/api/sliced-files").methods({
           data: {
             name: validation.data.name,
             modelId: validation.data.modelId,
-            url: validation.data.url,
-            size: validation.data.size,
+            url: s3UploadResult.s3Url,
+            size: s3UploadResult.size,
+            s3Key: s3UploadResult.s3Key,
             
             // Basic print information
             printTimeMinutes: metadata.printTimeMinutes,

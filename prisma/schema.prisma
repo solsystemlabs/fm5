@@ -41,6 +41,7 @@ model SlicedFile {
   modelId               Int
   url                   String
   size                  Int
+  s3Key                 String?                // S3 object key for file management
   
   // Basic print information
   printTimeMinutes      Int?                   // from "model printing time"

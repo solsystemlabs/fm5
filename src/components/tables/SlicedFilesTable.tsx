@@ -208,7 +208,7 @@ export default function SlicedFilesTable({
                 </button>
                 <span className="text-muted-foreground">|</span>
                 <a
-                  href={slicedFile.url}
+                  href={`/api/sliced-files/${slicedFile.id}/download`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary hover:text-primary/80 text-sm font-medium"

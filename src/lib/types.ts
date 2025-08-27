@@ -72,6 +72,7 @@ export interface SlicedFile {
   modelId: number;
   url: string;
   size: number;
+  s3Key?: string;
   modelFileId?: number;
   
   // Basic print information

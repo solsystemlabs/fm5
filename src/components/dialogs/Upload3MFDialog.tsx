@@ -27,7 +27,6 @@ type Upload3MFDialogProps = {
 const uploadFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
   modelId: z.number().min(1, "Model selection is required"),
-  url: z.string().url("Valid URL is required"),
   file: z.instanceof(File, { message: "File is required" }),
 });
 
@@ -45,7 +44,6 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
     defaultValues: {
       name: "",
       modelId: 0,
-      url: "",
       file: undefined as any,
     },
     onSubmit: async ({ value }) => {
@@ -54,7 +52,6 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
         formData.append("file", value.file);
         formData.append("name", value.name);
         formData.append("modelId", value.modelId.toString());
-        formData.append("url", value.url);
 
         await uploadMutation.mutateAsync(formData);
         setIsOpen(false);
@@ -85,11 +82,6 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
     if (!form.getFieldValue("name")) {
       const baseName = file.name.replace(/\.(gcode\.)?3mf$/i, '');
       form.setFieldValue("name", baseName);
-    }
-    
-    // Auto-populate URL if empty
-    if (!form.getFieldValue("url")) {
-      form.setFieldValue("url", `https://example.com/uploads/${file.name}`);
     }
   };
 
@@ -255,27 +247,6 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
           )}
         </form.Field>
 
-        {/* URL Field */}
-        <form.Field name="url">
-          {(field) => (
-            <TextField className="space-y-2">
-              <Label className="text-sm font-medium text-foreground">File URL</Label>
-              <Input
-                className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                placeholder="https://example.com/path/to/file.3mf"
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-                onBlur={field.handleBlur}
-              />
-              <div className="text-xs text-muted-foreground">
-                URL where the file will be accessible after upload
-              </div>
-              <FieldError className="text-sm text-destructive">
-                {field.state.meta.errors.join(", ")}
-              </FieldError>
-            </TextField>
-          )}
-        </form.Field>
 
         {/* Submit Button */}
         <div className="flex items-center justify-end gap-x-4 pt-4 border-t">

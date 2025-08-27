@@ -1,0 +1,80 @@
+import type { Product } from "@/lib/types";
+import type { ReactNode } from "react";
+import { Cell, TableBody } from "react-aria-components";
+import FMCell from "../ui/table/FMCell";
+import FMColumn from "../ui/table/FMColumn";
+import FMRow from "../ui/table/FMRow";
+import FMTable from "../ui/table/FMTable";
+import FMTableHeader from "../ui/table/FMTableHeader";
+
+export default function ProductsTable({ data }: { data: Product[] }): ReactNode {
+  const formatPrice = (price: number | null): string => {
+    if (price === null) return "N/A";
+    return `$${price.toFixed(2)}`;
+  };
+
+  return (
+    <FMTable>
+      <FMTableHeader>
+        <FMTableHeader.Row>
+          <FMColumn className="rounded-tl-lg py-3.5 pr-3 pl-4 text-left sm:pl-6">
+            Name
+          </FMColumn>
+          <FMColumn>Model</FMColumn>
+          <FMColumn>Filaments</FMColumn>
+          <FMColumn>Price</FMColumn>
+          <FMColumn className="rounded-tr-lg">Sliced File</FMColumn>
+        </FMTableHeader.Row>
+      </FMTableHeader>
+      <TableBody>
+        {data.map((product) => (
+          <FMRow key={product.id}>
+            <Cell className="relative py-4 pr-3 pl-4 text-sm sm:pl-6">
+              <div className="flex items-center">
+                <div className="text-md text-foreground font-bold">
+                  {product.name}
+                </div>
+              </div>
+              <div className="text-muted-foreground mt-1 flex flex-col sm:hidden">
+                <span>{product.model.name} ({product.model.Category.name})</span>
+                <span>{formatPrice(product.price)}</span>
+              </div>
+            </Cell>
+            <FMCell className="hidden sm:table-cell">
+              <div>
+                <div className="text-foreground font-medium">
+                  {product.model.name}
+                </div>
+                <div className="text-muted-foreground text-sm">
+                  {product.model.Category.name}
+                </div>
+              </div>
+            </FMCell>
+            <FMCell className="hidden sm:table-cell">
+              <div className="text-muted-foreground">
+                {product.Filaments && product.Filaments.length > 0 ? (
+                  <span>
+                    {product.Filaments.length} filament
+                    {product.Filaments.length !== 1 ? "s" : ""}
+                  </span>
+                ) : (
+                  <span>No filaments</span>
+                )}
+              </div>
+            </FMCell>
+            <FMCell className="hidden sm:table-cell">
+              <span className="text-foreground font-medium">
+                {formatPrice(product.price)}
+              </span>
+            </FMCell>
+            <FMCell className="relative py-3.5 pr-4 pl-3 text-sm font-medium sm:pr-6">
+              <div className="text-muted-foreground">
+                {product.slicedFile.name}
+              </div>
+            </FMCell>
+          </FMRow>
+        ))}
+      </TableBody>
+    </FMTable>
+  );
+}

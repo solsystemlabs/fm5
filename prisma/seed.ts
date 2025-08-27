@@ -8,6 +8,8 @@ async function main() {
   // Clear existing data
   console.log("🧹 Clearing existing data...");
   try {
+    await prisma.product.deleteMany({});
+    await prisma.slicedFile.deleteMany({});
     await prisma.filament.deleteMany({});
     await prisma.model.deleteMany({});
     await prisma.materialType.deleteMany({});
@@ -218,7 +220,103 @@ async function main() {
 
   console.log("✅ Filaments created");
 
-  console.log("✅ Filaments created");
+  // Create sliced files for the models
+  const slicedFiles = await Promise.all([
+    prisma.slicedFile.create({
+      data: {
+        name: "Ancient Dragon - High Detail.gcode",
+        modelId: dragonModel.id,
+        url: "/uploads/ancient_dragon_hd.gcode",
+        size: 2458672,
+      },
+    }),
+    prisma.slicedFile.create({
+      data: {
+        name: "Medieval Castle - Walls.gcode",
+        modelId: castleModel.id,
+        url: "/uploads/castle_walls.gcode",
+        size: 5420183,
+      },
+    }),
+    prisma.slicedFile.create({
+      data: {
+        name: "Battle Tank - Standard.gcode",
+        modelId: tankModel.id,
+        url: "/uploads/tank_standard.gcode",
+        size: 1923847,
+      },
+    }),
+    prisma.slicedFile.create({
+      data: {
+        name: "Wizard Staff - Detailed.gcode",
+        modelId: staffModel.id,
+        url: "/uploads/wizard_staff.gcode",
+        size: 892365,
+      },
+    }),
+  ]);
+
+  console.log("✅ Sliced files created");
+
+  // Create products linking models, sliced files, and filaments
+  await Promise.all([
+    prisma.product.create({
+      data: {
+        name: "Premium Red Dragon",
+        modelId: dragonModel.id,
+        slicedFileId: slicedFiles[0].id,
+        price: 35.99,
+        Filaments: {
+          connect: [{ id: redFilament.id }],
+        },
+      },
+    }),
+    prisma.product.create({
+      data: {
+        name: "Blue Sparkle Dragon",
+        modelId: dragonModel.id,
+        slicedFileId: slicedFiles[0].id,
+        price: 42.99,
+        Filaments: {
+          connect: [{ id: blueFilament.id }],
+        },
+      },
+    }),
+    prisma.product.create({
+      data: {
+        name: "Medieval Castle Set",
+        modelId: castleModel.id,
+        slicedFileId: slicedFiles[1].id,
+        price: 89.99,
+        Filaments: {
+          connect: [{ id: blueFilament.id }, { id: grayFilament.id }],
+        },
+      },
+    }),
+    prisma.product.create({
+      data: {
+        name: "Military Tank Model",
+        modelId: tankModel.id,
+        slicedFileId: slicedFiles[2].id,
+        price: 28.50,
+        Filaments: {
+          connect: [{ id: greenFilament.id }],
+        },
+      },
+    }),
+    prisma.product.create({
+      data: {
+        name: "Wizard's Staff",
+        modelId: staffModel.id,
+        slicedFileId: slicedFiles[3].id,
+        Filaments: {
+          connect: [{ id: whiteFilament.id }],
+        },
+      },
+    }),
+  ]);
+
+  console.log("✅ Products created");
   console.log("🎉 Database seeded successfully!");
 }
 

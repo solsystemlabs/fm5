@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Filament, MaterialType, Model, Brand, CreateFilamentForm, CreateModelForm, ModelCategory, GroupedFilaments } from './types'
+import { Filament, MaterialType, Model, Brand, CreateFilamentForm, CreateModelForm, CreateProductForm, ModelCategory, GroupedFilaments, Product, SlicedFile } from './types'
 import { FilamentType } from '@prisma/client'
 
 // Query keys
@@ -11,6 +11,8 @@ const QUERY_KEYS = {
   models: ['models'] as const,
   modelCategories: ['modelCategories'] as const,
   brands: ['brands'] as const,
+  products: ['products'] as const,
+  slicedFiles: ['slicedFiles'] as const,
 }
 
 // API functions
@@ -154,6 +156,36 @@ const api = {
     }
     return response.json()
   },
+
+  getProducts: async (): Promise<Product[]> => {
+    const response = await fetch('/api/products')
+    if (!response.ok) {
+      throw new Error('Failed to fetch products')
+    }
+    return response.json()
+  },
+
+  createProduct: async (product: CreateProductForm): Promise<Product> => {
+    const response = await fetch('/api/products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(product),
+    })
+    if (!response.ok) {
+      throw new Error('Failed to create product')
+    }
+    return response.json()
+  },
+
+  getSlicedFiles: async (): Promise<SlicedFile[]> => {
+    const response = await fetch('/api/sliced-files')
+    if (!response.ok) {
+      throw new Error('Failed to fetch sliced files')
+    }
+    return response.json()
+  },
 }
 
 // Hooks
@@ -291,5 +323,31 @@ export function useCreateModelCategory() {
       // Also invalidate to ensure we have the latest data
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.modelCategories })
     },
+  })
+}
+
+export function useProducts() {
+  return useQuery({
+    queryKey: QUERY_KEYS.products,
+    queryFn: api.getProducts,
+  })
+}
+
+export function useCreateProduct() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: api.createProduct,
+    onSuccess: () => {
+      // Invalidate and refetch products after creating a new one
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.products })
+    },
+  })
+}
+
+export function useSlicedFiles() {
+  return useQuery({
+    queryKey: QUERY_KEYS.slicedFiles,
+    queryFn: api.getSlicedFiles,
   })
 }

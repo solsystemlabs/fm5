@@ -25,6 +25,26 @@ export interface Model {
   Filaments?: Filament[];
 }
 
+export interface SlicedFile {
+  id: number;
+  name: string;
+  modelId: number;
+  url: string;
+  size: number;
+  modelFileId?: number;
+}
+
+export interface Product {
+  id: number;
+  name: string;
+  modelId: number;
+  model: Model;
+  price: number | null;
+  slicedFileId: number;
+  slicedFile: SlicedFile;
+  Filaments?: Filament[];
+}
+
 export interface Filament {
   id: number;
   name: string;
@@ -59,6 +79,15 @@ export interface CreateModelForm {
   name: string;
   modelCategoryId: number;
   filamentIds?: number[];
+}
+
+// Form types for creating products
+export interface CreateProductForm {
+  name: string;
+  modelId: number;
+  filamentIds?: number[];
+  price?: number;
+  slicedFileId: number;
 }
 
 // Grouped filaments response type

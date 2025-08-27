@@ -17,6 +17,8 @@ import { Route as ProductsIndexRouteImport } from './routes/products/index'
 import { Route as ModelsIndexRouteImport } from './routes/models/index'
 import { Route as InventoryIndexRouteImport } from './routes/inventory/index'
 import { Route as FilamentsIndexRouteImport } from './routes/filaments/index'
+import { ServerRoute as ApiSlicedFilesServerRouteImport } from './routes/api/sliced-files'
+import { ServerRoute as ApiProductsServerRouteImport } from './routes/api/products'
 import { ServerRoute as ApiModelsServerRouteImport } from './routes/api/models'
 import { ServerRoute as ApiModelCategoriesServerRouteImport } from './routes/api/model-categories'
 import { ServerRoute as ApiMetricsServerRouteImport } from './routes/api/metrics'
@@ -60,6 +62,16 @@ const FilamentsIndexRoute = FilamentsIndexRouteImport.update({
   id: '/filaments/',
   path: '/filaments/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSlicedFilesServerRoute = ApiSlicedFilesServerRouteImport.update({
+  id: '/api/sliced-files',
+  path: '/api/sliced-files',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiProductsServerRoute = ApiProductsServerRouteImport.update({
+  id: '/api/products',
+  path: '/api/products',
+  getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiModelsServerRoute = ApiModelsServerRouteImport.update({
   id: '/api/models',
@@ -185,6 +197,8 @@ export interface FileServerRoutesByFullPath {
   '/api/metrics': typeof ApiMetricsServerRoute
   '/api/model-categories': typeof ApiModelCategoriesServerRoute
   '/api/models': typeof ApiModelsServerRoute
+  '/api/products': typeof ApiProductsServerRoute
+  '/api/sliced-files': typeof ApiSlicedFilesServerRoute
   '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRouteWithChildren
   '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
 }
@@ -198,6 +212,8 @@ export interface FileServerRoutesByTo {
   '/api/metrics': typeof ApiMetricsServerRoute
   '/api/model-categories': typeof ApiModelCategoriesServerRoute
   '/api/models': typeof ApiModelsServerRoute
+  '/api/products': typeof ApiProductsServerRoute
+  '/api/sliced-files': typeof ApiSlicedFilesServerRoute
   '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRouteWithChildren
   '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
 }
@@ -212,6 +228,8 @@ export interface FileServerRoutesById {
   '/api/metrics': typeof ApiMetricsServerRoute
   '/api/model-categories': typeof ApiModelCategoriesServerRoute
   '/api/models': typeof ApiModelsServerRoute
+  '/api/products': typeof ApiProductsServerRoute
+  '/api/sliced-files': typeof ApiSlicedFilesServerRoute
   '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRouteWithChildren
   '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
 }
@@ -227,6 +245,8 @@ export interface FileServerRouteTypes {
     | '/api/metrics'
     | '/api/model-categories'
     | '/api/models'
+    | '/api/products'
+    | '/api/sliced-files'
     | '/api/filaments/$filamentId'
     | '/api/filaments/$filamentId/models'
   fileServerRoutesByTo: FileServerRoutesByTo
@@ -240,6 +260,8 @@ export interface FileServerRouteTypes {
     | '/api/metrics'
     | '/api/model-categories'
     | '/api/models'
+    | '/api/products'
+    | '/api/sliced-files'
     | '/api/filaments/$filamentId'
     | '/api/filaments/$filamentId/models'
   id:
@@ -253,6 +275,8 @@ export interface FileServerRouteTypes {
     | '/api/metrics'
     | '/api/model-categories'
     | '/api/models'
+    | '/api/products'
+    | '/api/sliced-files'
     | '/api/filaments/$filamentId'
     | '/api/filaments/$filamentId/models'
   fileServerRoutesById: FileServerRoutesById
@@ -267,6 +291,8 @@ export interface RootServerRouteChildren {
   ApiMetricsServerRoute: typeof ApiMetricsServerRoute
   ApiModelCategoriesServerRoute: typeof ApiModelCategoriesServerRoute
   ApiModelsServerRoute: typeof ApiModelsServerRoute
+  ApiProductsServerRoute: typeof ApiProductsServerRoute
+  ApiSlicedFilesServerRoute: typeof ApiSlicedFilesServerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -317,6 +343,20 @@ declare module '@tanstack/react-router' {
 }
 declare module '@tanstack/react-start/server' {
   interface ServerFileRoutesByPath {
+    '/api/sliced-files': {
+      id: '/api/sliced-files'
+      path: '/api/sliced-files'
+      fullPath: '/api/sliced-files'
+      preLoaderRoute: typeof ApiSlicedFilesServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/products': {
+      id: '/api/products'
+      path: '/api/products'
+      fullPath: '/api/products'
+      preLoaderRoute: typeof ApiProductsServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/models': {
       id: '/api/models'
       path: '/api/models'
@@ -445,6 +485,8 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiMetricsServerRoute: ApiMetricsServerRoute,
   ApiModelCategoriesServerRoute: ApiModelCategoriesServerRoute,
   ApiModelsServerRoute: ApiModelsServerRoute,
+  ApiProductsServerRoute: ApiProductsServerRoute,
+  ApiSlicedFilesServerRoute: ApiSlicedFilesServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport
   ._addFileChildren(rootServerRouteChildren)

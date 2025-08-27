@@ -20,6 +20,30 @@ model Model {
   modelCategoryId Int
   Category        ModelCategory @relation(fields: [modelCategoryId], references: [id])
   Filaments       Filament[]    @relation("FilamentToModel")
+  ModelFiles      ModelFile[]
+  Product         Product[]
+}
+
+model ModelFile {
+  id          Int          @id @unique @default(autoincrement())
+  name        String       @unique
+  modelId     Int
+  url         String
+  size        Int
+  Filaments   Filament[]
+  Model       Model        @relation(fields: [modelId], references: [id])
+  SlicedFiles SlicedFile[]
+}
+
+model SlicedFile {
+  id          Int        @id @unique @default(autoincrement())
+  name        String     @unique
+  modelId     Int
+  url         String
+  size        Int
+  ModelFile   ModelFile? @relation(fields: [modelFileId], references: [id])
+  modelFileId Int?
+  Product     Product[]
 }
 
 model Filament {
@@ -36,6 +60,21 @@ model Filament {
   Brand          Brand        @relation(fields: [brandName], references: [name])
   brandName      String
   diameter       Float
+  ModelFile      ModelFile?   @relation(fields: [modelFileId], references: [id])
+  modelFileId    Int?
+  Product        Product?     @relation(fields: [productId], references: [id])
+  productId      Int?
+}
+
+model Product {
+  id           Int        @id @unique @default(autoincrement())
+  name         String
+  Filaments    Filament[]
+  model        Model      @relation(fields: [modelId], references: [id])
+  modelId      Int
+  price        Float?
+  slicedFile   SlicedFile @relation(fields: [slicedFileId], references: [id])
+  slicedFileId Int
 }
 
 model FilamentType {

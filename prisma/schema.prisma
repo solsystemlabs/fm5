@@ -23,6 +23,7 @@ model Model {
   ModelFiles      ModelFile[]
   Product         Product[]
   ModelImage      ModelImage[]
+  SlicedFiles     SlicedFile[]
 }
 
 model ModelFile {
@@ -80,6 +81,7 @@ model SlicedFile {
   updatedAt DateTime @updatedAt
 
   // Relationships
+  Model               Model                @relation(fields: [modelId], references: [id])
   ModelFile           ModelFile?           @relation(fields: [modelFileId], references: [id])
   modelFileId         Int?
   Product             Product[]

@@ -19,6 +19,7 @@ type FMModalProps = {
     label: string;
     onPress?: () => void;
     className?: string;
+    isDisabled?: boolean;
   };
   secondaryAction?: {
     label: string;
@@ -85,6 +86,7 @@ export default function FMModal({
                           primaryAction.onPress?.();
                           close();
                         }}
+                        isDisabled={primaryAction.isDisabled}
                       >
                         {primaryAction.label}
                       </FMButton>

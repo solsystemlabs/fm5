@@ -156,7 +156,12 @@ export default function AddProductDialog({
               >
                 <Label className="text-foreground block text-sm font-medium">Model *</Label>
                 <Button className="flex items-center justify-between w-full mt-1 px-3 py-2 text-left bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50">
-                  <SelectValue placeholder={modelsLoading ? "Loading models..." : "Select a model"} />
+                  <SelectValue>
+                    {field.state.value 
+                      ? models.find(m => m.id === field.state.value)?.name || "Select a model"
+                      : modelsLoading ? "Loading models..." : "Select a model"
+                    }
+                  </SelectValue>
                   <span aria-hidden="true">▼</span>
                 </Button>
                 <Popover className="w-[--trigger-width] max-h-60 overflow-auto bg-background border border-border rounded-md shadow-lg">
@@ -204,7 +209,12 @@ export default function AddProductDialog({
               >
                 <Label className="text-foreground block text-sm font-medium">Sliced File *</Label>
                 <Button className="flex items-center justify-between w-full mt-1 px-3 py-2 text-left bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50">
-                  <SelectValue placeholder={slicedFilesLoading ? "Loading sliced files..." : "Select a sliced file"} />
+                  <SelectValue>
+                    {field.state.value 
+                      ? slicedFiles.find(f => f.id === field.state.value)?.name || "Select a sliced file"
+                      : slicedFilesLoading ? "Loading sliced files..." : "Select a sliced file"
+                    }
+                  </SelectValue>
                   <span aria-hidden="true">▼</span>
                 </Button>
                 <Popover className="w-[--trigger-width] max-h-60 overflow-auto bg-background border border-border rounded-md shadow-lg">

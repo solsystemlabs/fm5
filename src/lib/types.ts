@@ -1,6 +1,6 @@
 // Database types based on Prisma schema
 
-import type { FilamentType } from "@prisma/client";
+import type { FilamentType, Prisma } from "@prisma/client";
 
 export interface MaterialType {
   id: number;
@@ -23,18 +23,21 @@ export interface Model {
   modelCategoryId: number;
   Category: ModelCategory;
   Filaments?: Filament[];
+  ModelFiles?: any[];
+  ModelImage?: any[];
+  SlicedFiles?: SlicedFile[];
 }
 
 export interface SlicedFileFilament {
   id: number;
   slicedFileId: number;
   filamentIndex: number;
-  
+
   // Total usage
   lengthUsed?: number;
   volumeUsed?: number;
   weightUsed?: number;
-  
+
   // Usage breakdown by purpose (when available)
   modelLength?: number;
   modelVolume?: number;
@@ -54,7 +57,7 @@ export interface SlicedFileFilament {
   wallLength?: number;
   wallVolume?: number;
   wallWeight?: number;
-  
+
   // Filament properties
   filamentType?: string;
   filamentColor?: string;
@@ -74,33 +77,33 @@ export interface SlicedFile {
   size: number;
   s3Key?: string;
   modelFileId?: number;
-  
+
   // Basic print information
   printTimeMinutes?: number;
   totalTimeMinutes?: number;
   layerCount?: number;
   layerHeight?: number;
   maxZHeight?: number;
-  
+
   // Slicer information
   slicerName?: string;
   slicerVersion?: string;
   profileName?: string;
-  
+
   // Printer settings
   nozzleDiameter?: number;
   bedType?: string;
   bedTemperature?: number;
-  
+
   // Filament totals (aggregated across all filaments)
   totalFilamentLength?: number;
   totalFilamentVolume?: number;
   totalFilamentWeight?: number;
-  
+
   // Timestamps
   createdAt: string;
   updatedAt: string;
-  
+
   // Relationships
   SlicedFileFilaments?: SlicedFileFilament[];
   ModelFile?: any; // Can be expanded later if needed
@@ -117,21 +120,9 @@ export interface Product {
   Filaments?: Filament[];
 }
 
-export interface Filament {
-  id: number;
-  name: string;
-  color: string;
-  materialTypeId: number;
-  Material: MaterialType;
-  filamentTypeId: number;
-  Type: FilamentType;
-  Models?: Model[];
-  cost: number | null;
-  grams: number | null;
-  brandName: string;
-  Brand: Brand;
-  diameter: number;
-}
+export type Filament = Prisma.FilamentGetPayload<{
+  include: { Material: true; Type: true; Models: true };
+}>;
 
 // Form types for creating filaments
 export interface CreateFilamentForm {

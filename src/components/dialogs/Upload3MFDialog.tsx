@@ -41,7 +41,6 @@ interface UploadProgress {
 }
 
 export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps) {
-  const [isOpen, setIsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
@@ -51,7 +50,7 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
   const { uploadWithProgress } = useUploadSlicedFileWithProgress();
   const [isUploading, setIsUploading] = useState(false);
 
-  const form = useForm<UploadFormData>({
+  const form = useForm({
     defaultValues: {
       name: "",
       modelId: 0,
@@ -74,7 +73,6 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
         
         setUploadProgress(null);
         setIsUploading(false);
-        setIsOpen(false);
         form.reset();
         setSelectedFile(null);
       } catch (error) {
@@ -127,10 +125,21 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
   return (
     <FMModal
       triggerElement={triggerElement}
-      isOpen={isOpen}
-      onOpenChange={setIsOpen}
       title="Upload 3MF File"
       description="Upload and process a 3MF sliced file with automatic metadata extraction"
+      primaryAction={{
+        label: isUploading ? "Uploading..." : "Upload & Process",
+        onPress: () => form.handleSubmit(),
+        isDisabled: isUploading || !selectedFile,
+      }}
+      secondaryAction={{
+        label: "Cancel",
+        onPress: () => {
+          form.reset();
+          setSelectedFile(null);
+          setUploadError(null);
+        },
+      }}
     >
       <Form
         onSubmit={(e) => {
@@ -300,24 +309,6 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
             </div>
           </div>
         )}
-
-        {/* Submit Button */}
-        <div className="flex items-center justify-end gap-x-4 pt-4 border-t">
-          <FMButton
-            variant="outline"
-            onPress={() => setIsOpen(false)}
-            disabled={isUploading}
-          >
-            Cancel
-          </FMButton>
-          <FMButton
-            type="submit"
-            disabled={isUploading || !selectedFile}
-            className="min-w-[120px]"
-          >
-            {isUploading ? "Uploading..." : "Upload & Process"}
-          </FMButton>
-        </div>
 
         {/* Upload Error */}
         {uploadError && (

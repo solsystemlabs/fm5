@@ -89,7 +89,7 @@ export const toastService = {
       type: 'upload-progress',
       task
     }, {
-      timeout: null // Don't auto-dismiss upload progress toasts
+      timeout: undefined // Don't auto-dismiss upload progress toasts
     });
   },
 

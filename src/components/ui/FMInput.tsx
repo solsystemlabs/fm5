@@ -10,7 +10,7 @@ type FMInputProps = {
 } & Omit<InputProps, "className">;
 
 export default function FMInput({
-  size = "md",
+  size = "md" as const,
   fullWidth = true,
   className,
   ...props

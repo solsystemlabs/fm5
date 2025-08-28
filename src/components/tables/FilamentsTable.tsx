@@ -1,18 +1,18 @@
-import type { Filament } from "@prisma/client";
+import { useDeleteFilament } from "@/lib/api-hooks";
 import type { ReactNode } from "react";
 import { Cell, ColorSwatch, TableBody } from "react-aria-components";
 import { DeleteConfirmDialog } from "../ui/DeleteConfirmDialog";
-import { useDeleteFilament } from "@/lib/api-hooks";
 import FMCell from "../ui/table/FMCell";
 import FMColumn from "../ui/table/FMColumn";
 import FMRow from "../ui/table/FMRow";
 import FMTable from "../ui/table/FMTable";
 import FMTableHeader from "../ui/table/FMTableHeader";
+import type { Filament } from "../../lib/types";
 
 export default function FilamentsTable({
   data,
 }: {
-  data: Filament[];
+  data: Filament[]; // Use any[] for now to fix immediate type issues
 }): ReactNode {
   const deleteFilament = useDeleteFilament();
 
@@ -30,7 +30,7 @@ export default function FilamentsTable({
           <FMColumn>Cost</FMColumn>
           <FMColumn>Weight</FMColumn>
           <FMColumn>Models</FMColumn>
-          <FMColumn className="rounded-tr-lg w-12">
+          <FMColumn className="w-12 rounded-tr-lg">
             <span className="sr-only">Actions</span>
           </FMColumn>
         </FMTableHeader.Row>

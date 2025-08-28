@@ -17,10 +17,10 @@ interface ExtendedModel extends Model {
   ModelImage: ModelImage[];
 }
 
-export function transformModelsToTree(models: ExtendedModel[]): ModelsTreeData {
+export function transformModelsToTree(models: any[]): ModelsTreeData {
   const treeNodes: TreeNode[] = models.map((model) => {
     // Create file nodes for model files
-    const fileNodes: TreeNode[] = model.ModelFiles.map((file) => ({
+    const fileNodes: TreeNode[] = (model.ModelFiles || []).map((file) => ({
       id: `file-${file.id}`,
       name: file.name,
       type: 'modelFile' as const,
@@ -31,7 +31,7 @@ export function transformModelsToTree(models: ExtendedModel[]): ModelsTreeData {
     }));
 
     // Create file nodes for model images
-    const imageNodes: TreeNode[] = model.ModelImage.map((image) => ({
+    const imageNodes: TreeNode[] = (model.ModelImage || []).map((image) => ({
       id: `image-${image.id}`,
       name: image.name,
       type: 'modelImage' as const,

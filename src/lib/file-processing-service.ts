@@ -197,8 +197,11 @@ export async function extractZipFiles(zipFile: File): Promise<ProcessedFiles> {
   });
 
   try {
+    // Convert File to ArrayBuffer for JSZip
+    const arrayBuffer = await zipFile.arrayBuffer();
+    
     const zip = new JSZip();
-    const zipData = await zip.loadAsync(zipFile);
+    const zipData = await zip.loadAsync(arrayBuffer);
     
     const result: ProcessedFiles = {
       images: [],

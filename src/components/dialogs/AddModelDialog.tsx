@@ -350,11 +350,16 @@ export default function AddModelDialog({
                 <ListBox 
                   aria-label="Selected files"
                   className="space-y-2"
-                  items={selectedFiles.map((file, index) => ({ file, index }))}
+                  items={selectedFiles.map((file, index) => ({ 
+                    id: `${file.name}-${file.size}-${index}`, 
+                    file, 
+                    index 
+                  }))}
                 >
-                  {({ file, index }) => (
+                  {({ id, file, index }) => (
                     <ListBoxItem
-                      key={index}
+                      key={id}
+                      id={id}
                       textValue={file.name}
                       className="flex items-center justify-between p-2 bg-background border border-border rounded-md hover:bg-muted"
                     >

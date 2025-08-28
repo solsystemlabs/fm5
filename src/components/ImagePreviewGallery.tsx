@@ -13,6 +13,8 @@ import {
   ListBoxItem,
   Modal,
   ModalOverlay,
+  Tooltip,
+  TooltipTrigger,
 } from "react-aria-components";
 
 export interface ImageFile {
@@ -279,20 +281,42 @@ export function ImageThumbnailGrid({
   return (
     <div className={`flex items-center space-x-2 ${className}`}>
       {visibleImages.map((image, index) => (
-        <div
-          key={image.id || index}
-          className="border-border bg-muted relative h-8 w-8 overflow-hidden rounded-full border"
-        >
-          <img
-            src={image.preview || image.url}
-            alt={image.name}
-            className="h-full w-full object-cover"
-            loading="lazy"
-          />
-        </div>
+        <TooltipTrigger key={image.id || index} delay={500}>
+          <Button className="border-border bg-muted hover:border-primary/50 focus:border-primary focus:ring-primary/20 relative h-12 w-12 overflow-hidden rounded-sm border p-0 transition-colors focus:ring-2 focus:outline-none">
+            <img
+              src={image.preview || image.url}
+              alt={image.name}
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          </Button>
+          <Tooltip className="border-b-pewter-400 bg-popover text-popover-foreground z-50 max-w-sm min-w-0 rounded-lg border px-3 py-2 shadow-lg will-change-transform">
+            <div className="space-y-2">
+              <div className="aspect-video w-64 overflow-hidden rounded border">
+                <img
+                  src={image.preview || image.url}
+                  alt={image.name}
+                  className="h-full w-full object-contain"
+                  loading="lazy"
+                />
+              </div>
+              <div className="text-sm">
+                <p className="truncate font-medium">{image.name}</p>
+                <p className="text-muted-foreground text-xs">
+                  {formatFileSize(image.size)}
+                </p>
+                {image.category && (
+                  <span className="bg-primary/10 text-primary mt-1 inline-block rounded px-2 py-0.5 text-xs capitalize">
+                    {image.category}
+                  </span>
+                )}
+              </div>
+            </div>
+          </Tooltip>
+        </TooltipTrigger>
       ))}
       {remainingCount > 0 && (
-        <div className="bg-muted border-border flex h-8 w-8 items-center justify-center rounded-full border">
+        <div className="bg-muted border-border flex h-12 w-12 items-center justify-center rounded-sm border">
           <span className="text-muted-foreground text-xs font-medium">
             +{remainingCount}
           </span>
@@ -301,4 +325,3 @@ export function ImageThumbnailGrid({
     </div>
   );
 }
-

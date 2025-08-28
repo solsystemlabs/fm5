@@ -30,14 +30,17 @@ function ModelsPage() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
-      <div className="sm:flex sm:items-center">
+      <div className="flex">
         <div className="sm:flex-auto">
-          <h1 className="text-foreground text-base font-semibold">Models & Files</h1>
+          <h1 className="text-foreground text-base font-semibold">
+            Models & Files
+          </h1>
           <p className="text-muted-foreground mt-2 text-sm">
-            Explore your 3D models in a hierarchical view. Expand models to see their associated files and images.
+            Explore your 3D models in a hierarchical view. Expand models to see
+            their associated files and images.
           </p>
           {treeData.summary && (
-            <div className="mt-3 flex items-center space-x-6 text-sm text-muted-foreground">
+            <div className="text-muted-foreground mt-3 flex items-center space-x-6 text-sm">
               <span>{treeData.summary.totalModels} models</span>
               <span>{treeData.summary.totalFiles} files</span>
               <span>{treeData.summary.totalImages} images</span>
@@ -46,7 +49,7 @@ function ModelsPage() {
         </div>
         <AddModelDialog
           triggerElement={
-            <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+            <div className="sm:mt-0 sm:ml-16 sm:flex-none">
               <FMButton size="lg">Add Model</FMButton>
             </div>
           }

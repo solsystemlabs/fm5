@@ -26,7 +26,7 @@ function FilamentsPage() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
-      <div className="sm:flex sm:items-center">
+      <div className="flex">
         <div className="sm:flex-auto">
           <h1 className="text-foreground text-base font-semibold">Filaments</h1>
           <p className="text-muted-foreground mt-2 text-sm">

@@ -26,11 +26,11 @@ function SlicedFilesPage() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
-      <div className="sm:flex sm:items-center">
+      <div className="flex">
         <div className="sm:flex-auto">
           <h1 className="text-foreground text-base font-semibold">3MF Files</h1>
           <p className="text-muted-foreground mt-2 text-sm">
-            Manage your 3MF sliced files with automatic metadata extraction, 
+            Manage your 3MF sliced files with automatic metadata extraction,
             print time estimates, and filament usage breakdowns.
           </p>
         </div>
@@ -53,3 +53,4 @@ function SlicedFilesPage() {
     </div>
   );
 }
+

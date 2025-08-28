@@ -29,6 +29,13 @@ export interface ProcessedFiles {
   extractedCount: number;
 }
 
+export interface ExtractionProgress {
+  extractedCount: number;
+  totalCount: number;
+  percentage: number;
+  currentFile?: string;
+}
+
 export interface ValidationResult {
   isValid: boolean;
   errors: string[];
@@ -274,6 +281,117 @@ export async function extractZipFiles(zipFile: File): Promise<ProcessedFiles> {
 }
 
 /**
+ * Extract and process ZIP archive with progress callbacks
+ */
+export async function extractZipFilesWithProgress(
+  zipFile: File, 
+  onProgress?: (progress: ExtractionProgress) => void
+): Promise<ProcessedFiles> {
+  logger.info('Starting ZIP extraction with progress', {
+    filename: zipFile.name,
+    size: zipFile.size
+  });
+
+  try {
+    // Convert File to ArrayBuffer for JSZip
+    const arrayBuffer = await zipFile.arrayBuffer();
+    
+    const zip = new JSZip();
+    const zipData = await zip.loadAsync(arrayBuffer);
+    
+    const result: ProcessedFiles = {
+      images: [],
+      modelFiles: [],
+      totalSize: 0,
+      extractedCount: 0
+    };
+
+    // Get list of files to process
+    const filesToProcess = Object.entries(zipData.files).filter(([filename, zipEntry]) => 
+      !zipEntry.dir && !filename.startsWith('__MACOSX/') && !filename.startsWith('.DS_Store')
+    );
+
+    const totalFiles = filesToProcess.length;
+    let processedFiles = 0;
+
+    for (const [filename, zipEntry] of filesToProcess) {
+      // Report progress
+      onProgress?.({
+        extractedCount: processedFiles,
+        totalCount: totalFiles,
+        percentage: Math.round((processedFiles / totalFiles) * 100),
+        currentFile: filename
+      });
+
+      try {
+        const fileData = await zipEntry.async('arraybuffer');
+        const extractedFile = new File([fileData], filename, {
+          type: getMimeTypeFromFilename(filename)
+        });
+
+        result.totalSize += extractedFile.size;
+        result.extractedCount++;
+
+        // Process based on file type
+        if (isImageFile(extractedFile)) {
+          const preview = await createImagePreview(extractedFile);
+          const processedImage: ProcessedImageFile = {
+            file: extractedFile,
+            name: filename,
+            size: extractedFile.size,
+            type: extractedFile.type,
+            preview,
+            category: categorizeImage(filename)
+          };
+          result.images.push(processedImage);
+        } else if (isModelFile(extractedFile)) {
+          const processedModel: ProcessedModelFile = {
+            file: extractedFile,
+            name: filename,
+            size: extractedFile.size,
+            type: extractedFile.type,
+            fileType: getModelFileType(filename)
+          };
+          result.modelFiles.push(processedModel);
+        }
+
+        processedFiles++;
+      } catch (error) {
+        logger.warn('Failed to extract file from ZIP', {
+          filename,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+        processedFiles++;
+      }
+    }
+
+    // Final progress update
+    onProgress?.({
+      extractedCount: processedFiles,
+      totalCount: totalFiles,
+      percentage: 100,
+      currentFile: undefined
+    });
+
+    logger.info('ZIP extraction completed', {
+      originalFile: zipFile.name,
+      extractedFiles: result.extractedCount,
+      images: result.images.length,
+      modelFiles: result.modelFiles.length,
+      totalSize: result.totalSize
+    });
+
+    return result;
+  } catch (error) {
+    logger.error('ZIP extraction failed', {
+      filename: zipFile.name,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+    throw new Error(`Failed to extract ZIP file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+/**
  * Process individual files (non-ZIP)
  */
 export async function categorizeFiles(files: File[]): Promise<ProcessedFiles> {
@@ -322,10 +440,53 @@ export async function categorizeFiles(files: File[]): Promise<ProcessedFiles> {
 }
 
 /**
+ * Pre-scan ZIP file to count processable files (images and model files)
+ */
+async function getProcessableFileCountFromZip(zipFile: File): Promise<number> {
+  try {
+    const arrayBuffer = await zipFile.arrayBuffer();
+    const zip = new JSZip();
+    const zipData = await zip.loadAsync(arrayBuffer);
+    
+    let count = 0;
+    for (const [filename, zipEntry] of Object.entries(zipData.files)) {
+      // Skip directories and system files
+      if (zipEntry.dir || filename.startsWith('__MACOSX/') || filename.startsWith('.DS_Store')) {
+        continue;
+      }
+      
+      // Check if file would be processable as image or model
+      const extension = getFileExtension(filename);
+      const mimeType = getMimeTypeFromFilename(filename);
+      
+      const isImage = SUPPORTED_FILE_TYPES.images.extensions.includes(extension) ||
+                     SUPPORTED_FILE_TYPES.images.mimeTypes.includes(mimeType);
+      const isModel = SUPPORTED_FILE_TYPES.modelFiles.extensions.includes(extension) ||
+                     SUPPORTED_FILE_TYPES.modelFiles.mimeTypes.includes(mimeType);
+      
+      if (isImage || isModel) {
+        count++;
+      }
+    }
+    
+    return count;
+  } catch (error) {
+    logger.warn('Failed to pre-scan ZIP file', {
+      filename: zipFile.name,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+    return 1; // Fallback to at least 1 file
+  }
+}
+
+/**
  * Main file processing function
  * Handles both ZIP archives and individual files
  */
-export async function processUploadedFiles(files: File[]): Promise<ProcessedFiles> {
+export async function processUploadedFiles(
+  files: File[], 
+  onProgress?: (progress: ExtractionProgress) => void
+): Promise<ProcessedFiles> {
   // Validate files first
   const validation = validateFiles(files);
   if (!validation.isValid) {
@@ -343,23 +504,73 @@ export async function processUploadedFiles(files: File[]): Promise<ProcessedFile
     extractedCount: 0
   };
 
+  // Get actual file counts by pre-scanning ZIP files
+  let totalProcessableFiles = otherFiles.length;
+  
+  // Pre-scan ZIP files to get accurate file counts
+  const zipFileCounts: number[] = [];
+  for (const zipFile of zipFiles) {
+    const count = await getProcessableFileCountFromZip(zipFile);
+    zipFileCounts.push(count);
+    totalProcessableFiles += count;
+  }
+  
+  let processedFiles = 0;
+  
+  // Process individual files first
+  if (otherFiles.length > 0) {
+    for (const file of otherFiles) {
+      onProgress?.({
+        extractedCount: processedFiles,
+        totalCount: totalProcessableFiles,
+        percentage: Math.round((processedFiles / totalProcessableFiles) * 100),
+        currentFile: file.name
+      });
+
+      const fileResult = await categorizeFiles([file]);
+      result.images.push(...fileResult.images);
+      result.modelFiles.push(...fileResult.modelFiles);
+      result.totalSize += fileResult.totalSize;
+      result.extractedCount += fileResult.extractedCount;
+      
+      processedFiles++;
+    }
+  }
+
   // Process ZIP files
   for (const zipFile of zipFiles) {
-    const zipResult = await extractZipFiles(zipFile);
+    onProgress?.({
+      extractedCount: processedFiles,
+      totalCount: totalEstimatedFiles,
+      percentage: Math.round((processedFiles / totalEstimatedFiles) * 100),
+      currentFile: zipFile.name
+    });
+
+    const zipResult = await extractZipFilesWithProgress(zipFile, (zipProgress) => {
+      // Update progress with ZIP extraction details
+      onProgress?.({
+        extractedCount: processedFiles + zipProgress.extractedCount,
+        totalCount: totalProcessableFiles,
+        percentage: Math.round(((processedFiles + zipProgress.extractedCount) / totalProcessableFiles) * 100),
+        currentFile: zipProgress.currentFile || zipFile.name
+      });
+    });
+
     result.images.push(...zipResult.images);
     result.modelFiles.push(...zipResult.modelFiles);
     result.totalSize += zipResult.totalSize;
     result.extractedCount += zipResult.extractedCount;
+    
+    processedFiles += zipResult.extractedCount;
   }
 
-  // Process individual files
-  if (otherFiles.length > 0) {
-    const fileResult = await categorizeFiles(otherFiles);
-    result.images.push(...fileResult.images);
-    result.modelFiles.push(...fileResult.modelFiles);
-    result.totalSize += fileResult.totalSize;
-    result.extractedCount += fileResult.extractedCount;
-  }
+  // Final progress update
+  onProgress?.({
+    extractedCount: processedFiles,
+    totalCount: Math.max(totalProcessableFiles, processedFiles),
+    percentage: 100,
+    currentFile: undefined
+  });
 
   return result;
 }

@@ -8,6 +8,8 @@ import {
 import type { ReactNode } from "react";
 import Header from "../components/layout/Header";
 import { ThemeProvider } from "../lib/theme-context";
+import { BackgroundUploadProvider } from "../lib/background-upload-context";
+import { ToastProvider } from "../components/ui/ToastProvider";
 import appCss from "../styles/global.css?url";
 
 const queryClient = new QueryClient();
@@ -37,12 +39,16 @@ function RootComponent() {
     <RootDocument>
       <ThemeProvider>
         <QueryClientProvider client={queryClient}>
-          <div className="w-full h-full min-h-screen bg-background">
-            <Header />
-            <main className="container mx-auto px-4 py-8">
-              <Outlet />
-            </main>
-          </div>
+          <BackgroundUploadProvider>
+            <ToastProvider>
+              <div className="w-full h-full min-h-screen bg-background">
+                <Header />
+                <main className="container mx-auto px-4 py-8">
+                  <Outlet />
+                </main>
+              </div>
+            </ToastProvider>
+          </BackgroundUploadProvider>
         </QueryClientProvider>
       </ThemeProvider>
     </RootDocument>

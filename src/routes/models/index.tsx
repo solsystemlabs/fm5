@@ -1,8 +1,9 @@
 import { useModels } from "@/lib/api-hooks";
 import { createFileRoute } from "@tanstack/react-router";
-import ModelsTable from "../../components/tables/ModelsTable";
+import ModelsTreeView from "../../components/trees/ModelsTreeView";
 import FMButton from "../../components/ui/FMButton";
 import AddModelDialog from "../../components/dialogs/AddModelDialog";
+import { transformModelsToTree } from "@/lib/tree-utils";
 
 export const Route = createFileRoute("/models/")({
   component: ModelsPage,
@@ -24,15 +25,24 @@ function ModelsPage() {
     );
   }
 
+  // Transform flat models data into tree structure
+  const treeData = transformModelsToTree(models);
+
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-foreground text-base font-semibold">Models</h1>
+          <h1 className="text-foreground text-base font-semibold">Models & Files</h1>
           <p className="text-muted-foreground mt-2 text-sm">
-            A complete list of all your 3D models organized by category and
-            associated filaments.
+            Explore your 3D models in a hierarchical view. Expand models to see their associated files and images.
           </p>
+          {treeData.summary && (
+            <div className="mt-3 flex items-center space-x-6 text-sm text-muted-foreground">
+              <span>{treeData.summary.totalModels} models</span>
+              <span>{treeData.summary.totalFiles} files</span>
+              <span>{treeData.summary.totalImages} images</span>
+            </div>
+          )}
         </div>
         <AddModelDialog
           triggerElement={
@@ -48,7 +58,9 @@ function ModelsPage() {
           <p className="text-muted-foreground">Loading models...</p>
         </div>
       ) : (
-        <ModelsTable data={models} />
+        <div className="mt-8">
+          <ModelsTreeView data={treeData.models} />
+        </div>
       )}
     </div>
   );

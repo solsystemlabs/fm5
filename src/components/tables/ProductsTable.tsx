@@ -1,6 +1,8 @@
 import type { Product } from "@/lib/types";
 import type { ReactNode } from "react";
 import { Cell, TableBody } from "react-aria-components";
+import { DeleteConfirmDialog } from "../ui/DeleteConfirmDialog";
+import { useDeleteProduct } from "@/lib/api-hooks";
 import FMCell from "../ui/table/FMCell";
 import FMColumn from "../ui/table/FMColumn";
 import FMRow from "../ui/table/FMRow";
@@ -8,6 +10,8 @@ import FMTable from "../ui/table/FMTable";
 import FMTableHeader from "../ui/table/FMTableHeader";
 
 export default function ProductsTable({ data }: { data: Product[] }): ReactNode {
+  const deleteProduct = useDeleteProduct();
+  
   const formatPrice = (price: number | null): string => {
     if (price === null) return "N/A";
     return `$${price.toFixed(2)}`;
@@ -23,7 +27,10 @@ export default function ProductsTable({ data }: { data: Product[] }): ReactNode 
           <FMColumn>Model</FMColumn>
           <FMColumn>Filaments</FMColumn>
           <FMColumn>Price</FMColumn>
-          <FMColumn className="rounded-tr-lg">Sliced File</FMColumn>
+          <FMColumn>Sliced File</FMColumn>
+          <FMColumn className="rounded-tr-lg w-12">
+            <span className="sr-only">Actions</span>
+          </FMColumn>
         </FMTableHeader.Row>
       </FMTableHeader>
       <TableBody>
@@ -67,10 +74,19 @@ export default function ProductsTable({ data }: { data: Product[] }): ReactNode 
                 {formatPrice(product.price)}
               </span>
             </FMCell>
-            <FMCell className="relative py-3.5 pr-4 pl-3 text-sm font-medium sm:pr-6">
+            <FMCell>
               <div className="text-muted-foreground">
                 {product.slicedFile.name}
               </div>
+            </FMCell>
+            <FMCell className="py-4 pr-4 pl-3 text-right sm:pr-6">
+              <DeleteConfirmDialog
+                title="Delete Product"
+                description="Are you sure you want to delete this product? This action cannot be undone."
+                itemName={product.name}
+                onConfirm={() => deleteProduct.mutate(product.id)}
+                isLoading={deleteProduct.isPending}
+              />
             </FMCell>
           </FMRow>
         ))}

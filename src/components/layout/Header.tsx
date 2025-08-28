@@ -13,7 +13,6 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard" },
   { name: "Products", href: "/products" },
   { name: "Models", href: "/models" },
-  { name: "Model Files", href: "/model-files" },
   { name: "Filaments", href: "/filaments" },
   { name: "3MF Files", href: "/sliced-files" },
   { name: "Inventory", href: "/inventory" },

@@ -357,6 +357,46 @@ const api = {
     }
     return response.json()
   },
+
+  deleteModel: async (modelId: number): Promise<any> => {
+    const response = await fetch(`/api/models/${modelId}`, {
+      method: 'DELETE',
+    })
+    if (!response.ok) {
+      throw new Error('Failed to delete model')
+    }
+    return response.json()
+  },
+
+  deleteFilament: async (filamentId: number): Promise<any> => {
+    const response = await fetch(`/api/filaments/${filamentId}`, {
+      method: 'DELETE',
+    })
+    if (!response.ok) {
+      throw new Error('Failed to delete filament')
+    }
+    return response.json()
+  },
+
+  deleteProduct: async (productId: number): Promise<any> => {
+    const response = await fetch(`/api/products/${productId}`, {
+      method: 'DELETE',
+    })
+    if (!response.ok) {
+      throw new Error('Failed to delete product')
+    }
+    return response.json()
+  },
+
+  deleteSlicedFile: async (slicedFileId: number): Promise<any> => {
+    const response = await fetch(`/api/sliced-files/${slicedFileId}`, {
+      method: 'DELETE',
+    })
+    if (!response.ok) {
+      throw new Error('Failed to delete sliced file')
+    }
+    return response.json()
+  },
 }
 
 // Hooks
@@ -614,6 +654,57 @@ export function useDeleteModelFiles() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.modelFiles })
       // Also invalidate all model-specific file queries
       queryClient.invalidateQueries({ queryKey: ['modelFiles', 'byModel'] })
+    },
+  })
+}
+
+export function useDeleteModel() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: api.deleteModel,
+    onSuccess: () => {
+      // Invalidate relevant queries after deleting model
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.models })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.modelFiles })
+    },
+  })
+}
+
+export function useDeleteFilament() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: api.deleteFilament,
+    onSuccess: () => {
+      // Invalidate relevant queries after deleting filament
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.filaments })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.filamentsGrouped })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.models }) // Models might reference filaments
+    },
+  })
+}
+
+export function useDeleteProduct() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: api.deleteProduct,
+    onSuccess: () => {
+      // Invalidate relevant queries after deleting product
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.products })
+    },
+  })
+}
+
+export function useDeleteSlicedFile() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: api.deleteSlicedFile,
+    onSuccess: () => {
+      // Invalidate relevant queries after deleting sliced file
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.slicedFiles })
     },
   })
 }

@@ -1,6 +1,8 @@
 import type { Filament } from "@prisma/client";
 import type { ReactNode } from "react";
 import { Cell, ColorSwatch, TableBody } from "react-aria-components";
+import { DeleteConfirmDialog } from "../ui/DeleteConfirmDialog";
+import { useDeleteFilament } from "@/lib/api-hooks";
 import FMCell from "../ui/table/FMCell";
 import FMColumn from "../ui/table/FMColumn";
 import FMRow from "../ui/table/FMRow";
@@ -12,6 +14,8 @@ export default function FilamentsTable({
 }: {
   data: Filament[];
 }): ReactNode {
+  const deleteFilament = useDeleteFilament();
+
   return (
     <FMTable>
       <FMTableHeader>
@@ -25,7 +29,10 @@ export default function FilamentsTable({
           <FMColumn className="hidden lg:table-cell">Diameter</FMColumn>
           <FMColumn>Cost</FMColumn>
           <FMColumn>Weight</FMColumn>
-          <FMColumn className="rounded-tr-lg">Models</FMColumn>
+          <FMColumn>Models</FMColumn>
+          <FMColumn className="rounded-tr-lg w-12">
+            <span className="sr-only">Actions</span>
+          </FMColumn>
         </FMTableHeader.Row>
       </FMTableHeader>
       <TableBody>
@@ -75,7 +82,7 @@ export default function FilamentsTable({
               <div className="hidden sm:block">${filament.cost}</div>
             </FMCell>
             <FMCell>{filament.grams}g</FMCell>
-            <FMCell className="relative py-3.5 pr-4 pl-3 text-sm font-medium sm:pr-6">
+            <FMCell>
               <div className="text-muted-foreground">
                 {filament.Models && filament.Models.length > 0 ? (
                   <span>
@@ -86,6 +93,15 @@ export default function FilamentsTable({
                   <span>No models</span>
                 )}
               </div>
+            </FMCell>
+            <FMCell className="py-4 pr-4 pl-3 text-right sm:pr-6">
+              <DeleteConfirmDialog
+                title="Delete Filament"
+                description="Are you sure you want to delete this filament? This action cannot be undone."
+                itemName={filament.name}
+                onConfirm={() => deleteFilament.mutate(filament.id)}
+                isLoading={deleteFilament.isPending}
+              />
             </FMCell>
           </FMRow>
         ))}

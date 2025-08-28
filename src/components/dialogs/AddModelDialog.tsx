@@ -1,6 +1,8 @@
 import FMInput from "@/components/ui/FMInput";
-import { useCreateModel, useModelCategories, useCreateModelCategory, useUploadModelFilesWithProgress } from "@/lib/api-hooks";
-import { processUploadedFiles, cleanupPreviews, formatFileSize, type ProcessedFiles } from "@/lib/file-processing-service";
+import { useCreateModel, useModelCategories, useCreateModelCategory } from "@/lib/api-hooks";
+import { processUploadedFiles, cleanupPreviews, formatFileSize, type ProcessedFiles, type ExtractionProgress } from "@/lib/file-processing-service";
+import { useBackgroundUpload } from "@/lib/background-upload-context";
+import { toastService } from "@/components/ui/ToastProvider";
 import { useForm } from "@tanstack/react-form";
 import { type ReactNode, useState, useCallback } from "react";
 import {
@@ -13,6 +15,8 @@ import {
   Text,
   ListBox,
   ListBoxItem,
+  ProgressBar,
+  Label,
 } from "react-aria-components";
 import { z } from "zod";
 import { CloudArrowUpIcon, DocumentIcon, PhotoIcon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -34,20 +38,12 @@ const modelFormSchema = z.object({
 
 type ModelFormData = z.infer<typeof modelFormSchema>;
 
-interface UploadProgress {
-  loaded: number;
-  total: number;
-  percentage: number;
-  speed?: string;
-  timeRemaining?: string;
-}
-
 export default function AddModelDialog({
   triggerElement,
 }: AddModelDialogProps): ReactNode {
   const createModelMutation = useCreateModel();
   const createModelCategoryMutation = useCreateModelCategory();
-  const { uploadWithProgress } = useUploadModelFilesWithProgress();
+  const { queueUpload } = useBackgroundUpload();
   
   const {
     data: modelCategories = [],
@@ -58,9 +54,9 @@ export default function AddModelDialog({
   // File upload state
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [processedFiles, setProcessedFiles] = useState<ProcessedFiles | null>(null);
-  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [extractionProgress, setExtractionProgress] = useState<ExtractionProgress | null>(null);
+  const [processingError, setProcessingError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -73,27 +69,29 @@ export default function AddModelDialog({
         // Create the model first
         const createdModel = await createModelMutation.mutateAsync(value);
 
-        // If we have files, upload them
-        if (selectedFiles.length > 0) {
-          setIsUploading(true);
-          setUploadError(null);
-
-          const formData = new FormData();
-          selectedFiles.forEach((file) => {
-            formData.append('files', file);
-          });
-
-          try {
-            await uploadWithProgress(createdModel.id, formData, (progress) => {
-              setUploadProgress(progress);
-            });
-          } catch (uploadErr) {
-            setUploadError(uploadErr instanceof Error ? uploadErr.message : 'Upload failed');
-            throw uploadErr;
-          } finally {
-            setIsUploading(false);
-            setUploadProgress(null);
-          }
+        // If we have processed files, queue them for background upload
+        if (processedFiles && (processedFiles.images.length > 0 || processedFiles.modelFiles.length > 0)) {
+          // Convert processed files back to File objects for upload
+          const filesToUpload = [
+            ...processedFiles.images.map(img => img.file),
+            ...processedFiles.modelFiles.map(model => model.file)
+          ];
+          
+          const taskId = queueUpload(createdModel.id, createdModel.name, filesToUpload);
+          
+          // Show toast notification for the background upload
+          const task = {
+            id: taskId,
+            modelId: createdModel.id,
+            modelName: createdModel.name,
+            files: filesToUpload,
+            status: 'pending' as const,
+            uploadedCount: 0,
+            failedCount: 0,
+            totalCount: filesToUpload.length
+          };
+          
+          toastService.showUploadProgress(task);
         }
 
         // Reset form and file state
@@ -109,14 +107,21 @@ export default function AddModelDialog({
   // File handling functions
   const handleFilesSelected = useCallback(async (files: File[]) => {
     setSelectedFiles(files);
-    setUploadError(null);
+    setProcessingError(null);
+    setIsProcessing(true);
+    setExtractionProgress(null);
     
     try {
-      const processed = await processUploadedFiles(files);
+      const processed = await processUploadedFiles(files, (progress) => {
+        setExtractionProgress(progress);
+      });
       setProcessedFiles(processed);
     } catch (error) {
-      setUploadError(error instanceof Error ? error.message : 'Failed to process files');
+      setProcessingError(error instanceof Error ? error.message : 'Failed to process files');
       console.error('Error processing files:', error);
+    } finally {
+      setIsProcessing(false);
+      setExtractionProgress(null);
     }
   }, []);
 
@@ -126,7 +131,9 @@ export default function AddModelDialog({
     }
     setSelectedFiles([]);
     setProcessedFiles(null);
-    setUploadError(null);
+    setProcessingError(null);
+    setExtractionProgress(null);
+    setIsProcessing(false);
   }, [processedFiles]);
 
   const handleRemoveFile = useCallback((fileToRemove: File) => {
@@ -143,9 +150,9 @@ export default function AddModelDialog({
 
   // Determine primary action label based on state
   const getPrimaryActionLabel = () => {
-    if (isUploading) return "Uploading...";
+    if (isProcessing) return "Processing files...";
     if (createModelMutation.isPending) return "Creating...";
-    if (selectedFiles.length > 0) return "Create Model & Upload Files";
+    if (selectedFiles.length > 0) return "Create Model & Queue Upload";
     return "Add Model";
   };
 
@@ -157,7 +164,7 @@ export default function AddModelDialog({
       primaryAction={{
         label: getPrimaryActionLabel(),
         onPress: () => form.handleSubmit(),
-        isDisabled: createModelMutation.isPending || isUploading,
+        isDisabled: createModelMutation.isPending || isProcessing,
       }}
       secondaryAction={{
         label: "Cancel",
@@ -407,32 +414,46 @@ export default function AddModelDialog({
             </div>
           )}
 
-          {uploadError && (
+          {processingError && (
             <div className="bg-destructive/10 border border-destructive/20 rounded-md p-3">
-              <p className="text-destructive text-sm">{uploadError}</p>
+              <p className="text-destructive text-sm">{processingError}</p>
             </div>
           )}
 
-          {uploadProgress && (
+          {extractionProgress && (
             <div className="bg-muted rounded-lg p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium">Uploading files...</span>
-                <span className="text-sm text-muted-foreground">
-                  {uploadProgress.percentage}%
-                </span>
-              </div>
-              <div className="w-full bg-background rounded-full h-2">
-                <div 
-                  className="bg-primary h-2 rounded-full transition-all duration-300" 
-                  style={{ width: `${uploadProgress.percentage}%` }}
-                />
-              </div>
-              {uploadProgress.speed && uploadProgress.timeRemaining && (
-                <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                  <span>{uploadProgress.speed}</span>
-                  <span>{uploadProgress.timeRemaining} remaining</span>
-                </div>
-              )}
+              <ProgressBar 
+                value={extractionProgress.percentage} 
+                maxValue={100}
+                className="w-full"
+              >
+                {({ percentage, valueText }) => (
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <Label className="text-sm font-medium">
+                        {extractionProgress.currentFile ? 'Extracting files...' : 'Processing files...'}
+                      </Label>
+                      <span className="text-sm text-muted-foreground">
+                        {valueText}
+                      </span>
+                    </div>
+                    <div className="w-full bg-background rounded-full h-2">
+                      <div 
+                        className="bg-primary h-2 rounded-full transition-all duration-300" 
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                    {extractionProgress.currentFile && (
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Processing: {extractionProgress.currentFile}
+                      </div>
+                    )}
+                    <div className="text-xs text-muted-foreground">
+                      {extractionProgress.extractedCount} of {extractionProgress.totalCount} files processed
+                    </div>
+                  </div>
+                )}
+              </ProgressBar>
             </div>
           )}
         </div>

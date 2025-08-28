@@ -1,6 +1,8 @@
 import type { SlicedFile } from "@/lib/types";
 import type { ReactNode } from "react";
 import { Cell, ColorSwatch, TableBody } from "react-aria-components";
+import { DeleteConfirmDialog } from "../ui/DeleteConfirmDialog";
+import { useDeleteSlicedFile } from "@/lib/api-hooks";
 import FMCell from "../ui/table/FMCell";
 import FMColumn from "../ui/table/FMColumn";
 import FMRow from "../ui/table/FMRow";
@@ -52,6 +54,8 @@ export default function SlicedFilesTable({
 }: {
   data: SlicedFile[];
 }): ReactNode {
+  const deleteSlicedFile = useDeleteSlicedFile();
+  
   return (
     <FMTable>
       <FMTableHeader>
@@ -215,6 +219,15 @@ export default function SlicedFilesTable({
                 >
                   Download
                 </a>
+                <span className="text-muted-foreground">|</span>
+                <DeleteConfirmDialog
+                  title="Delete Sliced File"
+                  description="Are you sure you want to delete this sliced file? This action cannot be undone."
+                  itemName={slicedFile.name}
+                  onConfirm={() => deleteSlicedFile.mutate(slicedFile.id)}
+                  isLoading={deleteSlicedFile.isPending}
+                  triggerClassName="text-sm font-medium p-0 bg-transparent text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                />
               </div>
             </FMCell>
           </FMRow>

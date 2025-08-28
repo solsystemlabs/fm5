@@ -1,4 +1,4 @@
-import { useProducts } from "@/lib/api-hooks";
+import { useProductsTRPC } from "@/lib/trpc-hooks";
 import { createFileRoute } from "@tanstack/react-router";
 import ProductsTable from "../../components/tables/ProductsTable";
 import FMButton from "../../components/ui/FMButton";
@@ -9,7 +9,7 @@ export const Route = createFileRoute("/products/")({
 });
 
 function ProductsPage() {
-  const { data: products = [], isLoading, error } = useProducts();
+  const { data: products = [], isLoading, error } = useProductsTRPC();
 
   if (error) {
     return (

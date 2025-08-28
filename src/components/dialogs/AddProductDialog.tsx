@@ -1,5 +1,5 @@
 import FMInput from "@/components/ui/FMInput";
-import { useCreateProduct, useModels, useSlicedFiles } from "@/lib/api-hooks";
+import { useCreateProductTRPC, useModelsTRPC, useSlicedFilesTRPC } from "@/lib/trpc-hooks";
 import { useForm } from "@tanstack/react-form";
 import { type ReactNode } from "react";
 import {
@@ -37,17 +37,17 @@ type ProductFormData = z.infer<typeof productFormSchema>;
 export default function AddProductDialog({
   triggerElement,
 }: AddProductDialogProps): ReactNode {
-  const createProductMutation = useCreateProduct();
+  const createProductMutation = useCreateProductTRPC();
   const {
     data: models = [],
     isLoading: modelsLoading,
     error: modelsError,
-  } = useModels();
+  } = useModelsTRPC();
   const {
     data: slicedFiles = [],
     isLoading: slicedFilesLoading,
     error: slicedFilesError,
-  } = useSlicedFiles();
+  } = useSlicedFilesTRPC();
 
   const form = useForm({
     defaultValues: {

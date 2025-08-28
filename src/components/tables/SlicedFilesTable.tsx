@@ -2,7 +2,7 @@ import type { SlicedFile } from "@/lib/types";
 import type { ReactNode } from "react";
 import { Cell, ColorSwatch, TableBody } from "react-aria-components";
 import { DeleteConfirmDialog } from "../ui/DeleteConfirmDialog";
-import { useDeleteSlicedFile } from "@/lib/api-hooks";
+import { useDeleteSlicedFileTRPC } from "@/lib/trpc-hooks";
 import FMCell from "../ui/table/FMCell";
 import FMColumn from "../ui/table/FMColumn";
 import FMRow from "../ui/table/FMRow";
@@ -54,7 +54,7 @@ export default function SlicedFilesTable({
 }: {
   data: SlicedFile[];
 }): ReactNode {
-  const deleteSlicedFile = useDeleteSlicedFile();
+  const deleteSlicedFile = useDeleteSlicedFileTRPC();
   
   return (
     <FMTable>

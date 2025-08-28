@@ -6,13 +6,13 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { useState } from "react";
 import Header from "../components/layout/Header";
 import { ThemeProvider } from "../lib/theme-context";
 import { BackgroundUploadProvider } from "../lib/background-upload-context";
 import { ToastProvider } from "../components/ui/ToastProvider";
+import { TRPCProvider, getQueryClient, createTRPCClientInstance } from "../lib/trpc/client";
 import appCss from "../styles/global.css?url";
-
-const queryClient = new QueryClient();
 
 export const Route = createRootRoute({
   head: () => ({
@@ -35,20 +35,25 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
+  const queryClient = getQueryClient();
+  const [trpcClient] = useState(() => createTRPCClientInstance());
+
   return (
     <RootDocument>
       <ThemeProvider>
         <QueryClientProvider client={queryClient}>
-          <BackgroundUploadProvider>
-            <ToastProvider>
-              <div className="w-full h-full min-h-screen bg-background">
-                <Header />
-                <main className="container mx-auto px-4 py-8">
-                  <Outlet />
-                </main>
-              </div>
-            </ToastProvider>
-          </BackgroundUploadProvider>
+          <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
+            <BackgroundUploadProvider>
+              <ToastProvider>
+                <div className="w-full h-full min-h-screen bg-background">
+                  <Header />
+                  <main className="container mx-auto px-4 py-8">
+                    <Outlet />
+                  </main>
+                </div>
+              </ToastProvider>
+            </BackgroundUploadProvider>
+          </TRPCProvider>
         </QueryClientProvider>
       </ThemeProvider>
     </RootDocument>

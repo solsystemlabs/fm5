@@ -1,4 +1,4 @@
-import { useFilamentsGrouped } from "@/lib/api-hooks";
+import { useFilamentsGroupedTRPC } from "@/lib/trpc-hooks";
 import { ChevronDownIcon, SearchIcon, XIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
@@ -31,7 +31,7 @@ export default function FilamentSelect({
   onSelectionChange,
 }: FilamentSelectProps): ReactNode {
   let { contains } = useFilter({ sensitivity: "base" });
-  const { data: groupedFilaments, isLoading, error } = useFilamentsGrouped();
+  const { data: groupedFilaments, isLoading, error } = useFilamentsGroupedTRPC();
   const [selectedKeys, setSelectedKeys] = useState<Selection>(
     new Set(selectedFilamentIds.map(String)),
   );

@@ -1,14 +1,14 @@
 import CreatableSelect from "@/components/ui/CreatableSelect";
 import FMInput from "@/components/ui/FMInput";
 import {
-  useBrands,
-  useCreateBrand,
-  useCreateFilament,
-  useCreateFilamentType,
-  useCreateMaterialType,
-  useFilamentTypes,
-  useMaterialTypes,
-} from "@/lib/api-hooks";
+  useBrandsTRPC,
+  useCreateBrandTRPC,
+  useCreateFilamentTRPC,
+  useCreateFilamentTypeTRPC,
+  useCreateMaterialTypeTRPC,
+  useFilamentTypesTRPC,
+  useMaterialTypesTRPC,
+} from "@/lib/trpc-hooks";
 import { useForm } from "@tanstack/react-form";
 import { type ReactNode } from "react";
 import {
@@ -58,26 +58,26 @@ type FilamentFormData = z.infer<typeof filamentFormSchema>;
 export default function AddFilamentDialog({
   triggerElement,
 }: AddFilamentDialogProps): ReactNode {
-  const createFilamentMutation = useCreateFilament();
-  const createBrandMutation = useCreateBrand();
-  const createMaterialTypeMutation = useCreateMaterialType();
-  const createFilamentTypeMutation = useCreateFilamentType();
+  const createFilamentMutation = useCreateFilamentTRPC();
+  const createBrandMutation = useCreateBrandTRPC();
+  const createMaterialTypeMutation = useCreateMaterialTypeTRPC();
+  const createFilamentTypeMutation = useCreateFilamentTypeTRPC();
 
   const {
     data: brands = [],
     isLoading: brandsLoading,
     error: brandsError,
-  } = useBrands();
+  } = useBrandsTRPC();
   const {
     data: materialTypes = [],
     isLoading: materialTypesLoading,
     error: materialTypesError,
-  } = useMaterialTypes();
+  } = useMaterialTypesTRPC();
   const {
     data: filamentTypes = [],
     isLoading: filamentTypesLoading,
     error: filamentTypesError,
-  } = useFilamentTypes();
+  } = useFilamentTypesTRPC();
 
   const form = useForm({
     defaultValues: {

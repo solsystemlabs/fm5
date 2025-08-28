@@ -11,6 +11,7 @@
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TrpcTestRouteImport } from './routes/trpc-test'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SlicedFilesIndexRouteImport } from './routes/sliced-files/index'
@@ -31,6 +32,7 @@ import { ServerRoute as ApiFilamentsGroupedServerRouteImport } from './routes/ap
 import { ServerRoute as ApiFilamentsServerRouteImport } from './routes/api/filaments'
 import { ServerRoute as ApiFilamentTypesServerRouteImport } from './routes/api/filament-types'
 import { ServerRoute as ApiBrandsServerRouteImport } from './routes/api/brands'
+import { ServerRoute as ApiTrpcSplatServerRouteImport } from './routes/api/trpc/$'
 import { ServerRoute as ApiSlicedFilesIdServerRouteImport } from './routes/api/sliced-files/$id'
 import { ServerRoute as ApiProductsIdServerRouteImport } from './routes/api/products/$id'
 import { ServerRoute as ApiModelsIdServerRouteImport } from './routes/api/models/$id'
@@ -44,6 +46,11 @@ import { ServerRoute as ApiDownloadModelFileFileIdServerRouteImport } from './ro
 
 const rootServerRouteImport = createServerRootRoute()
 
+const TrpcTestRoute = TrpcTestRouteImport.update({
+  id: '/trpc-test',
+  path: '/trpc-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -146,6 +153,11 @@ const ApiBrandsServerRoute = ApiBrandsServerRouteImport.update({
   path: '/api/brands',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiTrpcSplatServerRoute = ApiTrpcSplatServerRouteImport.update({
+  id: '/api/trpc/$',
+  path: '/api/trpc/$',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
 const ApiSlicedFilesIdServerRoute = ApiSlicedFilesIdServerRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -205,6 +217,7 @@ const ApiDownloadModelFileFileIdServerRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/trpc-test': typeof TrpcTestRoute
   '/models/$modelId': typeof ModelsModelIdRoute
   '/filaments': typeof FilamentsIndexRoute
   '/inventory': typeof InventoryIndexRoute
@@ -215,6 +228,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/trpc-test': typeof TrpcTestRoute
   '/models/$modelId': typeof ModelsModelIdRoute
   '/filaments': typeof FilamentsIndexRoute
   '/inventory': typeof InventoryIndexRoute
@@ -226,6 +240,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/trpc-test': typeof TrpcTestRoute
   '/models/$modelId': typeof ModelsModelIdRoute
   '/filaments/': typeof FilamentsIndexRoute
   '/inventory/': typeof InventoryIndexRoute
@@ -238,6 +253,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/trpc-test'
     | '/models/$modelId'
     | '/filaments'
     | '/inventory'
@@ -248,6 +264,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dashboard'
+    | '/trpc-test'
     | '/models/$modelId'
     | '/filaments'
     | '/inventory'
@@ -258,6 +275,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/dashboard'
+    | '/trpc-test'
     | '/models/$modelId'
     | '/filaments/'
     | '/inventory/'
@@ -269,6 +287,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
+  TrpcTestRoute: typeof TrpcTestRoute
   ModelsModelIdRoute: typeof ModelsModelIdRoute
   FilamentsIndexRoute: typeof FilamentsIndexRoute
   InventoryIndexRoute: typeof InventoryIndexRoute
@@ -294,6 +313,7 @@ export interface FileServerRoutesByFullPath {
   '/api/models/$id': typeof ApiModelsIdServerRouteWithChildren
   '/api/products/$id': typeof ApiProductsIdServerRoute
   '/api/sliced-files/$id': typeof ApiSlicedFilesIdServerRouteWithChildren
+  '/api/trpc/$': typeof ApiTrpcSplatServerRoute
   '/api/download/model-file/$fileId': typeof ApiDownloadModelFileFileIdServerRoute
   '/api/download/model-image/$imageId': typeof ApiDownloadModelImageImageIdServerRoute
   '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
@@ -318,6 +338,7 @@ export interface FileServerRoutesByTo {
   '/api/models/$id': typeof ApiModelsIdServerRouteWithChildren
   '/api/products/$id': typeof ApiProductsIdServerRoute
   '/api/sliced-files/$id': typeof ApiSlicedFilesIdServerRouteWithChildren
+  '/api/trpc/$': typeof ApiTrpcSplatServerRoute
   '/api/download/model-file/$fileId': typeof ApiDownloadModelFileFileIdServerRoute
   '/api/download/model-image/$imageId': typeof ApiDownloadModelImageImageIdServerRoute
   '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
@@ -343,6 +364,7 @@ export interface FileServerRoutesById {
   '/api/models/$id': typeof ApiModelsIdServerRouteWithChildren
   '/api/products/$id': typeof ApiProductsIdServerRoute
   '/api/sliced-files/$id': typeof ApiSlicedFilesIdServerRouteWithChildren
+  '/api/trpc/$': typeof ApiTrpcSplatServerRoute
   '/api/download/model-file/$fileId': typeof ApiDownloadModelFileFileIdServerRoute
   '/api/download/model-image/$imageId': typeof ApiDownloadModelImageImageIdServerRoute
   '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
@@ -369,6 +391,7 @@ export interface FileServerRouteTypes {
     | '/api/models/$id'
     | '/api/products/$id'
     | '/api/sliced-files/$id'
+    | '/api/trpc/$'
     | '/api/download/model-file/$fileId'
     | '/api/download/model-image/$imageId'
     | '/api/filaments/$filamentId/models'
@@ -393,6 +416,7 @@ export interface FileServerRouteTypes {
     | '/api/models/$id'
     | '/api/products/$id'
     | '/api/sliced-files/$id'
+    | '/api/trpc/$'
     | '/api/download/model-file/$fileId'
     | '/api/download/model-image/$imageId'
     | '/api/filaments/$filamentId/models'
@@ -417,6 +441,7 @@ export interface FileServerRouteTypes {
     | '/api/models/$id'
     | '/api/products/$id'
     | '/api/sliced-files/$id'
+    | '/api/trpc/$'
     | '/api/download/model-file/$fileId'
     | '/api/download/model-image/$imageId'
     | '/api/filaments/$filamentId/models'
@@ -437,12 +462,20 @@ export interface RootServerRouteChildren {
   ApiModelsServerRoute: typeof ApiModelsServerRouteWithChildren
   ApiProductsServerRoute: typeof ApiProductsServerRouteWithChildren
   ApiSlicedFilesServerRoute: typeof ApiSlicedFilesServerRouteWithChildren
+  ApiTrpcSplatServerRoute: typeof ApiTrpcSplatServerRoute
   ApiDownloadModelFileFileIdServerRoute: typeof ApiDownloadModelFileFileIdServerRoute
   ApiDownloadModelImageImageIdServerRoute: typeof ApiDownloadModelImageImageIdServerRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/trpc-test': {
+      id: '/trpc-test'
+      path: '/trpc-test'
+      fullPath: '/trpc-test'
+      preLoaderRoute: typeof TrpcTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -585,6 +618,13 @@ declare module '@tanstack/react-start/server' {
       path: '/api/brands'
       fullPath: '/api/brands'
       preLoaderRoute: typeof ApiBrandsServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/trpc/$': {
+      id: '/api/trpc/$'
+      path: '/api/trpc/$'
+      fullPath: '/api/trpc/$'
+      preLoaderRoute: typeof ApiTrpcSplatServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/sliced-files/$id': {
@@ -751,6 +791,7 @@ const ApiSlicedFilesServerRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
+  TrpcTestRoute: TrpcTestRoute,
   ModelsModelIdRoute: ModelsModelIdRoute,
   FilamentsIndexRoute: FilamentsIndexRoute,
   InventoryIndexRoute: InventoryIndexRoute,
@@ -774,6 +815,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiModelsServerRoute: ApiModelsServerRouteWithChildren,
   ApiProductsServerRoute: ApiProductsServerRouteWithChildren,
   ApiSlicedFilesServerRoute: ApiSlicedFilesServerRouteWithChildren,
+  ApiTrpcSplatServerRoute: ApiTrpcSplatServerRoute,
   ApiDownloadModelFileFileIdServerRoute: ApiDownloadModelFileFileIdServerRoute,
   ApiDownloadModelImageImageIdServerRoute:
     ApiDownloadModelImageImageIdServerRoute,

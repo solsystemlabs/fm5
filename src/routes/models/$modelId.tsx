@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { useModelFilesByModel, useModels } from "@/lib/api-hooks";
+import { useModelFilesByModelTRPC, useModelsTRPC } from "@/lib/trpc-hooks";
 import {
   ChevronLeftIcon,
   DocumentIcon,
@@ -22,8 +22,8 @@ function ModelDetailPage() {
     data: modelFilesData,
     isLoading: filesLoading,
     error: filesError,
-  } = useModelFilesByModel(parseInt(modelId));
-  const { data: modelsData, isLoading: modelsLoading } = useModels();
+  } = useModelFilesByModelTRPC(parseInt(modelId));
+  const { data: modelsData, isLoading: modelsLoading } = useModelsTRPC();
 
   const isLoading = filesLoading || modelsLoading;
   const error = filesError;

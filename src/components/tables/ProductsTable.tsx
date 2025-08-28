@@ -2,7 +2,7 @@ import type { Product } from "@/lib/types";
 import type { ReactNode } from "react";
 import { Cell, TableBody } from "react-aria-components";
 import { DeleteConfirmDialog } from "../ui/DeleteConfirmDialog";
-import { useDeleteProduct } from "@/lib/api-hooks";
+import { useDeleteProductTRPC } from "@/lib/trpc-hooks";
 import FMCell from "../ui/table/FMCell";
 import FMColumn from "../ui/table/FMColumn";
 import FMRow from "../ui/table/FMRow";
@@ -10,7 +10,7 @@ import FMTable from "../ui/table/FMTable";
 import FMTableHeader from "../ui/table/FMTableHeader";
 
 export default function ProductsTable({ data }: { data: Product[] }): ReactNode {
-  const deleteProduct = useDeleteProduct();
+  const deleteProduct = useDeleteProductTRPC();
   
   const formatPrice = (price: number | null): string => {
     if (price === null) return "N/A";

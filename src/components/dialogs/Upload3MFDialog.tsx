@@ -1,4 +1,5 @@
-import { useModels, useUploadSlicedFileWithProgress } from "@/lib/api-hooks";
+import { useModelsTRPC } from "@/lib/trpc-hooks";
+import { useUploadSlicedFileWithProgress } from "@/lib/api-hooks";
 import { useForm } from "@tanstack/react-form";
 import { type ReactNode, useState } from "react";
 import {
@@ -46,7 +47,7 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
   const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   
-  const { data: models = [], isLoading: modelsLoading } = useModels();
+  const { data: models = [], isLoading: modelsLoading } = useModelsTRPC();
   const { uploadWithProgress } = useUploadSlicedFileWithProgress();
   const [isUploading, setIsUploading] = useState(false);
 

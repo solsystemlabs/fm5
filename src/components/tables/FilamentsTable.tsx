@@ -1,4 +1,4 @@
-import { useDeleteFilament } from "@/lib/api-hooks";
+import { useDeleteFilamentTRPC } from "@/lib/trpc-hooks";
 import type { ReactNode } from "react";
 import { Cell, ColorSwatch, TableBody } from "react-aria-components";
 import { DeleteConfirmDialog } from "../ui/DeleteConfirmDialog";
@@ -12,9 +12,9 @@ import type { Filament } from "../../lib/types";
 export default function FilamentsTable({
   data,
 }: {
-  data: Filament[]; // Use any[] for now to fix immediate type issues
+  data: Filament[];
 }): ReactNode {
-  const deleteFilament = useDeleteFilament();
+  const deleteFilament = useDeleteFilamentTRPC();
 
   return (
     <FMTable>

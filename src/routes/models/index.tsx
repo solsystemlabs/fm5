@@ -1,4 +1,4 @@
-import { useModels } from "@/lib/api-hooks";
+import { useModelsTRPC } from "@/lib/trpc-hooks";
 import { createFileRoute } from "@tanstack/react-router";
 import ModelsTreeView from "../../components/trees/ModelsTreeView";
 import FMButton from "../../components/ui/FMButton";
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/models/")({
 });
 
 function ModelsPage() {
-  const { data: models = [], isLoading, error } = useModels();
+  const { data: models = [], isLoading, error } = useModelsTRPC();
 
   if (error) {
     return (

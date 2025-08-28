@@ -17,7 +17,7 @@ import {
 import { Link } from "@tanstack/react-router";
 import { ImageThumbnailGrid } from "../ImagePreviewGallery";
 import { formatFileSize } from "@/lib/file-processing-service";
-import { useDeleteModelFiles } from "@/lib/api-hooks";
+import { useDeleteModelFilesTRPC } from "@/lib/trpc-hooks";
 import type { TreeNode } from "@/types/tree";
 
 interface ModelsTreeViewProps {
@@ -30,7 +30,7 @@ export default function ModelsTreeView({
   className = "",
 }: ModelsTreeViewProps): ReactNode {
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
-  const deleteModelFilesMutation = useDeleteModelFiles();
+  const deleteModelFilesMutation = useDeleteModelFilesTRPC();
 
   const handleDelete = async (file: TreeNode) => {
     if (

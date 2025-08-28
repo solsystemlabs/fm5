@@ -6,7 +6,7 @@ import { Link } from "@tanstack/react-router";
 import { ImageThumbnailGrid, type ImageFile } from "../ImagePreviewGallery";
 import { UploadStatusCell } from "./UploadStatusCell";
 import { DeleteConfirmDialog } from "../ui/DeleteConfirmDialog";
-import { useDeleteModel } from "@/lib/api-hooks";
+import { useDeleteModelTRPC } from "@/lib/trpc-hooks";
 import FMCell from "../ui/table/FMCell";
 import FMColumn from "../ui/table/FMColumn";
 import FMRow from "../ui/table/FMRow";
@@ -30,7 +30,7 @@ interface ExtendedModel extends Model {
 }
 
 export default function ModelsTable({ data }: { data: ExtendedModel[] }): ReactNode {
-  const deleteModel = useDeleteModel();
+  const deleteModel = useDeleteModelTRPC();
 
   return (
     <FMTable>

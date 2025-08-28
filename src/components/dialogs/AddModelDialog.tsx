@@ -1,5 +1,5 @@
 import FMInput from "@/components/ui/FMInput";
-import { useCreateModel, useModelCategories, useCreateModelCategory } from "@/lib/api-hooks";
+import { useCreateModelTRPC, useModelCategoriesTRPC, useCreateModelCategoryTRPC } from "@/lib/trpc-hooks";
 import { processUploadedFiles, cleanupPreviews, formatFileSize, type ProcessedFiles, type ExtractionProgress } from "@/lib/file-processing-service";
 import { useBackgroundUpload } from "@/lib/background-upload-context";
 import { toastService } from "@/components/ui/ToastProvider";
@@ -41,15 +41,15 @@ type ModelFormData = z.infer<typeof modelFormSchema>;
 export default function AddModelDialog({
   triggerElement,
 }: AddModelDialogProps): ReactNode {
-  const createModelMutation = useCreateModel();
-  const createModelCategoryMutation = useCreateModelCategory();
+  const createModelMutation = useCreateModelTRPC();
+  const createModelCategoryMutation = useCreateModelCategoryTRPC();
   const { queueUpload } = useBackgroundUpload();
   
   const {
     data: modelCategories = [],
     isLoading: categoriesLoading,
     error: categoriesError,
-  } = useModelCategories();
+  } = useModelCategoriesTRPC();
 
   // File upload state
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);

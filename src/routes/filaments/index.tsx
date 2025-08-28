@@ -1,4 +1,4 @@
-import { useFilaments } from "@/lib/api-hooks";
+import { useFilamentsTRPC } from "@/lib/trpc-hooks";
 import { createFileRoute } from "@tanstack/react-router";
 import FilamentsTable from "../../components/tables/FilamentsTable";
 import FMButton from "../../components/ui/FMButton";
@@ -9,7 +9,7 @@ export const Route = createFileRoute("/filaments/")({
 });
 
 function FilamentsPage() {
-  const { data: filaments = [], isLoading, error } = useFilaments();
+  const { data: filaments = [], isLoading, error } = useFilamentsTRPC();
 
   if (error) {
     return (

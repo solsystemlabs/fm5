@@ -1,4 +1,4 @@
-import { useSlicedFiles } from "@/lib/api-hooks";
+import { useSlicedFilesTRPC } from "@/lib/trpc-hooks";
 import { createFileRoute } from "@tanstack/react-router";
 import SlicedFilesTable from "../../components/tables/SlicedFilesTable";
 import FMButton from "../../components/ui/FMButton";
@@ -9,7 +9,7 @@ export const Route = createFileRoute("/sliced-files/")({
 });
 
 function SlicedFilesPage() {
-  const { data: slicedFiles = [], isLoading, error } = useSlicedFiles();
+  const { data: slicedFiles = [], isLoading, error } = useSlicedFilesTRPC();
 
   if (error) {
     return (

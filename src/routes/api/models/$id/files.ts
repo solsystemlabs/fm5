@@ -65,7 +65,9 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
       logger.info('Files processed successfully', {
         modelId,
         images: processedFiles.images.length,
+        imageDetails: processedFiles.images.map(img => ({ name: img.name, size: img.size, category: img.category })),
         modelFiles: processedFiles.modelFiles.length,
+        modelFileDetails: processedFiles.modelFiles.map(f => ({ name: f.name, size: f.size, fileType: f.fileType })),
         totalSize: processedFiles.totalSize
       });
 
@@ -75,6 +77,15 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
         processedFiles.images.map(f => f.file),
         modelId
       );
+
+      logger.info('S3 upload completed', {
+        modelId,
+        modelFilesUploaded: uploadResults.modelFiles.length,
+        modelFilesSuccess: uploadResults.modelFiles.filter(r => !r.error).length,
+        imagesUploaded: uploadResults.images.length,
+        imagesSuccess: uploadResults.images.filter(r => !r.error).length,
+        uploadErrors: [...uploadResults.modelFiles, ...uploadResults.images].filter(r => r.error).map(r => ({ file: r.filename, error: r.error }))
+      });
 
       // Prepare database records
       const modelFileRecords = [];
@@ -104,6 +115,14 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
         }
       }
 
+      logger.info('Database records to be created', {
+        modelId,
+        modelFileRecords: modelFileRecords.length,
+        modelFileDetails: modelFileRecords.map(r => ({ name: r.name, url: r.url, size: r.size })),
+        modelImageRecords: modelImageRecords.length,
+        modelImageDetails: modelImageRecords.map(r => ({ name: r.name, url: r.url, size: r.size }))
+      });
+
       // Save to database using transactions
       const dbResults = await prisma.$transaction(async (tx) => {
         const createdModelFiles = modelFileRecords.length > 0
@@ -113,12 +132,24 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
             })
           : { count: 0 };
 
+        logger.info('ModelFiles database operation result', {
+          modelId,
+          recordsToCreate: modelFileRecords.length,
+          recordsCreated: createdModelFiles.count
+        });
+
         const createdModelImages = modelImageRecords.length > 0
           ? await tx.modelImage.createMany({
               data: modelImageRecords,
               skipDuplicates: true,
             })
           : { count: 0 };
+
+        logger.info('ModelImages database operation result', {
+          modelId,
+          recordsToCreate: modelImageRecords.length,
+          recordsCreated: createdModelImages.count
+        });
 
         // Fetch the created records with full data
         const modelFiles = modelFileRecords.length > 0

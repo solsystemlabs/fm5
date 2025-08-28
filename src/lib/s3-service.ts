@@ -117,13 +117,13 @@ export function generateModelFileS3Key(modelId: number, filename: string): strin
 }
 
 /**
- * Generate S3 key for model images following: {PROJECT_NAME}/{ENVIRONMENT}/images/model-{MODEL_ID}/{filename}
+ * Generate S3 key for model images following: {PROJECT_NAME}/{ENVIRONMENT}/imageFiles/model-{MODEL_ID}/{filename}
  */
 export function generateModelImageS3Key(modelId: number, filename: string): string {
   const config = getS3Config();
   const sanitizedFilename = sanitizeFilename(filename);
   
-  const s3Key = `${config.projectName}/${config.environment}/images/model-${modelId}/${sanitizedFilename}`;
+  const s3Key = `${config.projectName}/${config.environment}/imageFiles/model-${modelId}/${sanitizedFilename}`;
   
   logger.info('Generated model image S3 key', {
     modelId,
@@ -191,10 +191,8 @@ export async function uploadFileToS3(
 
     await s3Client.send(command);
 
-    // Generate S3 URL
-    const s3Url = config.baseUrl 
-      ? `${config.baseUrl}/${s3Key}`
-      : `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${s3Key}`;
+    // Generate S3 URL (direct S3 URL, not CloudFront)
+    const s3Url = `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${s3Key}`;
 
     const result: UploadResult = {
       s3Key,
@@ -488,9 +486,7 @@ export async function uploadLargeFileToS3(
 
     const completeResponse = await s3Client.send(completeCommand);
     
-    const s3Url = config.baseUrl 
-      ? `${config.baseUrl}/${s3Key}` 
-      : `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${s3Key}`;
+    const s3Url = `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${s3Key}`;
 
     logger.info('Multipart upload completed successfully', {
       s3Key,
@@ -611,6 +607,70 @@ export async function uploadModelFile(
 }
 
 /**
+ * Upload image file to S3 with public read access
+ * Images need to be publicly accessible for display in the UI
+ */
+export async function uploadImageWithPublicAccess(
+  file: File,
+  s3Key: string,
+  contentType: string = 'image/jpeg',
+  options: StreamingUploadOptions = {}
+): Promise<UploadResult> {
+  const config = getS3Config();
+  
+  try {
+    logger.info('Starting S3 image upload with public access', {
+      s3Key,
+      contentType,
+      bucket: config.bucketName,
+      size: file.size
+    });
+
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    
+    const command = new PutObjectCommand({
+      Bucket: config.bucketName,
+      Key: s3Key,
+      Body: fileBuffer,
+      ContentType: contentType,
+      // Add metadata for better file management
+      Metadata: {
+        'uploaded-by': 'fm5-manager',
+        'upload-timestamp': new Date().toISOString(),
+        'environment': config.environment,
+        'file-type': 'image'
+      },
+      // Server-side encryption (optional but recommended)
+      ServerSideEncryption: 'AES256',
+    });
+
+    await s3Client.send(command);
+
+    // Generate direct S3 URL (publicly accessible)
+    const s3Url = `https://${config.bucketName}.s3.${config.region}.amazonaws.com/${s3Key}`;
+
+    const result: UploadResult = {
+      s3Key,
+      s3Url,
+      size: fileBuffer.length,
+    };
+
+    logger.info('S3 image upload successful (public)', result);
+    return result;
+
+  } catch (error) {
+    logger.error('S3 image upload failed', {
+      s3Key,
+      bucket: config.bucketName,
+      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    
+    throw new Error(`Failed to upload image to S3: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+/**
  * Upload model image with automatic content type detection and key generation
  * Supports PNG, JPG, and JPEG files
  */
@@ -649,7 +709,8 @@ export async function uploadModelImage(
     contentType
   });
 
-  return await uploadWithProgress(file, s3Key, contentType, options);
+  // Use special upload function for images that sets public-read ACL
+  return await uploadImageWithPublicAccess(file, s3Key, contentType, options);
 }
 
 /**

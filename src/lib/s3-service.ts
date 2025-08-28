@@ -97,6 +97,46 @@ export function generateS3Key(modelId: number, filename: string): string {
 }
 
 /**
+ * Generate S3 key for model files following: {PROJECT_NAME}/{ENVIRONMENT}/modelFiles/model-{MODEL_ID}/{filename}
+ */
+export function generateModelFileS3Key(modelId: number, filename: string): string {
+  const config = getS3Config();
+  const sanitizedFilename = sanitizeFilename(filename);
+  
+  const s3Key = `${config.projectName}/${config.environment}/modelFiles/model-${modelId}/${sanitizedFilename}`;
+  
+  logger.info('Generated model file S3 key', {
+    modelId,
+    originalFilename: filename,
+    sanitizedFilename,
+    s3Key,
+    environment: config.environment
+  });
+  
+  return s3Key;
+}
+
+/**
+ * Generate S3 key for model images following: {PROJECT_NAME}/{ENVIRONMENT}/images/model-{MODEL_ID}/{filename}
+ */
+export function generateModelImageS3Key(modelId: number, filename: string): string {
+  const config = getS3Config();
+  const sanitizedFilename = sanitizeFilename(filename);
+  
+  const s3Key = `${config.projectName}/${config.environment}/images/model-${modelId}/${sanitizedFilename}`;
+  
+  logger.info('Generated model image S3 key', {
+    modelId,
+    originalFilename: filename,
+    sanitizedFilename,
+    s3Key,
+    environment: config.environment
+  });
+  
+  return s3Key;
+}
+
+/**
  * Upload file to S3
  */
 export interface UploadResult {
@@ -525,4 +565,154 @@ export async function uploadWithProgress(
     
     return result;
   }
+}
+
+/**
+ * Upload model file with automatic content type detection and key generation
+ * Supports STL, 3MF, and GCODE files
+ */
+export async function uploadModelFile(
+  file: File,
+  modelId: number,
+  options: StreamingUploadOptions = {}
+): Promise<UploadResult> {
+  // Validate file type
+  const supportedExtensions = ['.stl', '.3mf', '.gcode', '.gcode.3mf'];
+  const hasValidExtension = supportedExtensions.some(ext => 
+    file.name.toLowerCase().endsWith(ext)
+  );
+  
+  if (!hasValidExtension) {
+    throw new Error(`Unsupported model file type. Supported: ${supportedExtensions.join(', ')}`);
+  }
+
+  // Generate S3 key
+  const s3Key = generateModelFileS3Key(modelId, file.name);
+  
+  // Set appropriate content type
+  let contentType = 'application/octet-stream';
+  if (file.name.toLowerCase().endsWith('.stl')) {
+    contentType = 'model/stl';
+  } else if (file.name.toLowerCase().endsWith('.3mf')) {
+    contentType = 'application/vnd.ms-3mfdocument';
+  } else if (file.name.toLowerCase().endsWith('.gcode')) {
+    contentType = 'text/plain';
+  }
+  
+  logger.info('Starting model file upload', {
+    filename: file.name,
+    size: file.size,
+    modelId,
+    s3Key,
+    contentType
+  });
+
+  return await uploadWithProgress(file, s3Key, contentType, options);
+}
+
+/**
+ * Upload model image with automatic content type detection and key generation
+ * Supports PNG, JPG, and JPEG files
+ */
+export async function uploadModelImage(
+  file: File,
+  modelId: number,
+  options: StreamingUploadOptions = {}
+): Promise<UploadResult> {
+  // Validate file type
+  const supportedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+  const supportedExtensions = ['.png', '.jpg', '.jpeg'];
+  
+  const hasValidType = supportedTypes.includes(file.type.toLowerCase());
+  const hasValidExtension = supportedExtensions.some(ext => 
+    file.name.toLowerCase().endsWith(ext)
+  );
+  
+  if (!hasValidType && !hasValidExtension) {
+    throw new Error(`Unsupported image file type. Supported: PNG, JPG, JPEG`);
+  }
+
+  // Generate S3 key
+  const s3Key = generateModelImageS3Key(modelId, file.name);
+  
+  // Use the file's mime type or default to appropriate image type
+  let contentType = file.type || 'image/jpeg';
+  if (file.name.toLowerCase().endsWith('.png')) {
+    contentType = 'image/png';
+  }
+  
+  logger.info('Starting model image upload', {
+    filename: file.name,
+    size: file.size,
+    modelId,
+    s3Key,
+    contentType
+  });
+
+  return await uploadWithProgress(file, s3Key, contentType, options);
+}
+
+/**
+ * Upload multiple model files and images
+ * Returns separate results for each file type
+ */
+export interface BatchUploadResult {
+  modelFiles: Array<UploadResult & { filename: string; error?: string }>;
+  images: Array<UploadResult & { filename: string; error?: string }>;
+}
+
+export async function uploadModelFilesAndImages(
+  modelFiles: File[],
+  images: File[],
+  modelId: number,
+  options: StreamingUploadOptions = {}
+): Promise<BatchUploadResult> {
+  const result: BatchUploadResult = {
+    modelFiles: [],
+    images: []
+  };
+
+  // Upload model files
+  for (const file of modelFiles) {
+    try {
+      const uploadResult = await uploadModelFile(file, modelId, options);
+      result.modelFiles.push({ ...uploadResult, filename: file.name });
+    } catch (error) {
+      logger.error('Failed to upload model file', {
+        filename: file.name,
+        modelId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      result.modelFiles.push({
+        s3Key: '',
+        s3Url: '',
+        size: file.size,
+        filename: file.name,
+        error: error instanceof Error ? error.message : 'Upload failed'
+      });
+    }
+  }
+
+  // Upload images
+  for (const file of images) {
+    try {
+      const uploadResult = await uploadModelImage(file, modelId, options);
+      result.images.push({ ...uploadResult, filename: file.name });
+    } catch (error) {
+      logger.error('Failed to upload model image', {
+        filename: file.name,
+        modelId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      result.images.push({
+        s3Key: '',
+        s3Url: '',
+        size: file.size,
+        filename: file.name,
+        error: error instanceof Error ? error.message : 'Upload failed'
+      });
+    }
+  }
+
+  return result;
 }

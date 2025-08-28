@@ -14,6 +14,8 @@ export const ServerRoute = createServerFileRoute("/api/models").methods({
               Brand: true,
             },
           },
+          ModelFiles: true,
+          ModelImage: true,
         },
         orderBy: {
           name: "asc",
@@ -59,6 +61,8 @@ export const ServerRoute = createServerFileRoute("/api/models").methods({
               Brand: true,
             },
           },
+          ModelFiles: true,
+          ModelImage: true,
         },
       });
 

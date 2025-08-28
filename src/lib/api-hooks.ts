@@ -13,6 +13,8 @@ const QUERY_KEYS = {
   brands: ['brands'] as const,
   products: ['products'] as const,
   slicedFiles: ['slicedFiles'] as const,
+  modelFiles: ['modelFiles'] as const,
+  modelFilesByModel: (modelId: number) => ['modelFiles', 'byModel', modelId] as const,
 }
 
 // API functions
@@ -255,6 +257,106 @@ const api = {
       xhr.send(formData)
     })
   },
+
+  getModelFiles: async (): Promise<any> => {
+    const response = await fetch('/api/model-files')
+    if (!response.ok) {
+      throw new Error('Failed to fetch model files')
+    }
+    return response.json()
+  },
+
+  getModelFilesByModel: async (modelId: number): Promise<any> => {
+    const response = await fetch(`/api/models/${modelId}/files`)
+    if (!response.ok) {
+      throw new Error('Failed to fetch model files')
+    }
+    return response.json()
+  },
+
+  uploadModelFiles: async (modelId: number, formData: FormData): Promise<any> => {
+    const response = await fetch(`/api/models/${modelId}/files`, {
+      method: 'POST',
+      body: formData,
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to upload model files')
+    }
+    return response.json()
+  },
+
+  uploadModelFilesWithProgress: (
+    modelId: number,
+    formData: FormData,
+    onProgress?: (progress: { loaded: number; total: number; percentage: number; speed?: string; timeRemaining?: string }) => void
+  ): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest()
+      const startTime = Date.now()
+      
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable && onProgress) {
+          const now = Date.now()
+          const elapsedTime = now - startTime
+          const speed = event.loaded / elapsedTime * 1000 // bytes/sec
+          const timeRemaining = (event.total - event.loaded) / speed / 1000 // seconds
+          
+          onProgress({
+            loaded: event.loaded,
+            total: event.total,
+            percentage: Math.round((event.loaded / event.total) * 100),
+            speed: `${(speed / 1024 / 1024).toFixed(1)} MB/s`,
+            timeRemaining: `${Math.round(timeRemaining)}s`
+          })
+        }
+      })
+      
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const result = JSON.parse(xhr.responseText)
+            resolve(result)
+          } catch (error) {
+            reject(new Error('Failed to parse server response'))
+          }
+        } else {
+          try {
+            const error = JSON.parse(xhr.responseText)
+            reject(new Error(error.error || `Upload failed with status ${xhr.status}`))
+          } catch {
+            reject(new Error(`Upload failed with status ${xhr.status}`))
+          }
+        }
+      })
+      
+      xhr.addEventListener('error', () => {
+        reject(new Error('Network error during upload'))
+      })
+      
+      xhr.addEventListener('timeout', () => {
+        reject(new Error('Upload timed out'))
+      })
+      
+      xhr.open('POST', `/api/models/${modelId}/files`)
+      xhr.timeout = 10 * 60 * 1000 // 10 minutes timeout
+      xhr.send(formData)
+    })
+  },
+
+  deleteModelFiles: async (fileIds: number[], type: 'modelFile' | 'modelImage'): Promise<any> => {
+    const response = await fetch('/api/model-files', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ fileIds, type }),
+    })
+    if (!response.ok) {
+      throw new Error('Failed to delete model files')
+    }
+    return response.json()
+  },
 }
 
 // Hooks
@@ -448,4 +550,70 @@ export function useUploadSlicedFileWithProgress() {
       })
     }
   }
+}
+
+export function useModelFiles() {
+  return useQuery({
+    queryKey: QUERY_KEYS.modelFiles,
+    queryFn: api.getModelFiles,
+  })
+}
+
+export function useModelFilesByModel(modelId: number) {
+  return useQuery({
+    queryKey: QUERY_KEYS.modelFilesByModel(modelId),
+    queryFn: () => api.getModelFilesByModel(modelId),
+    enabled: !!modelId,
+  })
+}
+
+export function useUploadModelFiles() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: ({ modelId, formData }: { modelId: number; formData: FormData }) => 
+      api.uploadModelFiles(modelId, formData),
+    onSuccess: (_, { modelId }) => {
+      // Invalidate relevant queries after uploading files
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.models })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.modelFiles })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.modelFilesByModel(modelId) })
+    },
+  })
+}
+
+export function useUploadModelFilesWithProgress() {
+  const queryClient = useQueryClient()
+  
+  return {
+    uploadWithProgress: (
+      modelId: number,
+      formData: FormData,
+      onProgress?: (progress: { loaded: number; total: number; percentage: number; speed?: string; timeRemaining?: string }) => void
+    ) => {
+      return api.uploadModelFilesWithProgress(modelId, formData, onProgress).then((result) => {
+        // Invalidate relevant queries after uploading files
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.models })
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.modelFiles })
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.modelFilesByModel(modelId) })
+        return result
+      })
+    }
+  }
+}
+
+export function useDeleteModelFiles() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: ({ fileIds, type }: { fileIds: number[]; type: 'modelFile' | 'modelImage' }) =>
+      api.deleteModelFiles(fileIds, type),
+    onSuccess: () => {
+      // Invalidate relevant queries after deleting files
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.models })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.modelFiles })
+      // Also invalidate all model-specific file queries
+      queryClient.invalidateQueries({ queryKey: ['modelFiles', 'byModel'] })
+    },
+  })
 }

@@ -53,6 +53,7 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/bcryptjs": "^2.4.6",
+    "@types/jszip": "^3.4.0",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "@types/xml2js": "^0.4.14",

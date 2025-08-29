@@ -24,7 +24,8 @@ FM5 Manager is a comprehensive 3D printing management application built with Tan
 
 ```bash
 # Start development server (runs on port 3000)
-npm run dev
+npm run dev              # Starts Docker DB + migrates + runs dev server
+npm run dev:clean        # Fresh start: reset DB + run dev server
 
 # Build for production
 npm run build
@@ -43,8 +44,23 @@ npm run test:e2e:debug   # Run E2E tests in debug mode
 # Run all tests
 npm run test:all
 
-# Database operations
+# Database operations (Docker-based local PostgreSQL)
+npm run db:start         # Start PostgreSQL in Docker
+npm run db:stop          # Stop Docker database
+npm run db:restart       # Restart Docker database
+npm run db:wait          # Wait for database to be ready
+npm run db:migrate       # Run Prisma migrations
 npm run db:seed          # Seed database with initial data
+npm run db:reset         # Full reset: stop, remove volumes, start, migrate, seed
+npm run db:studio        # Open Prisma Studio
+
+# Environment management
+npm run env:local        # Switch to local development environment
+npm run env:staging      # Switch to staging environment  
+npm run env:production   # Switch to production environment
+
+# Docker utilities
+npm run docker:logs      # View PostgreSQL container logs
 ```
 
 ## Architecture & Code Organization
@@ -58,10 +74,18 @@ npm run db:seed          # Seed database with initial data
 
 ### Database & API Architecture
 - **Database**: PostgreSQL with Prisma ORM
+- **Local Development**: Docker Compose with PostgreSQL 18 container
 - **Schema**: Defined in `prisma/schema.prisma` with models for Filament, Model, Brand, MaterialType, ModelCategory
 - **API Routes**: Server-side routes using TanStack Start's `createServerFileRoute`
 - **Validation**: Zod schemas for request validation
 - **Data Fetching**: React Query hooks for client-side state management
+
+### Environment Configuration
+- **Local Development**: Docker PostgreSQL (`npm run dev`)
+- **Staging**: Supabase PostgreSQL (for Netlify deployment)
+- **Production**: TBD (configurable via environment files)
+- **Environment Files**: `.env.local`, `.env.staging`, `.env.production`
+- **Switch Environments**: Use `npm run env:local|staging|production`
 
 ### Component Structure
 - **Layout Components**: `src/components/layout/` - Header and navigation
@@ -130,10 +154,27 @@ Core entities managed by the application:
 
 ## Development Notes
 
+### Infrastructure
 - Server runs on port 3000 by default
+- Local PostgreSQL runs on port 5432 via Docker
+- Docker Compose manages local database lifecycle
 - Hot reload enabled through Vite
+- Database automatically starts with `npm run dev`
+
+### Configuration
 - TypeScript strict mode with null checks enabled
 - ES modules configuration (`"type": "module"` in package.json)
 - Auto-import resolution for `@/` paths via vite-tsconfig-paths
-- Database schema changes require Prisma migrations
+- Environment-specific `.env` files for different deployment targets
+
+### Database Management
+- Database schema changes require Prisma migrations (`npm run db:migrate`)
+- Use `npm run db:reset` for clean slate during development
+- Prisma Studio available via `npm run db:studio` for database inspection
+- Docker volumes persist data between container restarts
 - MSW (Mock Service Worker) available for testing API interactions
+
+### Best Practices
+- Always use `npm run dev` which handles database startup automatically
+- Use environment switching commands (`npm run env:*`) for different deployment contexts
+- Monitor Docker logs with `npm run docker:logs` if database issues occur

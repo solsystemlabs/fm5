@@ -1,7 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
+    "dev": "npm run db:start && npm run db:migrate && vite dev",
+    "dev:clean": "npm run db:reset && npm run dev",
     "build": "vite build",
     "test": "vitest",
     "test:ui": "vitest --ui",
@@ -11,7 +12,18 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
     "test:all": "npm run test:run && npm run test:e2e",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:start": "docker compose up -d postgres && npm run db:wait",
+    "db:stop": "docker compose down",
+    "db:restart": "npm run db:stop && npm run db:start",
+    "db:wait": "node scripts/wait-for-db.js",
+    "db:migrate": "prisma migrate dev --skip-generate",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:reset": "npm run db:stop && docker compose down -v && npm run db:start && npm run db:migrate && npm run db:seed",
+    "db:studio": "prisma studio",
+    "docker:logs": "docker compose logs -f postgres",
+    "env:local": "node scripts/setup-env.js local",
+    "env:staging": "node scripts/setup-env.js staging",
+    "env:production": "node scripts/setup-env.js production"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -57,6 +69,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/jszip": "^3.4.0",
+    "@types/pg": "^8.15.5",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "@types/xml2js": "^0.4.14",
@@ -65,6 +78,7 @@
     "happy-dom": "^18.0.1",
     "jsdom": "^26.1.0",
     "msw": "^2.10.5",
+    "pg": "^8.16.3",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "prisma": "^6.13.0",

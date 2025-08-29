@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 
 export interface DashboardData {
   overview: {
@@ -50,19 +50,36 @@ export interface DashboardData {
   }>;
 }
 
-export function useDashboardAnalytics() {
-  return useQuery({
-    queryKey: ['dashboard-analytics'],
-    queryFn: async (): Promise<DashboardData> => {
-      const response = await fetch('/api/dashboard-analytics');
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch dashboard analytics');
-      }
+// Query options for dashboard analytics (for use with TanStack Router loaders)
+export const dashboardAnalyticsQueryOptions = queryOptions({
+  queryKey: ['dashboard-analytics'],
+  queryFn: async (): Promise<DashboardData> => {
+    const response = await fetch('/api/dashboard-analytics', {
+      cache: 'no-store', // Prevent browser caching
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch dashboard analytics');
+    }
 
-      return response.json();
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnWindowFocus: false,
-  });
+    return response.json();
+  },
+  staleTime: 0, // Always consider data stale
+  gcTime: 0, // Don't keep old data in memory
+  refetchOnWindowFocus: true,
+  refetchOnMount: 'always',
+});
+
+export function useDashboardAnalytics() {
+  return useQuery(dashboardAnalyticsQueryOptions);
+}
+
+// Suspense version for better SSR + streaming behavior
+export function useDashboardAnalyticsSuspense() {
+  return useSuspenseQuery(dashboardAnalyticsQueryOptions);
 }

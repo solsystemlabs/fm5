@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
-  createRootRoute,
+  createRootRouteWithContext,
   HeadContent,
   Outlet,
   Scripts,
@@ -14,7 +14,11 @@ import { ToastProvider } from "../components/ui/ToastProvider";
 import { TRPCProvider, getQueryClient, createTRPCClientInstance } from "../lib/trpc/client";
 import appCss from "../styles/global.css?url";
 
-export const Route = createRootRoute({
+interface MyRouterContext {
+  queryClient: QueryClient;
+}
+
+export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },

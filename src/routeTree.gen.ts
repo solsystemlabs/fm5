@@ -31,6 +31,7 @@ import { ServerRoute as ApiHealthServerRouteImport } from './routes/api/health'
 import { ServerRoute as ApiFilamentsGroupedServerRouteImport } from './routes/api/filaments-grouped'
 import { ServerRoute as ApiFilamentsServerRouteImport } from './routes/api/filaments'
 import { ServerRoute as ApiFilamentTypesServerRouteImport } from './routes/api/filament-types'
+import { ServerRoute as ApiDashboardAnalyticsServerRouteImport } from './routes/api/dashboard-analytics'
 import { ServerRoute as ApiBrandsServerRouteImport } from './routes/api/brands'
 import { ServerRoute as ApiTrpcSplatServerRouteImport } from './routes/api/trpc/$'
 import { ServerRoute as ApiSlicedFilesIdServerRouteImport } from './routes/api/sliced-files/$id'
@@ -148,6 +149,12 @@ const ApiFilamentTypesServerRoute = ApiFilamentTypesServerRouteImport.update({
   path: '/api/filament-types',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiDashboardAnalyticsServerRoute =
+  ApiDashboardAnalyticsServerRouteImport.update({
+    id: '/api/dashboard-analytics',
+    path: '/api/dashboard-analytics',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 const ApiBrandsServerRoute = ApiBrandsServerRouteImport.update({
   id: '/api/brands',
   path: '/api/brands',
@@ -297,6 +304,7 @@ export interface RootRouteChildren {
 }
 export interface FileServerRoutesByFullPath {
   '/api/brands': typeof ApiBrandsServerRoute
+  '/api/dashboard-analytics': typeof ApiDashboardAnalyticsServerRoute
   '/api/filament-types': typeof ApiFilamentTypesServerRoute
   '/api/filaments': typeof ApiFilamentsServerRouteWithChildren
   '/api/filaments-grouped': typeof ApiFilamentsGroupedServerRoute
@@ -322,6 +330,7 @@ export interface FileServerRoutesByFullPath {
 }
 export interface FileServerRoutesByTo {
   '/api/brands': typeof ApiBrandsServerRoute
+  '/api/dashboard-analytics': typeof ApiDashboardAnalyticsServerRoute
   '/api/filament-types': typeof ApiFilamentTypesServerRoute
   '/api/filaments': typeof ApiFilamentsServerRouteWithChildren
   '/api/filaments-grouped': typeof ApiFilamentsGroupedServerRoute
@@ -348,6 +357,7 @@ export interface FileServerRoutesByTo {
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
   '/api/brands': typeof ApiBrandsServerRoute
+  '/api/dashboard-analytics': typeof ApiDashboardAnalyticsServerRoute
   '/api/filament-types': typeof ApiFilamentTypesServerRoute
   '/api/filaments': typeof ApiFilamentsServerRouteWithChildren
   '/api/filaments-grouped': typeof ApiFilamentsGroupedServerRoute
@@ -375,6 +385,7 @@ export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
   fullPaths:
     | '/api/brands'
+    | '/api/dashboard-analytics'
     | '/api/filament-types'
     | '/api/filaments'
     | '/api/filaments-grouped'
@@ -400,6 +411,7 @@ export interface FileServerRouteTypes {
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
     | '/api/brands'
+    | '/api/dashboard-analytics'
     | '/api/filament-types'
     | '/api/filaments'
     | '/api/filaments-grouped'
@@ -425,6 +437,7 @@ export interface FileServerRouteTypes {
   id:
     | '__root__'
     | '/api/brands'
+    | '/api/dashboard-analytics'
     | '/api/filament-types'
     | '/api/filaments'
     | '/api/filaments-grouped'
@@ -451,6 +464,7 @@ export interface FileServerRouteTypes {
 }
 export interface RootServerRouteChildren {
   ApiBrandsServerRoute: typeof ApiBrandsServerRoute
+  ApiDashboardAnalyticsServerRoute: typeof ApiDashboardAnalyticsServerRoute
   ApiFilamentTypesServerRoute: typeof ApiFilamentTypesServerRoute
   ApiFilamentsServerRoute: typeof ApiFilamentsServerRouteWithChildren
   ApiFilamentsGroupedServerRoute: typeof ApiFilamentsGroupedServerRoute
@@ -611,6 +625,13 @@ declare module '@tanstack/react-start/server' {
       path: '/api/filament-types'
       fullPath: '/api/filament-types'
       preLoaderRoute: typeof ApiFilamentTypesServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/dashboard-analytics': {
+      id: '/api/dashboard-analytics'
+      path: '/api/dashboard-analytics'
+      fullPath: '/api/dashboard-analytics'
+      preLoaderRoute: typeof ApiDashboardAnalyticsServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/brands': {
@@ -804,6 +825,7 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiBrandsServerRoute: ApiBrandsServerRoute,
+  ApiDashboardAnalyticsServerRoute: ApiDashboardAnalyticsServerRoute,
   ApiFilamentTypesServerRoute: ApiFilamentTypesServerRoute,
   ApiFilamentsServerRoute: ApiFilamentsServerRouteWithChildren,
   ApiFilamentsGroupedServerRoute: ApiFilamentsGroupedServerRoute,

@@ -194,3 +194,43 @@ model MaterialType {
   name     String     @unique
   Filament Filament[]
 }
+
+// Dashboard Analytics Models
+model DashboardAnalytics {
+  id                    Int      @id @unique @default(autoincrement())
+  date                  DateTime @default(now()) @db.Date
+  totalFilaments        Int      @default(0)
+  totalModels           Int      @default(0)
+  totalProducts         Int      @default(0)
+  totalSlicedFiles      Int      @default(0)
+  totalPrintTimeMinutes Int?     // Aggregate print time
+  totalFilamentWeight   Float?   // Aggregate filament weight used
+  totalFilamentCost     Float?   // Aggregate estimated cost
+  mostUsedMaterialType  String?
+  mostUsedBrand         String?
+  avgPrintTime          Float?   // Average print time in minutes
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@unique([date])
+}
+
+model RecentActivity {
+  id          Int                @id @unique @default(autoincrement())
+  type        ActivityType
+  title       String
+  description String?
+  entityType  String // "filament", "model", "product", "sliced_file"
+  entityId    Int
+  metadata    Json? // Flexible field for additional data
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+enum ActivityType {
+  CREATED
+  UPDATED
+  DELETED
+  UPLOADED
+  DOWNLOADED
+}

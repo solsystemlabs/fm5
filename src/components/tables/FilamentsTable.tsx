@@ -99,7 +99,7 @@ export default function FilamentsTable({
                 title="Delete Filament"
                 description="Are you sure you want to delete this filament? This action cannot be undone."
                 itemName={filament.name}
-                onConfirm={() => deleteFilament.mutate(filament.id)}
+                onConfirm={() => deleteFilament.mutate({ id: filament.id })}
                 isLoading={deleteFilament.isPending}
               />
             </FMCell>

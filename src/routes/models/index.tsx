@@ -32,20 +32,11 @@ function ModelsPage() {
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="flex">
         <div className="sm:flex-auto">
-          <h1 className="text-foreground text-base font-semibold">
-            Models & Files
-          </h1>
+          <h1 className="text-foreground text-base font-semibold">Models</h1>
           <p className="text-muted-foreground mt-2 text-sm">
             Explore your 3D models in a hierarchical view. Expand models to see
             their associated files and images.
           </p>
-          {treeData.summary && (
-            <div className="text-muted-foreground mt-3 flex items-center space-x-6 text-sm">
-              <span>{treeData.summary.totalModels} models</span>
-              <span>{treeData.summary.totalFiles} files</span>
-              <span>{treeData.summary.totalImages} images</span>
-            </div>
-          )}
         </div>
         <AddModelDialog
           triggerElement={

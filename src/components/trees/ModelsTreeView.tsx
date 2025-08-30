@@ -14,7 +14,7 @@ import {
   ArrowDownTrayIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { ImageThumbnailGrid } from "../ImagePreviewGallery";
 import { formatFileSize } from "@/lib/file-processing-service";
 import { useDeleteModelFilesTRPC } from "@/lib/trpc-hooks";
@@ -31,6 +31,11 @@ export default function ModelsTreeView({
 }: ModelsTreeViewProps): ReactNode {
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
   const deleteModelFilesMutation = useDeleteModelFilesTRPC();
+  const navigate = useNavigate();
+
+  const handleModelAction = (modelId: string) => {
+    navigate({ to: '/models/$modelId', params: { modelId } });
+  };
 
   const handleDelete = async (file: TreeNode) => {
     if (
@@ -52,6 +57,8 @@ export default function ModelsTreeView({
     }
   };
 
+  // TODO: Rework this; download urls should be saved in the db on the model itself, not generated on the fly here
+  // TODO: What the heck? Don't create a temporary <a> tag and programmatically click it!!!
   const handleDownload = async (file: TreeNode) => {
     if (!file.originalData) return;
 
@@ -101,10 +108,13 @@ export default function ModelsTreeView({
         id={node.id}
         textValue={node.name}
         className="group outline-none"
+        {...(isModel && { onAction: () => handleModelAction(node.id) })}
       >
         <TreeItemContent>
           {({ hasChildItems }) => (
-            <div className="hover:bg-muted/50 mx-1 my-0.5 flex items-center rounded-md py-2 transition-colors">
+            <div
+              className={`hover:bg-muted/50 mx-1 my-0.5 flex items-center rounded-md py-2 transition-colors ${isModel ? 'cursor-pointer' : ''}`}
+            >
               {/* Indentation and chevron */}
               <div
                 className="flex w-full items-center"

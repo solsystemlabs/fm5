@@ -121,21 +121,27 @@ export default function ImagePreviewGallery({
         <ListBox
           aria-label="Image gallery"
           className={`grid ${gridColsClass} gap-4`}
-          items={images.map((image, index) => ({ image, index }))}
+          items={images.map((image, index) => ({ 
+            ...image, 
+            index,
+            id: image.id || `image-${index}` 
+          }))}
         >
-          {({ image, index }) => (
+          {(item) => (
             <ListBoxItem
-              key={image.id || index}
-              textValue={image.name}
+              key={item.id}
+              textValue={item.name}
               className="group bg-muted border-border hover:border-primary/50 relative aspect-square cursor-pointer overflow-hidden rounded-lg border transition-colors"
-              onAction={() => handleImageClick(index)}
+              onAction={() => handleImageClick(item.index)}
             >
               {/* Image */}
               <img
-                src={image.preview || image.url}
-                alt={image.name}
+                src={item.preview || item.url}
+                alt={item.name}
                 className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
                 loading="lazy"
+                crossOrigin="anonymous"
+                decoding="async"
               />
 
               {/* Overlay on hover */}
@@ -147,14 +153,14 @@ export default function ImagePreviewGallery({
                   <div className="absolute top-2 right-2 flex space-x-1">
                     <Button
                       className="rounded-full bg-black/50 p-1 text-white transition-colors hover:bg-black/70"
-                      onPress={() => handleImageClick(index)}
+                      onPress={() => handleImageClick(item.index)}
                     >
                       <EyeIcon className="h-4 w-4" />
                     </Button>
                     {onDelete && (
                       <Button
                         className="rounded-full bg-black/50 p-1 text-white transition-colors hover:bg-red-500"
-                        onPress={() => onDelete(image)}
+                        onPress={() => onDelete(item)}
                       >
                         <TrashIcon className="h-4 w-4" />
                       </Button>
@@ -166,14 +172,14 @@ export default function ImagePreviewGallery({
               {/* Image info overlay */}
               <div className="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                 <p className="truncate text-xs font-medium text-white">
-                  {image.name}
+                  {item.name}
                 </p>
                 <p className="text-xs text-white/80">
-                  {formatFileSize(image.size)}
+                  {formatFileSize(item.size)}
                 </p>
-                {image.category && (
+                {item.category && (
                   <span className="mt-1 inline-block rounded bg-white/20 px-1 py-0.5 text-xs text-white capitalize">
-                    {image.category}
+                    {item.category}
                   </span>
                 )}
               </div>
@@ -225,6 +231,8 @@ export default function ImagePreviewGallery({
                 src={selectedImage.preview || selectedImage.url}
                 alt={selectedImage.name}
                 className="max-h-full max-w-full object-contain"
+                crossOrigin="anonymous"
+                decoding="async"
               />
 
               {/* Image info */}
@@ -308,6 +316,8 @@ export function ImageThumbnailGrid({
                 alt={image.name}
                 className="h-full w-full object-cover"
                 loading="lazy"
+                crossOrigin="anonymous"
+                decoding="async"
               />
               {/* Subtle hover overlay to indicate clickability */}
               <div className="absolute inset-0 bg-black/0 transition-colors duration-200 hover:bg-black/20" />
@@ -320,6 +330,8 @@ export function ImageThumbnailGrid({
                     alt={image.name}
                     className="h-full w-full object-contain"
                     loading="lazy"
+                    crossOrigin="anonymous"
+                    decoding="async"
                   />
                 </div>
                 <div className="text-sm">
@@ -471,6 +483,8 @@ function ImageGalleryContent({
         src={selectedImage.preview || selectedImage.url}
         alt={selectedImage.name}
         className="max-h-full max-w-full object-contain"
+        crossOrigin="anonymous"
+        decoding="async"
       />
 
       {/* Image info */}

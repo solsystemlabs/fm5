@@ -48,8 +48,8 @@ export const ServerRoute = createServerFileRoute(
         0,
       );
       const lowStockFilaments = filamentInventory.filter(
-        (f) => (f.grams || 0) < 100,
-      ); // Less than 100g
+        (f) => (f.grams || 0) < 200,
+      );
 
       // Get print time analytics from sliced files
       const printTimeStats = await prisma.slicedFile.aggregate({
@@ -121,4 +121,3 @@ export const ServerRoute = createServerFileRoute(
     }
   },
 });
-

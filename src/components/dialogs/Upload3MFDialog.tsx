@@ -1,20 +1,21 @@
-import { useModelsTRPC } from "@/lib/trpc-hooks";
 import { useUploadSlicedFileWithProgress } from "@/lib/api-hooks";
+import { useModelsTRPC } from "@/lib/trpc-hooks";
 import { useForm } from "@tanstack/react-form";
+import clsx from "clsx";
 import { type ReactNode, useState } from "react";
 import {
   Button as AriaButton,
+  FieldError,
   FileTrigger,
   Form,
-  Select,
-  SelectValue,
+  Input,
+  Label,
   ListBox,
   ListBoxItem,
   Popover,
+  Select,
+  SelectValue,
   TextField,
-  Label,
-  Input,
-  FieldError,
 } from "react-aria-components";
 import { z } from "zod";
 import FMModal from "../FMModal";
@@ -31,8 +32,6 @@ const uploadFormSchema = z.object({
   file: z.instanceof(File, { message: "File is required" }),
 });
 
-type UploadFormData = z.infer<typeof uploadFormSchema>;
-
 interface UploadProgress {
   loaded: number;
   total: number;
@@ -41,12 +40,16 @@ interface UploadProgress {
   timeRemaining?: string;
 }
 
-export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps) {
+export default function Upload3MFDialog({
+  triggerElement,
+}: Upload3MFDialogProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(
+    null,
+  );
   const [uploadError, setUploadError] = useState<string | null>(null);
-  
+
   const { data: models = [], isLoading: modelsLoading } = useModelsTRPC();
   const { uploadWithProgress } = useUploadSlicedFileWithProgress();
   const [isUploading, setIsUploading] = useState(false);
@@ -62,7 +65,7 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
         setIsUploading(true);
         setUploadError(null);
         setUploadProgress({ loaded: 0, total: value.file.size, percentage: 0 });
-        
+
         const formData = new FormData();
         formData.append("file", value.file);
         formData.append("name", value.name);
@@ -71,14 +74,16 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
         await uploadWithProgress(formData, (progress) => {
           setUploadProgress(progress);
         });
-        
+
         setUploadProgress(null);
         setIsUploading(false);
         form.reset();
         setSelectedFile(null);
       } catch (error) {
         console.error("Upload failed:", error);
-        setUploadError(error instanceof Error ? error.message : 'Upload failed');
+        setUploadError(
+          error instanceof Error ? error.message : "Upload failed",
+        );
         setUploadProgress(null);
         setIsUploading(false);
       }
@@ -90,19 +95,19 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
 
   const handleFileSelect = (files: FileList | null) => {
     if (!files || files.length === 0) return;
-    
+
     const file = files[0];
-    if (!file.name.endsWith('.3mf') && !file.name.endsWith('.gcode.3mf')) {
-      alert('Please select a 3MF file (.3mf or .gcode.3mf)');
+    if (!file.name.endsWith(".3mf") && !file.name.endsWith(".gcode.3mf")) {
+      alert("Please select a 3MF file (.3mf or .gcode.3mf)");
       return;
     }
-    
+
     setSelectedFile(file);
     form.setFieldValue("file", file);
-    
+
     // Auto-populate name from filename
     if (!form.getFieldValue("name")) {
-      const baseName = file.name.replace(/\.(gcode\.)?3mf$/i, '');
+      const baseName = file.name.replace(/\.(gcode\.)?3mf$/i, "");
       form.setFieldValue("name", baseName);
     }
   };
@@ -151,14 +156,16 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
       >
         {/* File Upload Area */}
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-foreground">3MF File</Label>
+          <Label className="text-foreground text-sm font-medium">
+            3MF File
+          </Label>
           <div
-            className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+            className={`rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
               isDragOver
                 ? "border-primary bg-primary/5"
                 : selectedFile
-                ? "border-green-500 bg-green-50 dark:bg-green-950/20"
-                : "border-muted-foreground/25 hover:border-muted-foreground/50"
+                  ? "border-green-500 bg-green-50 dark:bg-green-950/20"
+                  : "border-muted-foreground/25 hover:border-muted-foreground/50"
             }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -166,10 +173,10 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
           >
             {selectedFile ? (
               <div className="space-y-2">
-                <div className="text-green-600 dark:text-green-400 font-medium">
+                <div className="font-medium text-green-600 dark:text-green-400">
                   ✓ {selectedFile.name}
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-muted-foreground text-sm">
                   {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
                 </div>
                 <FileTrigger
@@ -183,12 +190,12 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="text-4xl text-muted-foreground">📁</div>
+                <div className="text-muted-foreground text-4xl">📁</div>
                 <div className="space-y-2">
                   <div className="text-foreground font-medium">
                     Drag and drop your 3MF file here
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-muted-foreground text-sm">
                     or click to browse (.3mf, .gcode.3mf)
                   </div>
                 </div>
@@ -196,16 +203,14 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
                   acceptedFileTypes={[".3mf"]}
                   onSelect={handleFileSelect}
                 >
-                  <FMButton variant="outline">
-                    Browse Files
-                  </FMButton>
+                  <FMButton variant="outline">Browse Files</FMButton>
                 </FileTrigger>
               </div>
             )}
           </div>
           <form.Field name="file">
             {(field) => (
-              <FieldError className="text-sm text-destructive">
+              <FieldError className="text-destructive text-sm">
                 {field.state.meta.errors.join(", ")}
               </FieldError>
             )}
@@ -216,15 +221,17 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
         <form.Field name="name">
           {(field) => (
             <TextField className="space-y-2">
-              <Label className="text-sm font-medium text-foreground">File Name</Label>
+              <Label className="text-foreground text-sm font-medium">
+                File Name
+              </Label>
               <Input
-                className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:ring-primary w-full rounded-md border px-3 py-2 focus:border-transparent focus:ring-2 focus:outline-none"
                 placeholder="Enter a descriptive name"
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
               />
-              <FieldError className="text-sm text-destructive">
+              <FieldError className="text-destructive text-sm">
                 {field.state.meta.errors.join(", ")}
               </FieldError>
             </TextField>
@@ -234,29 +241,38 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
         {/* Model Selection */}
         <form.Field name="modelId">
           {(field) => (
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-foreground">Associated Model</Label>
+            <div className="flex flex-col space-y-2">
+              <Label className="text-foreground text-sm font-medium">
+                Associated Model
+              </Label>
               <Select
                 selectedKey={field.state.value || null}
                 onSelectionChange={(key) => field.handleChange(Number(key))}
-                className="w-full"
+                className="flex w-full"
               >
-                <AriaButton className="w-full flex items-center justify-between px-3 py-2 border border-input rounded-md bg-background text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-primary">
+                <AriaButton
+                  className={clsx(
+                    "border-input bg-background text-foreground focus:ring-primary flex w-full items-center justify-between rounded-md border px-3 py-2",
+                    "hover:bg-accent",
+                    "focus:ring-2 focus:outline-none",
+                  )}
+                >
                   <SelectValue className="flex-1 text-left">
                     {field.state.value
-                      ? models.find((m) => m.id === field.state.value)?.name || "Select a model"
+                      ? models.find((m) => m.id === field.state.value)?.name ||
+                        "Select a model"
                       : "Select a model"}
                   </SelectValue>
                   <span className="ml-2">▼</span>
                 </AriaButton>
-                <Popover className="w-full">
-                  <ListBox className="max-h-60 overflow-auto border border-border rounded-md bg-popover shadow-lg">
+                <Popover className="w-full max-w-80">
+                  <ListBox className="border-border bg-popover max-h-60 overflow-auto rounded-md border shadow-lg">
                     {modelsLoading ? (
-                      <ListBoxItem className="px-3 py-2 text-muted-foreground">
+                      <ListBoxItem className="text-muted-foreground px-3 py-2">
                         Loading models...
                       </ListBoxItem>
                     ) : models.length === 0 ? (
-                      <ListBoxItem className="px-3 py-2 text-muted-foreground">
+                      <ListBoxItem className="text-muted-foreground px-3 py-2">
                         No models available
                       </ListBoxItem>
                     ) : (
@@ -264,7 +280,7 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
                         <ListBoxItem
                           key={model.id}
                           id={model.id}
-                          className="px-3 py-2 hover:bg-accent cursor-pointer focus:bg-accent focus:outline-none"
+                          className="hover:bg-accent focus:bg-accent cursor-pointer px-3 py-2 focus:outline-none"
                         >
                           {model.name}
                         </ListBoxItem>
@@ -273,7 +289,7 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
                   </ListBox>
                 </Popover>
               </Select>
-              <FieldError className="text-sm text-destructive">
+              <FieldError className="text-destructive text-sm">
                 {field.state.meta.errors.join(", ")}
               </FieldError>
             </div>
@@ -282,29 +298,32 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
 
         {/* Upload Progress */}
         {uploadProgress && (
-          <div className="space-y-3 p-4 bg-muted/50 rounded-lg border">
+          <div className="bg-muted/50 space-y-3 rounded-lg border p-4">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium">Uploading file...</span>
-              <span className="text-muted-foreground">{uploadProgress.percentage}%</span>
+              <span className="text-muted-foreground">
+                {uploadProgress.percentage}%
+              </span>
             </div>
-            
+
             {/* Progress Bar */}
-            <div className="w-full bg-muted rounded-full h-2">
-              <div 
+            <div className="bg-muted h-2 w-full rounded-full">
+              <div
                 className="bg-primary h-2 rounded-full transition-all duration-300 ease-out"
                 style={{ width: `${uploadProgress.percentage}%` }}
               />
             </div>
-            
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
+
+            <div className="text-muted-foreground flex items-center justify-between text-xs">
               <span>
-                {(uploadProgress.loaded / (1024 * 1024)).toFixed(1)} MB of{' '}
+                {(uploadProgress.loaded / (1024 * 1024)).toFixed(1)} MB of{" "}
                 {(uploadProgress.total / (1024 * 1024)).toFixed(1)} MB
               </span>
               {uploadProgress.speed && (
                 <span>
                   {uploadProgress.speed}
-                  {uploadProgress.timeRemaining && ` • ${uploadProgress.timeRemaining} remaining`}
+                  {uploadProgress.timeRemaining &&
+                    ` • ${uploadProgress.timeRemaining} remaining`}
                 </span>
               )}
             </div>
@@ -313,7 +332,7 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
 
         {/* Upload Error */}
         {uploadError && (
-          <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+          <div className="text-destructive bg-destructive/10 rounded-md p-3 text-sm">
             Upload failed: {uploadError}
           </div>
         )}
@@ -321,3 +340,4 @@ export default function Upload3MFDialog({ triggerElement }: Upload3MFDialogProps
     </FMModal>
   );
 }
+

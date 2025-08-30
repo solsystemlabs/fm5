@@ -15,6 +15,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import FMInput from "./FMInput";
+import clsx from "clsx";
 
 export type CreatableSelectItem = {
   id: string | number;
@@ -126,7 +127,13 @@ export default function CreatableSelect<T extends CreatableSelectItem>({
           <Popover
             triggerRef={triggerRef}
             placement="bottom start"
-            className="ring-opacity-5 bg-popover border-border max-h-60 overflow-auto rounded-md border py-1 text-base shadow-lg ring-1 ring-black focus:outline-none sm:text-sm"
+            className={clsx(
+              "max-h-60 overflow-auto rounded-md py-1",
+              "bg-popover ring-black",
+              "ring-opacity-5 border-border border ring-1",
+              "text-base sm:text-sm",
+              "shadow-lg focus:outline-none",
+            )}
             style={{
               width: triggerRef.current?.offsetWidth
                 ? `${triggerRef.current.offsetWidth}px`
@@ -185,7 +192,10 @@ export default function CreatableSelect<T extends CreatableSelectItem>({
                     <ListBoxItem
                       key={item.id}
                       id={item.id}
-                      className="text-popover-foreground hover:bg-accent hover:text-accent-foreground relative cursor-default py-2 pr-9 pl-3 select-none"
+                      className={clsx(
+                        "text-popover-foreground relative cursor-default py-2 pr-9 pl-3 select-none",
+                        "hover:bg-accent hover:text-accent-foreground",
+                      )}
                     >
                       {item.name}
                     </ListBoxItem>
@@ -208,4 +218,3 @@ export default function CreatableSelect<T extends CreatableSelectItem>({
     </div>
   );
 }
-

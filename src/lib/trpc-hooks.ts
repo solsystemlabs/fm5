@@ -1,6 +1,4 @@
 /**
- * Type-safe tRPC hooks to replace the existing api-hooks.ts
- * 
  * This file provides React Query hooks using tRPC for type safety.
  * It maintains compatibility with the existing patterns while adding
  * end-to-end type safety.
@@ -39,14 +37,14 @@ export function useCreateFilamentTRPC() {
     trpc.filaments.create.mutationOptions({
       onSuccess: () => {
         // Invalidate related queries
-        queryClient.invalidateQueries({ 
-          queryKey: [["filaments", "list"]]
+        queryClient.invalidateQueries({
+          queryKey: [["filaments", "list"]],
         });
-        queryClient.invalidateQueries({ 
-          queryKey: [["filaments", "grouped"]]
+        queryClient.invalidateQueries({
+          queryKey: [["filaments", "grouped"]],
         });
       },
-    })
+    }),
   );
 }
 
@@ -58,11 +56,11 @@ export function useUpdateFilamentTRPC() {
     trpc.filaments.update.mutationOptions({
       onSuccess: () => {
         // Invalidate related queries
-        queryClient.invalidateQueries({ 
-          queryKey: [["filaments"]]
+        queryClient.invalidateQueries({
+          queryKey: [["filaments"]],
         });
       },
-    })
+    }),
   );
 }
 
@@ -74,14 +72,14 @@ export function useDeleteFilamentTRPC() {
     trpc.filaments.delete.mutationOptions({
       onSuccess: () => {
         // Invalidate related queries
-        queryClient.invalidateQueries({ 
-          queryKey: [["filaments"]]
+        queryClient.invalidateQueries({
+          queryKey: [["filaments"]],
         });
-        queryClient.invalidateQueries({ 
-          queryKey: [["models"]]
+        queryClient.invalidateQueries({
+          queryKey: [["models"]],
         });
       },
-    })
+    }),
   );
 }
 
@@ -109,11 +107,11 @@ export function useCreateModelTRPC() {
   return useMutation(
     trpc.models.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ 
-          queryKey: [["models"]]
+        queryClient.invalidateQueries({
+          queryKey: [["models"]],
         });
       },
-    })
+    }),
   );
 }
 
@@ -124,11 +122,11 @@ export function useUpdateModelTRPC() {
   return useMutation(
     trpc.models.update.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ 
-          queryKey: [["models"]]
+        queryClient.invalidateQueries({
+          queryKey: [["models"]],
         });
       },
-    })
+    }),
   );
 }
 
@@ -139,11 +137,11 @@ export function useDeleteModelTRPC() {
   return useMutation(
     trpc.models.delete.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ 
-          queryKey: [["models"]]
+        queryClient.invalidateQueries({
+          queryKey: [["models"]],
         });
       },
-    })
+    }),
   );
 }
 
@@ -154,11 +152,11 @@ export function useDeleteModelFilesTRPC() {
   return useMutation(
     trpc.models.deleteFiles.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ 
-          queryKey: [["models"]]
+        queryClient.invalidateQueries({
+          queryKey: [["models"]],
         });
       },
-    })
+    }),
   );
 }
 
@@ -186,11 +184,11 @@ export function useCreateProductTRPC() {
   return useMutation(
     trpc.products.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ 
-          queryKey: [["products"]]
+        queryClient.invalidateQueries({
+          queryKey: [["products"]],
         });
       },
-    })
+    }),
   );
 }
 
@@ -201,11 +199,11 @@ export function useUpdateProductTRPC() {
   return useMutation(
     trpc.products.update.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ 
-          queryKey: [["products"]]
+        queryClient.invalidateQueries({
+          queryKey: [["products"]],
         });
       },
-    })
+    }),
   );
 }
 
@@ -216,11 +214,11 @@ export function useDeleteProductTRPC() {
   return useMutation(
     trpc.products.delete.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ 
-          queryKey: [["products"]]
+        queryClient.invalidateQueries({
+          queryKey: [["products"]],
         });
       },
-    })
+    }),
   );
 }
 
@@ -248,11 +246,11 @@ export function useCreateSlicedFileTRPC() {
   return useMutation(
     trpc.slicedFiles.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ 
-          queryKey: [["slicedFiles"]]
+        queryClient.invalidateQueries({
+          queryKey: [["slicedFiles"]],
         });
       },
-    })
+    }),
   );
 }
 
@@ -263,11 +261,11 @@ export function useDeleteSlicedFileTRPC() {
   return useMutation(
     trpc.slicedFiles.delete.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ 
-          queryKey: [["slicedFiles"]]
+        queryClient.invalidateQueries({
+          queryKey: [["slicedFiles"]],
         });
       },
-    })
+    }),
   );
 }
 
@@ -285,11 +283,11 @@ export function useCreateBrandTRPC() {
   return useMutation(
     trpc.brands.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ 
-          queryKey: [["brands"]]
+        queryClient.invalidateQueries({
+          queryKey: [["brands"]],
         });
       },
-    })
+    }),
   );
 }
 
@@ -305,11 +303,11 @@ export function useCreateMaterialTypeTRPC() {
   return useMutation(
     trpc.materialTypes.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ 
-          queryKey: [["materialTypes"]]
+        queryClient.invalidateQueries({
+          queryKey: [["materialTypes"]],
         });
       },
-    })
+    }),
   );
 }
 
@@ -325,11 +323,11 @@ export function useCreateFilamentTypeTRPC() {
   return useMutation(
     trpc.filamentTypes.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ 
-          queryKey: [["filamentTypes"]]
+        queryClient.invalidateQueries({
+          queryKey: [["filamentTypes"]],
         });
       },
-    })
+    }),
   );
 }
 
@@ -345,10 +343,11 @@ export function useCreateModelCategoryTRPC() {
   return useMutation(
     trpc.modelCategories.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ 
-          queryKey: [["modelCategories"]]
+        queryClient.invalidateQueries({
+          queryKey: [["modelCategories"]],
         });
       },
-    })
+    }),
   );
 }
+

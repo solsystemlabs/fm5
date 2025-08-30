@@ -1,15 +1,14 @@
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
-    image: postgres:18
+    image: postgres:18beta3
     container_name: fm5-postgres
     restart: always
     environment:
       POSTGRES_DB: fm5_dev
       POSTGRES_USER: fm5_user
       POSTGRES_PASSWORD: fm5_password
-      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
     volumes:
@@ -24,3 +23,4 @@ services:
 volumes:
   postgres_data:
     driver: local
+

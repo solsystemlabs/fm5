@@ -497,7 +497,7 @@ export function useCreateFilament() {
       // Invalidate and refetch filaments after creating a new one
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.filaments });
       // Update dashboard analytics
-      queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-analytics"] });
     },
   });
 }
@@ -511,7 +511,7 @@ export function useCreateModel() {
       // Invalidate and refetch models after creating a new one
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.models });
       // Update dashboard analytics
-      queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-analytics"] });
     },
   });
 }
@@ -613,7 +613,7 @@ export function useCreateProduct() {
       // Invalidate and refetch products after creating a new one
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.products });
       // Update dashboard analytics
-      queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-analytics"] });
     },
   });
 }
@@ -634,7 +634,7 @@ export function useUploadSlicedFile() {
       // Invalidate and refetch sliced files after uploading a new one
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.slicedFiles });
       // Update dashboard analytics
-      queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-analytics"] });
     },
   });
 }
@@ -643,7 +643,7 @@ export function useUploadSlicedFileWithProgress() {
   const queryClient = useQueryClient();
 
   return {
-    uploadWithProgress: (
+    uploadWithProgress: async (
       formData: FormData,
       onProgress?: (progress: {
         loaded: number;
@@ -659,7 +659,7 @@ export function useUploadSlicedFileWithProgress() {
           // Invalidate and refetch sliced files after uploading a new one
           queryClient.invalidateQueries({ queryKey: QUERY_KEYS.slicedFiles });
           // Update dashboard analytics
-          queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] });
+          queryClient.invalidateQueries({ queryKey: ["dashboard-analytics"] });
           return result;
         });
     },
@@ -764,7 +764,7 @@ export function useDeleteModel() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.models });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.modelFiles });
       // Update dashboard analytics
-      queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-analytics"] });
     },
   });
 }
@@ -780,7 +780,7 @@ export function useDeleteFilament() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.filamentsGrouped });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.models }); // Models might reference filaments
       // Update dashboard analytics
-      queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-analytics"] });
     },
   });
 }
@@ -794,7 +794,7 @@ export function useDeleteProduct() {
       // Invalidate relevant queries after deleting product
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.products });
       // Update dashboard analytics
-      queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-analytics"] });
     },
   });
 }
@@ -808,8 +808,7 @@ export function useDeleteSlicedFile() {
       // Invalidate relevant queries after deleting sliced file
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.slicedFiles });
       // Update dashboard analytics
-      queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-analytics"] });
     },
   });
 }
-

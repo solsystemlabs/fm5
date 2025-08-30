@@ -13,6 +13,8 @@ import {
   EyeIcon,
   ArrowDownTrayIcon,
   TrashIcon,
+  CubeIcon,
+  PlayIcon,
 } from "@heroicons/react/24/outline";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ImageThumbnailGrid } from "../ImagePreviewGallery";
@@ -46,10 +48,22 @@ export default function ModelsTreeView({
     }
 
     try {
-      await deleteModelFilesMutation.mutateAsync({
-        fileIds: [file.originalData.id],
-        type: file.type === "modelImage" ? "modelImage" : "modelFile",
-      });
+      // Map new node types to deletion parameters
+      if (file.type === "modelImage") {
+        // Delete from tagged union File system
+        await deleteModelFilesMutation.mutateAsync({
+          imageFileIds: [file.originalData.id],
+        });
+      } else if (file.type === "modelFile") {
+        await deleteModelFilesMutation.mutateAsync({
+          modelFileIds: [file.originalData.id],
+        });
+      } else if (file.type === "threeMFFile") {
+        await deleteModelFilesMutation.mutateAsync({
+          threeMFFileIds: [file.originalData.id],
+        });
+      }
+      // Note: slicedFile deletion would be handled via threeMFFile cascade
     } catch (error) {
       alert(
         `Failed to delete file: ${error instanceof Error ? error.message : "Unknown error"}`,
@@ -63,10 +77,26 @@ export default function ModelsTreeView({
     if (!file.originalData) return;
 
     try {
-      const downloadEndpoint =
-        file.type === "modelImage"
-          ? `/api/download/model-image/${file.originalData.id}`
-          : `/api/download/model-file/${file.originalData.id}`;
+      let downloadEndpoint: string;
+      
+      // Map to appropriate download endpoints based on file type
+      switch (file.type) {
+        case "modelImage":
+          downloadEndpoint = `/api/download/model-image/${file.originalData.id}`;
+          break;
+        case "modelFile":
+          downloadEndpoint = `/api/download/model-file/${file.originalData.id}`;
+          break;
+        case "threeMFFile":
+          // TODO: Create threeMF download endpoint
+          downloadEndpoint = `/api/download/threemf-file/${file.originalData.id}`;
+          break;
+        case "slicedFile":
+          downloadEndpoint = `/api/download/sliced-files/${file.originalData.id}/download`;
+          break;
+        default:
+          throw new Error(`Unsupported file type: ${file.type}`);
+      }
 
       const response = await fetch(downloadEndpoint);
 
@@ -92,15 +122,23 @@ export default function ModelsTreeView({
   };
 
   const getFileTypeIcon = (node: TreeNode) => {
-    if (node.type === "modelImage") {
-      return <PhotoIcon className="h-4 w-4 text-blue-500" />;
+    switch (node.type) {
+      case "modelImage":
+        return <PhotoIcon className="h-4 w-4 text-blue-500" />;
+      case "modelFile":
+        return <DocumentIcon className="h-4 w-4 text-gray-500" />;
+      case "threeMFFile":
+        return <CubeIcon className="h-4 w-4 text-purple-500" />;
+      case "slicedFile":
+        return <PlayIcon className="h-4 w-4 text-green-500" />;
+      default:
+        return <DocumentIcon className="h-4 w-4 text-gray-500" />;
     }
-    return <DocumentIcon className="h-4 w-4 text-gray-500" />;
   };
 
   const renderTreeItem = (node: TreeNode): ReactNode => {
     const isModel = node.type === "model";
-    const isFile = node.type === "modelFile" || node.type === "modelImage";
+    const isFile = node.type === "modelFile" || node.type === "modelImage" || node.type === "threeMFFile" || node.type === "slicedFile";
 
     return (
       <TreeItem
@@ -171,6 +209,14 @@ export default function ModelsTreeView({
                                 </span>
                               </div>
                             )}
+                            {node.fileCounts.slicedFiles && node.fileCounts.slicedFiles > 0 && (
+                              <div className="flex items-center space-x-1">
+                                <PlayIcon className="h-4 w-4 text-green-600" />
+                                <span>
+                                  {node.fileCounts.slicedFiles} sliced
+                                </span>
+                              </div>
+                            )}
                           </div>
                         )}
                         {node.filaments && node.filaments.length > 0 && (
@@ -227,6 +273,8 @@ export default function ModelsTreeView({
                       <div className="text-muted-foreground text-sm">
                         {node.fileExtension?.toUpperCase()}{" "}
                         {node.size && `• ${formatFileSize(node.size)}`}
+                        {node.type === "threeMFFile" && node.hasGcode && " • Sliced"}
+                        {node.type === "slicedFile" && node.printTimeMinutes && ` • ${Math.round(node.printTimeMinutes / 60)}h ${node.printTimeMinutes % 60}m`}
                       </div>
                     </div>
 

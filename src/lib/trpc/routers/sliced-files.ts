@@ -4,7 +4,7 @@ import { router, publicProcedure, handlePrismaError } from '../init';
 // Input validation schemas
 const createSlicedFileSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  modelId: z.number().int().positive("Valid model ID is required"),
+  threeMFFileId: z.number().int().positive("Valid ThreeMF file ID is required"),
   url: z.string().url("Valid URL is required"),
   size: z.number().int().positive("Valid file size is required"),
   s3Key: z.string().optional(),
@@ -47,10 +47,13 @@ export const slicedFilesRouter = router({
               filamentIndex: "asc"
             }
           },
-          ModelFile: true,
-          Model: {
+          ThreeMFFile: {
             include: {
-              Category: true,
+              Model: {
+                include: {
+                  Category: true,
+                },
+              },
             },
           },
         },
@@ -85,10 +88,13 @@ export const slicedFilesRouter = router({
                 },
               },
             },
-            ModelFile: true,
-            Model: {
+            ThreeMFFile: {
               include: {
-                Category: true,
+                Model: {
+                  include: {
+                    Category: true,
+                  },
+                },
               },
             },
           },
@@ -109,10 +115,13 @@ export const slicedFilesRouter = router({
             SlicedFileFilaments: {
               orderBy: { filamentIndex: "asc" }
             },
-            ModelFile: true,
-            Model: {
+            ThreeMFFile: {
               include: {
-                Category: true,
+                Model: {
+                  include: {
+                    Category: true,
+                  },
+                },
               },
             },
           },
@@ -136,10 +145,13 @@ export const slicedFilesRouter = router({
             SlicedFileFilaments: {
               orderBy: { filamentIndex: "asc" }
             },
-            ModelFile: true,
-            Model: {
+            ThreeMFFile: {
               include: {
-                Category: true,
+                Model: {
+                  include: {
+                    Category: true,
+                  },
+                },
               },
             },
           },
@@ -164,20 +176,64 @@ export const slicedFilesRouter = router({
       }
     }),
 
-  // Get sliced files by model ID
-  byModel: publicProcedure
-    .input(z.object({ modelId: z.number() }))
+  // Get sliced files by ThreeMF file ID
+  byThreeMFFile: publicProcedure
+    .input(z.object({ threeMFFileId: z.number() }))
     .query(async ({ ctx, input }) => {
       try {
         return await ctx.prisma.slicedFile.findMany({
-          where: { modelId: input.modelId },
+          where: { threeMFFileId: input.threeMFFileId },
           include: {
             SlicedFileFilaments: {
               orderBy: {
                 filamentIndex: "asc"
               }
             },
-            ModelFile: true,
+            ThreeMFFile: {
+              include: {
+                Model: {
+                  include: {
+                    Category: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        });
+      } catch (error) {
+        handlePrismaError(error, "Failed to fetch sliced files for ThreeMF file");
+      }
+    }),
+
+  // Get sliced files by model ID (via ThreeMF files)
+  byModel: publicProcedure
+    .input(z.object({ modelId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        return await ctx.prisma.slicedFile.findMany({
+          where: {
+            ThreeMFFile: {
+              modelId: input.modelId,
+            },
+          },
+          include: {
+            SlicedFileFilaments: {
+              orderBy: {
+                filamentIndex: "asc"
+              }
+            },
+            ThreeMFFile: {
+              include: {
+                Model: {
+                  include: {
+                    Category: true,
+                  },
+                },
+              },
+            },
           },
           orderBy: {
             createdAt: "desc",
@@ -185,6 +241,23 @@ export const slicedFilesRouter = router({
         });
       } catch (error) {
         handlePrismaError(error, "Failed to fetch sliced files for model");
+      }
+    }),
+
+  // Get images for a specific sliced file
+  images: publicProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        return await ctx.prisma.file.findMany({
+          where: {
+            entityType: 'SLICED_FILE',
+            entityId: input.id,
+          },
+          orderBy: { createdAt: 'desc' },
+        });
+      } catch (error) {
+        handlePrismaError(error, "Failed to fetch sliced file images");
       }
     }),
 

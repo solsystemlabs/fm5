@@ -226,10 +226,14 @@ function hasGcodeEmbedded(filename: string): boolean {
  */
 export async function createImagePreview(file: File): Promise<string> {
   try {
-    // In server environment, we don't need actual blob URLs
-    // Just return a placeholder that indicates the file is processable
-    const arrayBuffer = await file.arrayBuffer();
-    return `data:${file.type};base64,${Buffer.from(arrayBuffer).toString('base64').substring(0, 100)}...`;
+    // Create a blob URL for browser environment (client-side)
+    if (typeof window !== 'undefined') {
+      return URL.createObjectURL(file);
+    }
+    
+    // For server-side processing, create a simple data URL without full base64 encoding
+    // Just return a placeholder since we don't need actual previews on server
+    return `data:${file.type};base64,placeholder`;
   } catch (error) {
     throw new Error(`Failed to process image: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
@@ -426,6 +430,17 @@ export async function extractZipFilesWithProgress(
       !zipEntry.dir && !filename.startsWith('__MACOSX/') && !filename.startsWith('.DS_Store')
     );
 
+    logger.info('ZIP file contents found', {
+      totalFiles: Object.keys(zipData.files).length,
+      allFiles: Object.keys(zipData.files),
+      filesToProcess: filesToProcess.length,
+      fileList: filesToProcess.map(([filename, zipEntry]) => ({ 
+        name: filename, 
+        size: zipEntry._data?.uncompressedSize || 0,
+        dir: zipEntry.dir 
+      }))
+    });
+
     const totalFiles = filesToProcess.length;
     let processedFiles = 0;
 
@@ -446,6 +461,15 @@ export async function extractZipFilesWithProgress(
 
         result.totalSize += extractedFile.size;
         result.extractedCount++;
+
+        logger.info('Processing extracted file from ZIP', {
+          filename,
+          size: extractedFile.size,
+          type: extractedFile.type,
+          isImage: isImageFile(extractedFile),
+          is3MF: is3MFFile(extractedFile),
+          isModel: isModelFile(extractedFile)
+        });
 
         // Enhanced processing logic with proper 3MF separation
         if (is3MFFile(extractedFile)) {

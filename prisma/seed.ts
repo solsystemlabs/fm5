@@ -167,7 +167,7 @@ async function main() {
       data: [
         {
           name: `${model.name}_main_view.jpg`,
-          url: `https://s3.aws.com/fm5-images/models/${model.name.toLowerCase().replace(/ /g, '_')}_main.jpg`,
+          url: `https://picsum.photos/600/400?random=${Math.floor(Math.random() * 1000)}`,
           size: 125000 + Math.floor(Math.random() * 50000),
           s3Key: `images/models/${model.name.toLowerCase().replace(/ /g, '_')}_main.jpg`,
           mimeType: 'image/jpeg',
@@ -176,7 +176,7 @@ async function main() {
         },
         {
           name: `${model.name}_detail_view.jpg`,
-          url: `https://s3.aws.com/fm5-images/models/${model.name.toLowerCase().replace(/ /g, '_')}_detail.jpg`,
+          url: `https://picsum.photos/600/400?random=${Math.floor(Math.random() * 1000)}`,
           size: 98000 + Math.floor(Math.random() * 40000),
           s3Key: `images/models/${model.name.toLowerCase().replace(/ /g, '_')}_detail.jpg`,
           mimeType: 'image/jpeg',
@@ -205,7 +205,7 @@ async function main() {
       data: [
         {
           name: 'thumbnail.png',
-          url: `https://s3.aws.com/fm5-images/3mf/${model.name.toLowerCase().replace(/ /g, '_')}_thumbnail.png`,
+          url: `https://picsum.photos/300/300?random=${Math.floor(Math.random() * 1000)}`,
           size: 85000 + Math.floor(Math.random() * 30000),
           s3Key: `images/3mf/${model.name.toLowerCase().replace(/ /g, '_')}_thumbnail.png`,
           mimeType: 'image/png',
@@ -214,7 +214,7 @@ async function main() {
         },
         {
           name: 'preview.png',
-          url: `https://s3.aws.com/fm5-images/3mf/${model.name.toLowerCase().replace(/ /g, '_')}_preview.png`,
+          url: `https://picsum.photos/500/400?random=${Math.floor(Math.random() * 1000)}`,
           size: 120000 + Math.floor(Math.random() * 40000),
           s3Key: `images/3mf/${model.name.toLowerCase().replace(/ /g, '_')}_preview.png`,
           mimeType: 'image/png',
@@ -375,7 +375,7 @@ async function main() {
       data: [
         {
           name: 'layer_preview.png',
-          url: `https://s3.aws.com/fm5-images/sliced/${product.name.toLowerCase().replace(/ /g, '_')}_layers.png`,
+          url: `https://picsum.photos/400/400?random=${Math.floor(Math.random() * 1000)}`,
           size: 180000 + Math.floor(Math.random() * 60000),
           s3Key: `images/sliced/${product.name.toLowerCase().replace(/ /g, '_')}_layers.png`,
           mimeType: 'image/png',
@@ -384,7 +384,7 @@ async function main() {
         },
         {
           name: 'print_preview.jpg',
-          url: `https://s3.aws.com/fm5-images/sliced/${product.name.toLowerCase().replace(/ /g, '_')}_preview.jpg`,
+          url: `https://picsum.photos/600/400?random=${Math.floor(Math.random() * 1000)}`,
           size: 220000 + Math.floor(Math.random() * 80000),
           s3Key: `images/sliced/${product.name.toLowerCase().replace(/ /g, '_')}_preview.jpg`,
           mimeType: 'image/jpeg',

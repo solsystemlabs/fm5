@@ -269,6 +269,146 @@ export function useDeleteSlicedFileTRPC() {
   );
 }
 
+// ===== THREEMF FILES =====
+
+export function useThreeMFFilesTRPC() {
+  const trpc = useTRPC();
+  return useQuery(trpc.threeMFFiles.list.queryOptions());
+}
+
+export function useThreeMFFileByIdTRPC(id: number) {
+  const trpc = useTRPC();
+  return useQuery(trpc.threeMFFiles.byId.queryOptions({ id }));
+}
+
+export function useThreeMFFilesByModelTRPC(modelId: number) {
+  const trpc = useTRPC();
+  return useQuery(trpc.threeMFFiles.byModelId.queryOptions({ modelId }));
+}
+
+export function useCreateThreeMFFileTRPC() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    trpc.threeMFFiles.create.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: [["threeMFFiles"]],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [["models"]],
+        });
+      },
+    }),
+  );
+}
+
+export function useDeleteThreeMFFileTRPC() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    trpc.threeMFFiles.delete.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: [["threeMFFiles"]],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [["models"]],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [["slicedFiles"]],
+        });
+      },
+    }),
+  );
+}
+
+// ===== FILES (Tagged Union System) =====
+
+export function useFilesByEntityTRPC(entityType: 'MODEL' | 'THREE_MF' | 'SLICED_FILE', entityId: number) {
+  const trpc = useTRPC();
+  return useQuery(trpc.files.byEntity.queryOptions({ entityType, entityId }));
+}
+
+export function useFileByIdTRPC(id: number) {
+  const trpc = useTRPC();
+  return useQuery(trpc.files.byId.queryOptions({ id }));
+}
+
+export function useFileStatsTRPC() {
+  const trpc = useTRPC();
+  return useQuery(trpc.files.stats.queryOptions());
+}
+
+export function useCreateFileTRPC() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    trpc.files.create.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: [["files"]],
+        });
+      },
+    }),
+  );
+}
+
+export function useCreateManyFilesTRPC() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    trpc.files.createMany.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: [["files"]],
+        });
+      },
+    }),
+  );
+}
+
+export function useDeleteFilesTRPC() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    trpc.files.delete.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: [["files"]],
+        });
+      },
+    }),
+  );
+}
+
+// ===== DASHBOARD =====
+
+export function useDashboardAnalyticsTRPC() {
+  const trpc = useTRPC();
+  return useQuery(trpc.dashboard.analytics.queryOptions());
+}
+
+export function useDashboardOverviewTRPC() {
+  const trpc = useTRPC();
+  return useQuery(trpc.dashboard.overview.queryOptions());
+}
+
+export function useDashboardInventoryTRPC() {
+  const trpc = useTRPC();
+  return useQuery(trpc.dashboard.inventory.queryOptions());
+}
+
+export function useDashboardPrintStatsTRPC() {
+  const trpc = useTRPC();
+  return useQuery(trpc.dashboard.printStats.queryOptions());
+}
+
 // ===== UTILITY DATA =====
 
 export function useBrandsTRPC() {

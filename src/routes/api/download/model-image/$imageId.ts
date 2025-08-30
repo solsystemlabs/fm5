@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { z } from "zod";
-import { generateSignedDownloadUrl, generateModelImageS3Key } from "@/lib/s3-service";
+import { generateSignedDownloadUrl } from "@/lib/s3-service";
 import { logger } from "@/lib/logger";
 
 const prisma = new PrismaClient();
@@ -18,51 +18,65 @@ export const ServerRoute = createServerFileRoute("/api/download/model-image/$ima
       const validatedParams = paramsSchema.parse(params);
       const imageId = validatedParams.imageId;
 
-      // Find the model image
-      const modelImage = await prisma.modelImage.findUnique({
+      // Find the image in the tagged union File system
+      const imageFile = await prisma.file.findUnique({
         where: { id: imageId },
-        include: {
-          Model: {
-            select: {
-              id: true,
-              name: true,
-            }
-          }
-        }
       });
 
-      if (!modelImage) {
+      if (!imageFile) {
         return Response.json(
           { error: "Image not found" },
           { status: 404 }
         );
       }
 
-      logger.info('Generating download URL for model image', {
+      // Ensure this is actually an image file
+      if (!imageFile.mimeType?.startsWith('image/')) {
+        return Response.json(
+          { error: "File is not an image" },
+          { status: 400 }
+        );
+      }
+
+      logger.info('Generating download URL for image file', {
         imageId,
-        imageName: modelImage.name,
-        modelId: modelImage.modelId,
-        modelName: modelImage.Model.name
+        imageName: imageFile.name,
+        entityType: imageFile.entityType,
+        entityId: imageFile.entityId,
+        mimeType: imageFile.mimeType
       });
 
-      // Generate the S3 key for this image
-      const s3Key = generateModelImageS3Key(modelImage.modelId, modelImage.name);
+      // Use S3 key if available, otherwise generate from URL
+      const s3Key = imageFile.s3Key;
+      if (!s3Key) {
+        logger.warn('No S3 key found for image file, returning direct URL', {
+          imageId,
+          imageName: imageFile.name
+        });
+        
+        return Response.json({
+          downloadUrl: imageFile.url,
+          filename: imageFile.name,
+          size: imageFile.size,
+          contentType: imageFile.mimeType || getContentTypeFromFilename(imageFile.name)
+        });
+      }
 
       // Generate signed download URL (expires in 1 hour)
       const downloadUrl = await generateSignedDownloadUrl(s3Key, 3600);
 
       logger.info('Download URL generated successfully', {
         imageId,
-        imageName: modelImage.name,
+        imageName: imageFile.name,
         s3Key
       });
 
       // Return the signed URL
       return Response.json({
         downloadUrl,
-        filename: modelImage.name,
-        size: modelImage.size,
-        contentType: getContentTypeFromFilename(modelImage.name)
+        filename: imageFile.name,
+        size: imageFile.size,
+        contentType: imageFile.mimeType || getContentTypeFromFilename(imageFile.name)
       });
 
     } catch (error) {

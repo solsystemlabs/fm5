@@ -720,17 +720,20 @@ export async function uploadModelImage(
 export interface BatchUploadResult {
   modelFiles: Array<UploadResult & { filename: string; error?: string }>;
   images: Array<UploadResult & { filename: string; error?: string }>;
+  threeMFFiles: Array<UploadResult & { filename: string; error?: string }>;
 }
 
 export async function uploadModelFilesAndImages(
   modelFiles: File[],
   images: File[],
+  threeMFFiles: File[] = [],
   modelId: number,
   options: StreamingUploadOptions = {}
 ): Promise<BatchUploadResult> {
   const result: BatchUploadResult = {
     modelFiles: [],
-    images: []
+    images: [],
+    threeMFFiles: []
   };
 
   // Upload model files
@@ -766,6 +769,27 @@ export async function uploadModelFilesAndImages(
         error: error instanceof Error ? error.message : 'Unknown error'
       });
       result.images.push({
+        s3Key: '',
+        s3Url: '',
+        size: file.size,
+        filename: file.name,
+        error: error instanceof Error ? error.message : 'Upload failed'
+      });
+    }
+  }
+
+  // Upload 3MF files
+  for (const file of threeMFFiles) {
+    try {
+      const uploadResult = await upload3MFFile(file, modelId, options);
+      result.threeMFFiles.push({ ...uploadResult, filename: file.name });
+    } catch (error) {
+      logger.error('Failed to upload 3MF file', {
+        filename: file.name,
+        modelId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      result.threeMFFiles.push({
         s3Key: '',
         s3Url: '',
         size: file.size,

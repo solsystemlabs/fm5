@@ -8,16 +8,11 @@ import { DashboardAnalytics } from "@/components/dashboard/DashboardAnalytics";
 import { DashboardBento } from "@/components/dashboard/DashboardBento";
 import { DashboardDetailed } from "@/components/dashboard/DashboardDetailed";
 import { DashboardError } from "@/components/dashboard/DashboardError";
-import { useDashboardAnalyticsSuspense, dashboardAnalyticsQueryOptions } from "@/lib/api-hooks/dashboard";
-import { useQueryClient } from "@tanstack/react-query";
+import { useDashboardAnalyticsTRPC } from "@/lib/trpc-hooks";
+import { useTRPC } from "@/lib/trpc/client";
+import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/dashboard")({
-  // Always fetch fresh dashboard data when route is loaded
-  loader: ({ context }) => {
-    // Invalidate existing cache and fetch fresh data
-    context.queryClient.removeQueries({ queryKey: ['dashboard-analytics'] });
-    return context.queryClient.fetchQuery(dashboardAnalyticsQueryOptions);
-  },
   component: RouteComponent,
   errorComponent: DashboardError,
 });
@@ -34,13 +29,13 @@ function RouteComponent() {
 
 function DashboardContent() {
   const [currentLayout, setCurrentLayout] = useState<DashboardLayout>("overview");
-  const { data } = useDashboardAnalyticsSuspense(); // No need for isLoading/error with suspense
+  const trpc = useTRPC();
+  const { data } = useSuspenseQuery(trpc.dashboard.analytics.queryOptions()); // Using tRPC with suspense
   const queryClient = useQueryClient();
 
   const handleRefresh = () => {
-    // Remove cached data and force fresh fetch
-    queryClient.removeQueries({ queryKey: ['dashboard-analytics'] });
-    queryClient.invalidateQueries({ queryKey: ['dashboard-analytics'] });
+    // Invalidate tRPC dashboard queries
+    queryClient.invalidateQueries({ queryKey: [["dashboard"]] });
   };
 
   const renderDashboardLayout = () => {

@@ -1,4 +1,5 @@
 import { formatFileSize } from "@/lib/file-processing-service";
+import { getImageSrc } from "@/lib/image-utils";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -136,7 +137,7 @@ export default function ImagePreviewGallery({
             >
               {/* Image */}
               <img
-                src={item.preview || item.url}
+                src={getImageSrc(item.preview, item.url)}
                 alt={item.name}
                 className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
                 loading="lazy"
@@ -228,7 +229,7 @@ export default function ImagePreviewGallery({
 
               {/* Main image */}
               <img
-                src={selectedImage.preview || selectedImage.url}
+                src={getImageSrc(selectedImage.preview, selectedImage.url)}
                 alt={selectedImage.name}
                 className="max-h-full max-w-full object-contain"
                 crossOrigin="anonymous"
@@ -312,7 +313,7 @@ export function ImageThumbnailGrid({
               onPress={() => handleImageClick(index)}
             >
               <img
-                src={image.preview || image.url}
+                src={getImageSrc(image.preview, image.url)}
                 alt={image.name}
                 className="h-full w-full object-cover"
                 loading="lazy"
@@ -326,7 +327,7 @@ export function ImageThumbnailGrid({
               <div className="space-y-2">
                 <div className="aspect-video w-64 overflow-hidden rounded border">
                   <img
-                    src={image.preview || image.url}
+                    src={getImageSrc(image.preview, image.url)}
                     alt={image.name}
                     className="h-full w-full object-contain"
                     loading="lazy"
@@ -480,7 +481,7 @@ function ImageGalleryContent({
 
       {/* Main image */}
       <img
-        src={selectedImage.preview || selectedImage.url}
+        src={getImageSrc(selectedImage.preview, selectedImage.url)}
         alt={selectedImage.name}
         className="max-h-full max-w-full object-contain"
         crossOrigin="anonymous"

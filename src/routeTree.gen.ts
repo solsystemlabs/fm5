@@ -35,6 +35,7 @@ import { ServerRoute as ApiDashboardAnalyticsServerRouteImport } from './routes/
 import { ServerRoute as ApiBrandsServerRouteImport } from './routes/api/brands'
 import { ServerRoute as ApiTrpcSplatServerRouteImport } from './routes/api/trpc/$'
 import { ServerRoute as ApiSlicedFilesIdServerRouteImport } from './routes/api/sliced-files/$id'
+import { ServerRoute as ApiProxyImageServerRouteImport } from './routes/api/proxy/image'
 import { ServerRoute as ApiProductsIdServerRouteImport } from './routes/api/products/$id'
 import { ServerRoute as ApiModelsIdServerRouteImport } from './routes/api/models/$id'
 import { ServerRoute as ApiFilamentsIdServerRouteImport } from './routes/api/filaments/$id'
@@ -169,6 +170,11 @@ const ApiSlicedFilesIdServerRoute = ApiSlicedFilesIdServerRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => ApiSlicedFilesServerRoute,
+} as any)
+const ApiProxyImageServerRoute = ApiProxyImageServerRouteImport.update({
+  id: '/api/proxy/image',
+  path: '/api/proxy/image',
+  getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiProductsIdServerRoute = ApiProductsIdServerRouteImport.update({
   id: '/$id',
@@ -320,6 +326,7 @@ export interface FileServerRoutesByFullPath {
   '/api/filaments/$id': typeof ApiFilamentsIdServerRoute
   '/api/models/$id': typeof ApiModelsIdServerRouteWithChildren
   '/api/products/$id': typeof ApiProductsIdServerRoute
+  '/api/proxy/image': typeof ApiProxyImageServerRoute
   '/api/sliced-files/$id': typeof ApiSlicedFilesIdServerRouteWithChildren
   '/api/trpc/$': typeof ApiTrpcSplatServerRoute
   '/api/download/model-file/$fileId': typeof ApiDownloadModelFileFileIdServerRoute
@@ -346,6 +353,7 @@ export interface FileServerRoutesByTo {
   '/api/filaments/$id': typeof ApiFilamentsIdServerRoute
   '/api/models/$id': typeof ApiModelsIdServerRouteWithChildren
   '/api/products/$id': typeof ApiProductsIdServerRoute
+  '/api/proxy/image': typeof ApiProxyImageServerRoute
   '/api/sliced-files/$id': typeof ApiSlicedFilesIdServerRouteWithChildren
   '/api/trpc/$': typeof ApiTrpcSplatServerRoute
   '/api/download/model-file/$fileId': typeof ApiDownloadModelFileFileIdServerRoute
@@ -373,6 +381,7 @@ export interface FileServerRoutesById {
   '/api/filaments/$id': typeof ApiFilamentsIdServerRoute
   '/api/models/$id': typeof ApiModelsIdServerRouteWithChildren
   '/api/products/$id': typeof ApiProductsIdServerRoute
+  '/api/proxy/image': typeof ApiProxyImageServerRoute
   '/api/sliced-files/$id': typeof ApiSlicedFilesIdServerRouteWithChildren
   '/api/trpc/$': typeof ApiTrpcSplatServerRoute
   '/api/download/model-file/$fileId': typeof ApiDownloadModelFileFileIdServerRoute
@@ -401,6 +410,7 @@ export interface FileServerRouteTypes {
     | '/api/filaments/$id'
     | '/api/models/$id'
     | '/api/products/$id'
+    | '/api/proxy/image'
     | '/api/sliced-files/$id'
     | '/api/trpc/$'
     | '/api/download/model-file/$fileId'
@@ -427,6 +437,7 @@ export interface FileServerRouteTypes {
     | '/api/filaments/$id'
     | '/api/models/$id'
     | '/api/products/$id'
+    | '/api/proxy/image'
     | '/api/sliced-files/$id'
     | '/api/trpc/$'
     | '/api/download/model-file/$fileId'
@@ -453,6 +464,7 @@ export interface FileServerRouteTypes {
     | '/api/filaments/$id'
     | '/api/models/$id'
     | '/api/products/$id'
+    | '/api/proxy/image'
     | '/api/sliced-files/$id'
     | '/api/trpc/$'
     | '/api/download/model-file/$fileId'
@@ -476,6 +488,7 @@ export interface RootServerRouteChildren {
   ApiModelsServerRoute: typeof ApiModelsServerRouteWithChildren
   ApiProductsServerRoute: typeof ApiProductsServerRouteWithChildren
   ApiSlicedFilesServerRoute: typeof ApiSlicedFilesServerRouteWithChildren
+  ApiProxyImageServerRoute: typeof ApiProxyImageServerRoute
   ApiTrpcSplatServerRoute: typeof ApiTrpcSplatServerRoute
   ApiDownloadModelFileFileIdServerRoute: typeof ApiDownloadModelFileFileIdServerRoute
   ApiDownloadModelImageImageIdServerRoute: typeof ApiDownloadModelImageImageIdServerRoute
@@ -654,6 +667,13 @@ declare module '@tanstack/react-start/server' {
       fullPath: '/api/sliced-files/$id'
       preLoaderRoute: typeof ApiSlicedFilesIdServerRouteImport
       parentRoute: typeof ApiSlicedFilesServerRoute
+    }
+    '/api/proxy/image': {
+      id: '/api/proxy/image'
+      path: '/api/proxy/image'
+      fullPath: '/api/proxy/image'
+      preLoaderRoute: typeof ApiProxyImageServerRouteImport
+      parentRoute: typeof rootServerRouteImport
     }
     '/api/products/$id': {
       id: '/api/products/$id'
@@ -837,6 +857,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiModelsServerRoute: ApiModelsServerRouteWithChildren,
   ApiProductsServerRoute: ApiProductsServerRouteWithChildren,
   ApiSlicedFilesServerRoute: ApiSlicedFilesServerRouteWithChildren,
+  ApiProxyImageServerRoute: ApiProxyImageServerRoute,
   ApiTrpcSplatServerRoute: ApiTrpcSplatServerRoute,
   ApiDownloadModelFileFileIdServerRoute: ApiDownloadModelFileFileIdServerRoute,
   ApiDownloadModelImageImageIdServerRoute:

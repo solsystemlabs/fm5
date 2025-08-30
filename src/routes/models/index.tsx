@@ -1,4 +1,6 @@
 import { useModelsTRPC } from "@/lib/trpc-hooks";
+import { useTRPC } from "@/lib/trpc/client";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import ModelsTreeView from "../../components/trees/ModelsTreeView";
 import FMButton from "../../components/ui/FMButton";
@@ -10,7 +12,19 @@ export const Route = createFileRoute("/models/")({
 });
 
 function ModelsPage() {
-  const { data: models = [], isLoading, error } = useModelsTRPC();
+  const { data: models = [], isLoading: modelsLoading, error: modelsError } = useModelsTRPC();
+  const trpc = useTRPC();
+  
+  // Fetch model images separately from tagged union File system
+  const { data: allModelImages = [], isLoading: imagesLoading } = useQuery(
+    trpc.files.byMimeType.queryOptions({
+      mimeTypePattern: "image/",
+      limit: 200 // Adjust as needed
+    })
+  );
+
+  const isLoading = modelsLoading || imagesLoading;
+  const error = modelsError;
 
   if (error) {
     return (
@@ -25,8 +39,19 @@ function ModelsPage() {
     );
   }
 
+  // Group images by model ID
+  const imagesByModel = allModelImages
+    .filter(img => img.entityType === 'MODEL')
+    .reduce((acc, img) => {
+      if (!acc[img.entityId]) {
+        acc[img.entityId] = [];
+      }
+      acc[img.entityId].push(img);
+      return acc;
+    }, {} as Record<number, any[]>);
+
   // Transform flat models data into tree structure
-  const treeData = transformModelsToTree(models);
+  const treeData = transformModelsToTree(models, imagesByModel);
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">

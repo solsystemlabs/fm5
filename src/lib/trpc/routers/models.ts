@@ -15,7 +15,8 @@ const updateModelSchema = createModelSchema.partial().extend({
 const deleteModelFilesSchema = z.object({
   modelId: z.number(),
   modelFileIds: z.array(z.number()).optional().default([]),
-  modelImageIds: z.array(z.number()).optional().default([]),
+  threeMFFileIds: z.array(z.number()).optional().default([]),
+  imageFileIds: z.array(z.number()).optional().default([]),
 });
 
 export const modelsRouter = router({
@@ -31,7 +32,11 @@ export const modelsRouter = router({
             },
           },
           ModelFiles: true,
-          ModelImage: true,
+          ThreeMFFiles: {
+            include: {
+              SlicedFiles: true,
+            },
+          },
         },
         orderBy: {
           name: "asc",
@@ -59,7 +64,11 @@ export const modelsRouter = router({
               },
             },
             ModelFiles: true,
-            ModelImage: true,
+            ThreeMFFiles: {
+              include: {
+                SlicedFiles: true,
+              },
+            },
           },
         });
       } catch (error) {
@@ -67,30 +76,42 @@ export const modelsRouter = router({
       }
     }),
 
-  // Get model files and images by model ID
+  // Get model files, 3MF files, and images by model ID
   files: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
       try {
-        const [modelFiles, modelImages] = await Promise.all([
+        const [modelFiles, threeMFFiles, imageFiles] = await Promise.all([
           ctx.prisma.modelFile.findMany({
             where: { modelId: input.id },
             orderBy: { id: 'desc' }
           }),
-          ctx.prisma.modelImage.findMany({
+          ctx.prisma.threeMFFile.findMany({
             where: { modelId: input.id },
+            include: {
+              SlicedFiles: true,
+            },
+            orderBy: { id: 'desc' }
+          }),
+          ctx.prisma.file.findMany({
+            where: { 
+              entityType: 'MODEL',
+              entityId: input.id 
+            },
             orderBy: { id: 'desc' }
           })
         ]);
 
         return {
           modelFiles,
-          modelImages,
+          threeMFFiles,
+          imageFiles,
           summary: {
-            totalFiles: modelFiles.length + modelImages.length,
+            totalFiles: modelFiles.length + threeMFFiles.length + imageFiles.length,
             modelFilesCount: modelFiles.length,
-            modelImagesCount: modelImages.length,
-            totalSize: [...modelFiles, ...modelImages].reduce((sum, file) => sum + file.size, 0)
+            threeMFFilesCount: threeMFFiles.length,
+            imageFilesCount: imageFiles.length,
+            totalSize: [...modelFiles, ...threeMFFiles, ...imageFiles].reduce((sum, file) => sum + file.size, 0)
           }
         };
       } catch (error) {
@@ -121,7 +142,11 @@ export const modelsRouter = router({
               },
             },
             ModelFiles: true,
-            ModelImage: true,
+            ThreeMFFiles: {
+              include: {
+                SlicedFiles: true,
+              },
+            },
           },
         });
       } catch (error) {
@@ -154,7 +179,11 @@ export const modelsRouter = router({
               },
             },
             ModelFiles: true,
-            ModelImage: true,
+            ThreeMFFiles: {
+              include: {
+                SlicedFiles: true,
+              },
+            },
           },
         });
       } catch (error) {
@@ -167,7 +196,7 @@ export const modelsRouter = router({
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
       try {
-        // Note: This will also cascade delete associated ModelFiles and ModelImages
+        // Note: This will cascade delete ModelFiles, ThreeMFFiles, SlicedFiles and tagged union Files
         // due to the foreign key constraints in the database
         return await ctx.prisma.model.delete({
           where: { id: input.id },
@@ -177,21 +206,22 @@ export const modelsRouter = router({
       }
     }),
 
-  // Delete specific model files and images
+  // Delete specific model files, 3MF files, and images
   deleteFiles: publicProcedure
     .input(deleteModelFilesSchema)
     .mutation(async ({ ctx, input }) => {
       try {
-        const { modelId, modelFileIds, modelImageIds } = input;
+        const { modelId, modelFileIds, threeMFFileIds, imageFileIds } = input;
 
-        if (modelFileIds.length === 0 && modelImageIds.length === 0) {
+        if (modelFileIds.length === 0 && threeMFFileIds.length === 0 && imageFileIds.length === 0) {
           throw new Error("No file IDs provided");
         }
 
         // Delete files from database and collect information for cleanup
         const deletedFiles = await ctx.prisma.$transaction(async (tx) => {
           let deletedModelFiles = [];
-          let deletedModelImages = [];
+          let deletedThreeMFFiles = [];
+          let deletedImageFiles = [];
 
           if (modelFileIds.length > 0) {
             // Fetch files before deletion to get S3 keys
@@ -213,35 +243,62 @@ export const modelsRouter = router({
             }
           }
 
-          if (modelImageIds.length > 0) {
-            // Fetch images before deletion to get S3 keys
-            const modelImagesToDelete = await tx.modelImage.findMany({
+          if (threeMFFileIds.length > 0) {
+            // Fetch ThreeMF files before deletion (this will cascade to SlicedFiles)
+            const threeMFFilesToDelete = await tx.threeMFFile.findMany({
               where: {
-                id: { in: modelImageIds },
-                modelId // Ensure images belong to this model
+                id: { in: threeMFFileIds },
+                modelId // Ensure files belong to this model
               }
             });
 
-            if (modelImagesToDelete.length > 0) {
-              await tx.modelImage.deleteMany({
+            if (threeMFFilesToDelete.length > 0) {
+              await tx.threeMFFile.deleteMany({
                 where: {
-                  id: { in: modelImageIds },
+                  id: { in: threeMFFileIds },
                   modelId
                 }
               });
-              deletedModelImages = modelImagesToDelete;
+              deletedThreeMFFiles = threeMFFilesToDelete;
             }
           }
 
-          return { deletedModelFiles, deletedModelImages };
+          if (imageFileIds.length > 0) {
+            // Fetch tagged union images before deletion
+            const imageFilesToDelete = await tx.file.findMany({
+              where: {
+                id: { in: imageFileIds },
+                entityType: 'MODEL',
+                entityId: modelId // Ensure images belong to this model
+              }
+            });
+
+            if (imageFilesToDelete.length > 0) {
+              await tx.file.deleteMany({
+                where: {
+                  id: { in: imageFileIds },
+                  entityType: 'MODEL',
+                  entityId: modelId
+                }
+              });
+              deletedImageFiles = imageFilesToDelete;
+            }
+          }
+
+          return { deletedModelFiles, deletedThreeMFFiles, deletedImageFiles };
         });
+
+        const totalDeleted = deletedFiles.deletedModelFiles.length + 
+                           deletedFiles.deletedThreeMFFiles.length + 
+                           deletedFiles.deletedImageFiles.length;
 
         return {
           success: true,
-          message: `Successfully deleted ${deletedFiles.deletedModelFiles.length + deletedFiles.deletedModelImages.length} files`,
+          message: `Successfully deleted ${totalDeleted} files`,
           deletedCounts: {
             modelFiles: deletedFiles.deletedModelFiles.length,
-            modelImages: deletedFiles.deletedModelImages.length
+            threeMFFiles: deletedFiles.deletedThreeMFFiles.length,
+            imageFiles: deletedFiles.deletedImageFiles.length
           }
         };
       } catch (error) {

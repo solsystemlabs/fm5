@@ -1,7 +1,7 @@
 export interface TreeNode {
   id: string;
   name: string;
-  type: 'model' | 'modelFile' | 'modelImage';
+  type: 'model' | 'modelFile' | 'modelImage' | 'threeMFFile' | 'slicedFile';
   
   // Model-specific properties
   category?: string;
@@ -14,6 +14,7 @@ export interface TreeNode {
   fileCounts?: {
     files: number;
     images: number;
+    slicedFiles?: number;
     total: number;
   };
   filaments?: Array<{
@@ -28,6 +29,13 @@ export interface TreeNode {
   size?: number;
   url?: string;
   fileExtension?: string;
+  mimeType?: string;
+  
+  // 3MF-specific properties
+  hasGcode?: boolean;
+  
+  // Sliced file-specific properties
+  printTimeMinutes?: number;
   
   // Hierarchy
   children?: TreeNode[];
@@ -42,5 +50,12 @@ export interface ModelsTreeData {
     totalModels: number;
     totalFiles: number;
     totalImages: number;
+    totalSlicedFiles: number;
+    breakdown?: {
+      modelFiles: number;
+      threeMFFiles: number;
+      slicedFiles: number;
+      images: number;
+    };
   };
 }

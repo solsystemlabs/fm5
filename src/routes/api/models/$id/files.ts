@@ -68,6 +68,8 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
         imageDetails: processedFiles.images.map(img => ({ name: img.name, size: img.size, category: img.category })),
         modelFiles: processedFiles.modelFiles.length,
         modelFileDetails: processedFiles.modelFiles.map(f => ({ name: f.name, size: f.size, fileType: f.fileType })),
+        threeMFFiles: processedFiles.threeMFFiles.length,
+        threeMFDetails: processedFiles.threeMFFiles.map(f => ({ name: f.name, size: f.size, hasGcode: f.hasGcode, embeddedImages: f.images.length })),
         totalSize: processedFiles.totalSize
       });
 
@@ -75,6 +77,7 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
       const uploadResults = await uploadModelFilesAndImages(
         processedFiles.modelFiles.map(f => f.file),
         processedFiles.images.map(f => f.file),
+        processedFiles.threeMFFiles.map(f => f.file),
         modelId
       );
 
@@ -84,33 +87,73 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
         modelFilesSuccess: uploadResults.modelFiles.filter(r => !r.error).length,
         imagesUploaded: uploadResults.images.length,
         imagesSuccess: uploadResults.images.filter(r => !r.error).length,
-        uploadErrors: [...uploadResults.modelFiles, ...uploadResults.images].filter(r => r.error).map(r => ({ file: r.filename, error: r.error }))
+        threeMFFilesUploaded: uploadResults.threeMFFiles.length,
+        threeMFFilesSuccess: uploadResults.threeMFFiles.filter(r => !r.error).length,
+        uploadErrors: [...uploadResults.modelFiles, ...uploadResults.images, ...uploadResults.threeMFFiles].filter(r => r.error).map(r => ({ file: r.filename, error: r.error }))
       });
 
       // Prepare database records
       const modelFileRecords = [];
       const modelImageRecords = [];
+      const threeMFFileRecords = [];
 
       // Process successful model file uploads
       for (const result of uploadResults.modelFiles) {
         if (!result.error) {
+          // Determine file type from extension
+          const fileExtension = result.filename.split('.').pop()?.toLowerCase() || '';
+          
           modelFileRecords.push({
             name: result.filename,
             modelId,
             url: result.s3Url,
             size: result.size,
+            fileType: fileExtension,
+            s3Key: result.s3Key || null,
+            createdAt: new Date(),
+            updatedAt: new Date(),
           });
         }
       }
 
-      // Process successful image uploads
+      // Process successful image uploads - use tagged union File system
       for (const result of uploadResults.images) {
         if (!result.error) {
+          // Determine MIME type from extension
+          const fileExtension = result.filename.split('.').pop()?.toLowerCase() || '';
+          const mimeType = fileExtension === 'png' ? 'image/png' : 
+                         fileExtension === 'jpg' || fileExtension === 'jpeg' ? 'image/jpeg' :
+                         fileExtension === 'gif' ? 'image/gif' :
+                         fileExtension === 'webp' ? 'image/webp' : 'image/jpeg';
+
           modelImageRecords.push({
+            name: result.filename,
+            url: result.s3Url,
+            size: result.size,
+            s3Key: result.s3Key || null,
+            mimeType,
+            entityType: 'MODEL',
+            entityId: modelId,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+        }
+      }
+
+      // Process successful ThreeMF file uploads
+      for (const result of uploadResults.threeMFFiles) {
+        if (!result.error) {
+          const processedThreeMF = processedFiles.threeMFFiles.find(f => f.name === result.filename);
+          
+          threeMFFileRecords.push({
             name: result.filename,
             modelId,
             url: result.s3Url,
             size: result.size,
+            s3Key: result.s3Key || null,
+            hasGcode: processedThreeMF?.hasGcode || false,
+            createdAt: new Date(),
+            updatedAt: new Date(),
           });
         }
       }
@@ -120,7 +163,9 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
         modelFileRecords: modelFileRecords.length,
         modelFileDetails: modelFileRecords.map(r => ({ name: r.name, url: r.url, size: r.size })),
         modelImageRecords: modelImageRecords.length,
-        modelImageDetails: modelImageRecords.map(r => ({ name: r.name, url: r.url, size: r.size }))
+        modelImageDetails: modelImageRecords.map(r => ({ name: r.name, url: r.url, size: r.size })),
+        threeMFFileRecords: threeMFFileRecords.length,
+        threeMFFileDetails: threeMFFileRecords.map(r => ({ name: r.name, url: r.url, size: r.size, hasGcode: r.hasGcode }))
       });
 
       // Save to database using transactions
@@ -138,17 +183,30 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
           recordsCreated: createdModelFiles.count
         });
 
-        const createdModelImages = modelImageRecords.length > 0
-          ? await tx.modelImage.createMany({
+        const createdImageFiles = modelImageRecords.length > 0
+          ? await tx.file.createMany({
               data: modelImageRecords,
               skipDuplicates: true,
             })
           : { count: 0 };
 
-        logger.info('ModelImages database operation result', {
+        logger.info('Image files (tagged union) database operation result', {
           modelId,
           recordsToCreate: modelImageRecords.length,
-          recordsCreated: createdModelImages.count
+          recordsCreated: createdImageFiles.count
+        });
+
+        const createdThreeMFFiles = threeMFFileRecords.length > 0
+          ? await tx.threeMFFile.createMany({
+              data: threeMFFileRecords,
+              skipDuplicates: true,
+            })
+          : { count: 0 };
+
+        logger.info('ThreeMF files database operation result', {
+          modelId,
+          recordsToCreate: threeMFFileRecords.length,
+          recordsCreated: createdThreeMFFiles.count
         });
 
         // Fetch the created records with full data
@@ -162,9 +220,10 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
           : [];
 
         const modelImages = modelImageRecords.length > 0
-          ? await tx.modelImage.findMany({
+          ? await tx.file.findMany({
               where: {
-                modelId,
+                entityType: 'MODEL',
+                entityId: modelId,
                 name: { in: modelImageRecords.map(r => r.name) }
               }
             })
@@ -172,7 +231,8 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
 
         return {
           modelFilesCount: createdModelFiles.count,
-          modelImagesCount: createdModelImages.count,
+          modelImagesCount: createdImageFiles.count,
+          threeMFFilesCount: createdThreeMFFiles.count,
           modelFiles,
           modelImages,
         };
@@ -184,19 +244,22 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
       // Collect any upload errors
       const uploadErrors = [
         ...uploadResults.modelFiles.filter(r => r.error).map(r => ({ file: r.filename, error: r.error })),
-        ...uploadResults.images.filter(r => r.error).map(r => ({ file: r.filename, error: r.error }))
+        ...uploadResults.images.filter(r => r.error).map(r => ({ file: r.filename, error: r.error })),
+        ...uploadResults.threeMFFiles.filter(r => r.error).map(r => ({ file: r.filename, error: r.error }))
       ];
 
       logger.info('File upload completed', {
         modelId,
         modelFilesCreated: dbResults.modelFilesCount,
         modelImagesCreated: dbResults.modelImagesCount,
+        threeMFFilesCreated: dbResults.threeMFFilesCount,
         uploadErrors: uploadErrors.length
       });
 
+      const totalFiles = dbResults.modelFilesCount + dbResults.modelImagesCount + dbResults.threeMFFilesCount;
       const response = {
         success: true,
-        message: `Successfully uploaded ${dbResults.modelFilesCount + dbResults.modelImagesCount} files`,
+        message: `Successfully uploaded ${totalFiles} files`,
         data: {
           modelFiles: dbResults.modelFiles,
           modelImages: dbResults.modelImages,
@@ -204,6 +267,7 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
             totalProcessed: processedFiles.extractedCount,
             modelFilesUploaded: dbResults.modelFilesCount,
             modelImagesUploaded: dbResults.modelImagesCount,
+            threeMFFilesUploaded: dbResults.threeMFFilesCount,
             totalSize: processedFiles.totalSize,
           }
         },
@@ -252,8 +316,11 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
           where: { modelId },
           orderBy: { id: 'desc' }
         }),
-        prisma.modelImage.findMany({
-          where: { modelId },
+        prisma.file.findMany({
+          where: { 
+            entityType: 'MODEL',
+            entityId: modelId 
+          },
           orderBy: { id: 'desc' }
         })
       ]);
@@ -333,18 +400,20 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
 
         if (modelImageIds.length > 0) {
           // Fetch images before deletion to get S3 keys
-          const modelImagesToDelete = await tx.modelImage.findMany({
+          const modelImagesToDelete = await tx.file.findMany({
             where: {
               id: { in: modelImageIds },
-              modelId // Ensure images belong to this model
+              entityType: 'MODEL',
+              entityId: modelId // Ensure images belong to this model
             }
           });
 
           if (modelImagesToDelete.length > 0) {
-            await tx.modelImage.deleteMany({
+            await tx.file.deleteMany({
               where: {
                 id: { in: modelImageIds },
-                modelId
+                entityType: 'MODEL',
+                entityId: modelId
               }
             });
             deletedModelImages = modelImagesToDelete;

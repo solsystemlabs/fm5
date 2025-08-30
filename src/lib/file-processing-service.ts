@@ -1,9 +1,10 @@
 import JSZip from 'jszip';
+import { FileEntityType } from '@prisma/client';
 import { logger } from './logger';
 
 /**
- * File Processing Service for FM5 Manager
- * Handles ZIP extraction, file categorization, and processing for model uploads
+ * Enhanced File Processing Service for FM5 Manager
+ * Handles ZIP extraction, file categorization, and processing with proper 3MF hierarchy
  */
 
 export interface ProcessedFile {
@@ -19,14 +20,34 @@ export interface ProcessedImageFile extends ProcessedFile {
 }
 
 export interface ProcessedModelFile extends ProcessedFile {
-  fileType: 'stl' | '3mf' | 'gcode' | 'other';
+  fileType: 'stl' | 'obj' | 'other'; // Non-3MF model files only
 }
 
+// New interface for 3MF containers with embedded images
+export interface ProcessedThreeMFFile extends ProcessedFile {
+  fileType: '3mf';
+  images: ProcessedImageFile[]; // Images extracted from this specific 3MF
+  hasGcode: boolean; // .gcode.3mf vs .3mf
+}
+
+// Enhanced ProcessedFiles interface with proper hierarchy
 export interface ProcessedFiles {
-  images: ProcessedImageFile[];
-  modelFiles: ProcessedModelFile[];
+  images: ProcessedImageFile[];           // Standalone images from ZIP or direct upload
+  modelFiles: ProcessedModelFile[];       // Non-3MF model files (STL, OBJ, etc.)
+  threeMFFiles: ProcessedThreeMFFile[];   // 3MF files with their embedded images
   totalSize: number;
   extractedCount: number;
+}
+
+// Helper type for file record creation with tagged union
+export interface FileRecord {
+  name: string;
+  url: string;
+  size: number;
+  s3Key?: string;
+  mimeType?: string;
+  entityType: FileEntityType;
+  entityId: number;
 }
 
 export interface ExtractionProgress {
@@ -43,7 +64,7 @@ export interface ValidationResult {
 }
 
 /**
- * Supported file types and their configurations
+ * Enhanced supported file types configuration
  */
 export const SUPPORTED_FILE_TYPES = {
   images: {
@@ -52,19 +73,19 @@ export const SUPPORTED_FILE_TYPES = {
     maxSize: 10 * 1024 * 1024, // 10MB
   },
   modelFiles: {
-    extensions: ['.stl', '.3mf', '.gcode', '.gcode.3mf', '.obj'],
-    mimeTypes: ['model/stl', 'application/vnd.ms-3mfdocument', 'text/plain', 'application/octet-stream'],
+    extensions: ['.stl', '.obj'], // Non-3MF model files only
+    mimeTypes: ['model/stl', 'model/obj', 'application/octet-stream'],
+    maxSize: 100 * 1024 * 1024, // 100MB
+  },
+  threeMFFiles: {
+    extensions: ['.3mf', '.gcode.3mf'], // 3MF containers (separate from modelFiles)
+    mimeTypes: ['application/vnd.ms-3mfdocument'],
     maxSize: 100 * 1024 * 1024, // 100MB
   },
   archives: {
     extensions: ['.zip'],
     mimeTypes: ['application/zip', 'application/x-zip-compressed'],
     maxSize: 500 * 1024 * 1024, // 500MB
-  },
-  threeMFFiles: {
-    extensions: ['.3mf', '.gcode.3mf'],
-    mimeTypes: ['application/vnd.ms-3mfdocument'],
-    maxSize: 100 * 1024 * 1024, // 100MB
   }
 };
 
@@ -183,15 +204,21 @@ function categorizeImage(filename: string): 'thumbnail' | 'preview' | 'other' {
 }
 
 /**
- * Determine model file type
+ * Determine model file type (non-3MF files only)
  */
-function getModelFileType(filename: string): 'stl' | '3mf' | 'gcode' | 'other' {
+function getModelFileType(filename: string): 'stl' | 'obj' | 'other' {
   const extension = getFileExtension(filename);
   
   if (extension === '.stl') return 'stl';
-  if (extension === '.3mf' || filename.toLowerCase().endsWith('.gcode.3mf')) return '3mf';
-  if (extension === '.gcode') return 'gcode';
+  if (extension === '.obj') return 'obj';
   return 'other';
+}
+
+/**
+ * Check if 3MF file has gcode embedded
+ */
+function hasGcodeEmbedded(filename: string): boolean {
+  return filename.toLowerCase().endsWith('.gcode.3mf');
 }
 
 /**
@@ -368,13 +395,13 @@ export async function extractZipFiles(zipFile: File): Promise<ProcessedFiles> {
 }
 
 /**
- * Extract and process ZIP archive with progress callbacks
+ * Enhanced ZIP archive processing with proper 3MF hierarchy
  */
 export async function extractZipFilesWithProgress(
   zipFile: File, 
   onProgress?: (progress: ExtractionProgress) => void
 ): Promise<ProcessedFiles> {
-  logger.info('Starting ZIP extraction with progress', {
+  logger.info('Starting enhanced ZIP extraction with 3MF hierarchy', {
     filename: zipFile.name,
     size: zipFile.size
   });
@@ -389,6 +416,7 @@ export async function extractZipFilesWithProgress(
     const result: ProcessedFiles = {
       images: [],
       modelFiles: [],
+      threeMFFiles: [], // New: separate 3MF containers
       totalSize: 0,
       extractedCount: 0
     };
@@ -419,8 +447,36 @@ export async function extractZipFilesWithProgress(
         result.totalSize += extractedFile.size;
         result.extractedCount++;
 
-        // Process based on file type
-        if (isImageFile(extractedFile)) {
+        // Enhanced processing logic with proper 3MF separation
+        if (is3MFFile(extractedFile)) {
+          // Process 3MF file as container with embedded images
+          logger.info('Processing 3MF container from ZIP', {
+            filename,
+            size: extractedFile.size,
+            hasGcode: hasGcodeEmbedded(filename)
+          });
+
+          // Extract images from this specific 3MF file
+          const embeddedImages = await extract3MFImages(extractedFile);
+          
+          const processedThreeMF: ProcessedThreeMFFile = {
+            file: extractedFile,
+            name: filename,
+            size: extractedFile.size,
+            type: extractedFile.type,
+            fileType: '3mf',
+            images: embeddedImages, // Images specific to this 3MF
+            hasGcode: hasGcodeEmbedded(filename)
+          };
+          
+          result.threeMFFiles.push(processedThreeMF);
+          
+          // Add embedded image sizes to total
+          for (const image of embeddedImages) {
+            result.totalSize += image.size;
+          }
+        } else if (isImageFile(extractedFile)) {
+          // Standalone image in ZIP (not from any 3MF)
           const preview = await createImagePreview(extractedFile);
           const processedImage: ProcessedImageFile = {
             file: extractedFile,
@@ -432,6 +488,7 @@ export async function extractZipFilesWithProgress(
           };
           result.images.push(processedImage);
         } else if (isModelFile(extractedFile)) {
+          // Non-3MF model files (STL, OBJ, etc.)
           const processedModel: ProcessedModelFile = {
             file: extractedFile,
             name: filename,
@@ -460,17 +517,19 @@ export async function extractZipFilesWithProgress(
       currentFile: undefined
     });
 
-    logger.info('ZIP extraction completed', {
+    logger.info('Enhanced ZIP extraction completed', {
       originalFile: zipFile.name,
       extractedFiles: result.extractedCount,
-      images: result.images.length,
+      standaloneImages: result.images.length,
       modelFiles: result.modelFiles.length,
+      threeMFFiles: result.threeMFFiles.length,
+      totalEmbeddedImages: result.threeMFFiles.reduce((sum, tmf) => sum + tmf.images.length, 0),
       totalSize: result.totalSize
     });
 
     return result;
   } catch (error) {
-    logger.error('ZIP extraction failed', {
+    logger.error('Enhanced ZIP extraction failed', {
       filename: zipFile.name,
       error: error instanceof Error ? error.message : 'Unknown error'
     });
@@ -479,12 +538,13 @@ export async function extractZipFilesWithProgress(
 }
 
 /**
- * Process individual files (non-ZIP)
+ * Enhanced processing of individual files with 3MF support
  */
 export async function categorizeFiles(files: File[]): Promise<ProcessedFiles> {
   const result: ProcessedFiles = {
     images: [],
     modelFiles: [],
+    threeMFFiles: [], // New: support for 3MF files
     totalSize: 0,
     extractedCount: 0
   };
@@ -494,7 +554,33 @@ export async function categorizeFiles(files: File[]): Promise<ProcessedFiles> {
     result.extractedCount++;
 
     try {
-      if (isImageFile(file)) {
+      if (is3MFFile(file)) {
+        // Process 3MF file as container with embedded images
+        logger.info('Processing 3MF container', {
+          filename: file.name,
+          size: file.size,
+          hasGcode: hasGcodeEmbedded(file.name)
+        });
+
+        const embeddedImages = await extract3MFImages(file);
+        
+        const processedThreeMF: ProcessedThreeMFFile = {
+          file,
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          fileType: '3mf',
+          images: embeddedImages,
+          hasGcode: hasGcodeEmbedded(file.name)
+        };
+        
+        result.threeMFFiles.push(processedThreeMF);
+        
+        // Add embedded image sizes to total
+        for (const image of embeddedImages) {
+          result.totalSize += image.size;
+        }
+      } else if (isImageFile(file)) {
         const preview = await createImagePreview(file);
         const processedImage: ProcessedImageFile = {
           file,
@@ -588,6 +674,7 @@ export async function processUploadedFiles(
   let result: ProcessedFiles = {
     images: [],
     modelFiles: [],
+    threeMFFiles: [], // New: support for 3MF files
     totalSize: 0,
     extractedCount: 0
   };
@@ -625,7 +712,7 @@ export async function processUploadedFiles(
     }
   }
 
-  // Process 3MF files (they are both model files AND can contain images)
+  // Process 3MF files as containers (not regular model files)
   for (const threeMFFile of threeMFFiles) {
     onProgress?.({
       extractedCount: processedFiles,
@@ -634,41 +721,43 @@ export async function processUploadedFiles(
       currentFile: threeMFFile.name
     });
 
-    // Add 3MF as a model file
-    const processedModel: ProcessedModelFile = {
-      file: threeMFFile,
-      name: threeMFFile.name,
-      size: threeMFFile.size,
-      type: threeMFFile.type,
-      fileType: '3mf'
-    };
-    result.modelFiles.push(processedModel);
-    result.totalSize += threeMFFile.size;
-    result.extractedCount += 1;
-
-    // Extract images from the 3MF file
     try {
-      logger.info('Attempting to extract images from 3MF file', {
+      logger.info('Processing 3MF container', {
         filename: threeMFFile.name,
-        size: threeMFFile.size
+        size: threeMFFile.size,
+        hasGcode: hasGcodeEmbedded(threeMFFile.name)
       });
+
+      // Extract images from this 3MF file
+      const embeddedImages = await extract3MFImages(threeMFFile);
       
-      const extractedImages = await extract3MFImages(threeMFFile);
+      // Create ProcessedThreeMFFile with embedded images
+      const processedThreeMF: ProcessedThreeMFFile = {
+        file: threeMFFile,
+        name: threeMFFile.name,
+        size: threeMFFile.size,
+        type: threeMFFile.type,
+        fileType: '3mf',
+        images: embeddedImages, // Images specific to this 3MF
+        hasGcode: hasGcodeEmbedded(threeMFFile.name)
+      };
       
-      logger.info('3MF image extraction result', {
-        filename: threeMFFile.name,
-        extractedCount: extractedImages.length,
-        images: extractedImages.map(img => ({ name: img.name, size: img.size, category: img.category }))
-      });
+      result.threeMFFiles.push(processedThreeMF);
+      result.totalSize += threeMFFile.size;
+      result.extractedCount += 1;
       
-      result.images.push(...extractedImages);
-      
-      // Add image sizes to total but don't count as separate files since they're embedded
-      for (const image of extractedImages) {
+      // Add embedded image sizes to total
+      for (const image of embeddedImages) {
         result.totalSize += image.size;
       }
+      
+      logger.info('3MF container processing completed', {
+        filename: threeMFFile.name,
+        embeddedImages: embeddedImages.length,
+        images: embeddedImages.map(img => ({ name: img.name, size: img.size, category: img.category }))
+      });
     } catch (error) {
-      logger.warn('Failed to extract images from 3MF file', {
+      logger.warn('Failed to process 3MF container', {
         filename: threeMFFile.name,
         error: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined
@@ -699,6 +788,7 @@ export async function processUploadedFiles(
 
     result.images.push(...zipResult.images);
     result.modelFiles.push(...zipResult.modelFiles);
+    result.threeMFFiles.push(...zipResult.threeMFFiles); // New: merge 3MF files
     result.totalSize += zipResult.totalSize;
     result.extractedCount += zipResult.extractedCount;
     

@@ -1,17 +1,18 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, FileEntityType } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Starting database seed...");
+  console.log("🌱 Starting enhanced database seed with proper hierarchy...");
 
-  // Clear existing data
+  // Clear existing data in correct order (respecting foreign key constraints)
   console.log("🧹 Clearing existing data...");
   try {
     await prisma.slicedFileFilament.deleteMany({});
     await prisma.product.deleteMany({});
     await prisma.slicedFile.deleteMany({});
-    await prisma.modelImage.deleteMany({});
+    await prisma.file.deleteMany({}); // New: tagged union file system
+    await prisma.threeMFFile.deleteMany({}); // New: 3MF containers
     await prisma.modelFile.deleteMany({});
     await prisma.filament.deleteMany({});
     await prisma.model.deleteMany({});
@@ -21,7 +22,7 @@ async function main() {
     await prisma.modelCategory.deleteMany({});
     await prisma.recentActivity.deleteMany({});
     await prisma.dashboardAnalytics.deleteMany({});
-    console.log("✅ Database cleared");
+    console.log("✅ Database cleared with proper hierarchy order");
   } catch (error) {
     console.log("ℹ️  Database tables don't exist yet, skipping cleanup");
   }
@@ -122,71 +123,113 @@ async function main() {
   // Get created models for further processing
   const models = await prisma.model.findMany();
 
-  // Create model images (2 per model)
-  const modelImages = [];
-  for (const model of models) {
-    const images = await Promise.all([
-      prisma.modelImage.create({
-        data: {
-          name: `${model.name} - Main View`,
-          modelId: model.id,
-          url: `https://picsum.photos/800/600?random=${model.id}1`,
-          size: 125000 + Math.floor(Math.random() * 50000),
-        },
-      }),
-      prisma.modelImage.create({
-        data: {
-          name: `${model.name} - Detail View`,
-          modelId: model.id,
-          url: `https://picsum.photos/800/600?random=${model.id}2`,
-          size: 98000 + Math.floor(Math.random() * 40000),
-        },
-      }),
-    ]);
-    modelImages.push(...images);
-  }
+  console.log("🏗️  Creating hierarchical file structure for models...");
 
-  console.log("✅ Model images created");
-
-  // Create model files (4 per model)
+  // Create proper hierarchical structure for each model
+  const createdThreeMFFiles = [];
   for (const model of models) {
+    // Create standalone model files (STL, OBJ - non-3MF files)
     await Promise.all([
       prisma.modelFile.create({
         data: {
           name: `${model.name}.stl`,
           modelId: model.id,
-          url: "",
+          url: `https://s3.aws.com/fm5-models/${model.name.toLowerCase().replace(/ /g, '_')}.stl`,
           size: 2500000 + Math.floor(Math.random() * 1500000),
+          s3Key: `models/${model.name.toLowerCase().replace(/ /g, '_')}.stl`,
+          fileType: 'stl',
         },
       }),
       prisma.modelFile.create({
         data: {
           name: `${model.name}_lowres.stl`,
           modelId: model.id,
-          url: "",
+          url: `https://s3.aws.com/fm5-models/${model.name.toLowerCase().replace(/ /g, '_')}_lowres.stl`,
           size: 850000 + Math.floor(Math.random() * 500000),
+          s3Key: `models/${model.name.toLowerCase().replace(/ /g, '_')}_lowres.stl`,
+          fileType: 'stl',
         },
       }),
       prisma.modelFile.create({
         data: {
           name: `${model.name}.obj`,
           modelId: model.id,
-          url: "",
+          url: `https://s3.aws.com/fm5-models/${model.name.toLowerCase().replace(/ /g, '_')}.obj`,
           size: 1800000 + Math.floor(Math.random() * 800000),
-        },
-      }),
-      prisma.modelFile.create({
-        data: {
-          name: `${model.name}_supports.stl`,
-          modelId: model.id,
-          url: "",
-          size: 3200000 + Math.floor(Math.random() * 1200000),
+          s3Key: `models/${model.name.toLowerCase().replace(/ /g, '_')}.obj`,
+          fileType: 'obj',
         },
       }),
     ]);
+
+    // Create standalone model images using tagged union File system
+    await prisma.file.createMany({
+      data: [
+        {
+          name: `${model.name}_main_view.jpg`,
+          url: `https://s3.aws.com/fm5-images/models/${model.name.toLowerCase().replace(/ /g, '_')}_main.jpg`,
+          size: 125000 + Math.floor(Math.random() * 50000),
+          s3Key: `images/models/${model.name.toLowerCase().replace(/ /g, '_')}_main.jpg`,
+          mimeType: 'image/jpeg',
+          entityType: 'MODEL' as FileEntityType,
+          entityId: model.id,
+        },
+        {
+          name: `${model.name}_detail_view.jpg`,
+          url: `https://s3.aws.com/fm5-images/models/${model.name.toLowerCase().replace(/ /g, '_')}_detail.jpg`,
+          size: 98000 + Math.floor(Math.random() * 40000),
+          s3Key: `images/models/${model.name.toLowerCase().replace(/ /g, '_')}_detail.jpg`,
+          mimeType: 'image/jpeg',
+          entityType: 'MODEL' as FileEntityType,
+          entityId: model.id,
+        },
+      ],
+    });
+
+    // Create ThreeMFFile container for this model
+    const threeMFFile = await prisma.threeMFFile.create({
+      data: {
+        name: `${model.name}.3mf`,
+        modelId: model.id,
+        url: `https://s3.aws.com/fm5-models/3mf/${model.name.toLowerCase().replace(/ /g, '_')}.3mf`,
+        size: 5000000 + Math.floor(Math.random() * 3000000),
+        s3Key: `models/3mf/${model.name.toLowerCase().replace(/ /g, '_')}.3mf`,
+        hasGcode: false, // This is an unsliced 3MF
+      },
+    });
+
+    createdThreeMFFiles.push(threeMFFile);
+
+    // Create images extracted from this specific 3MF file
+    await prisma.file.createMany({
+      data: [
+        {
+          name: 'thumbnail.png',
+          url: `https://s3.aws.com/fm5-images/3mf/${model.name.toLowerCase().replace(/ /g, '_')}_thumbnail.png`,
+          size: 85000 + Math.floor(Math.random() * 30000),
+          s3Key: `images/3mf/${model.name.toLowerCase().replace(/ /g, '_')}_thumbnail.png`,
+          mimeType: 'image/png',
+          entityType: 'THREE_MF' as FileEntityType,
+          entityId: threeMFFile.id,
+        },
+        {
+          name: 'preview.png',
+          url: `https://s3.aws.com/fm5-images/3mf/${model.name.toLowerCase().replace(/ /g, '_')}_preview.png`,
+          size: 120000 + Math.floor(Math.random() * 40000),
+          s3Key: `images/3mf/${model.name.toLowerCase().replace(/ /g, '_')}_preview.png`,
+          mimeType: 'image/png',
+          entityType: 'THREE_MF' as FileEntityType,
+          entityId: threeMFFile.id,
+        },
+      ],
+    });
   }
 
-  console.log("✅ Model files created");
+  console.log("✅ Hierarchical model structure created");
+  console.log(`   📁 ${models.length * 3} model files (STL/OBJ)`);
+  console.log(`   🎨 ${models.length * 2} standalone model images`);
+  console.log(`   📦 ${createdThreeMFFiles.length} ThreeMF containers`);
+  console.log(`   🖼️  ${createdThreeMFFiles.length * 2} 3MF embedded images`);
 
   // Create 30+ diverse filaments
   const filamentData = [
@@ -300,25 +343,55 @@ async function main() {
   for (let i = 0; i < productData.length; i++) {
     const product = productData[i];
     const model = models.find(m => m.name === product.model)!;
+    const threeMFFile = createdThreeMFFiles.find(tmf => tmf.modelId === model.id)!;
     
-    // Create unique sliced file for this product
+    // Create unique sliced file for this product (linked to ThreeMFFile)
     const slicedFile = await prisma.slicedFile.create({
       data: {
         name: `${product.name}.gcode`,
-        modelId: model.id,
+        threeMFFileId: threeMFFile.id,
         url: `/uploads/sliced/${product.name.toLowerCase().replace(/ /g, '_')}.gcode`,
         size: 500000 + Math.floor(Math.random() * 5000000),
+        s3Key: `sliced/${product.name.toLowerCase().replace(/ /g, '_')}.gcode`,
         printTimeMinutes: 60 + Math.floor(Math.random() * 480), // 1-8 hours
         totalTimeMinutes: 70 + Math.floor(Math.random() * 600), // slightly more than print time
         layerCount: 100 + Math.floor(Math.random() * 1500),
         layerHeight: 0.1 + Math.random() * 0.2, // 0.1-0.3mm
+        maxZHeight: 50 + Math.random() * 200, // 50-250mm
         slicerName: "BambuStudio",
         slicerVersion: "02.01.01.52",
+        profileName: "Generic PLA @BBL X1C",
         nozzleDiameter: 0.4,
+        bedType: "Textured PEI Plate",
         bedTemperature: 60 + Math.floor(Math.random() * 40), // 60-100°C
         totalFilamentWeight: 10 + Math.random() * 200, // 10-210g
         totalFilamentLength: 3000 + Math.random() * 50000, // 3-53m
+        totalFilamentVolume: 5 + Math.random() * 80, // 5-85 cm³
       },
+    });
+
+    // Create images associated with this sliced file
+    await prisma.file.createMany({
+      data: [
+        {
+          name: 'layer_preview.png',
+          url: `https://s3.aws.com/fm5-images/sliced/${product.name.toLowerCase().replace(/ /g, '_')}_layers.png`,
+          size: 180000 + Math.floor(Math.random() * 60000),
+          s3Key: `images/sliced/${product.name.toLowerCase().replace(/ /g, '_')}_layers.png`,
+          mimeType: 'image/png',
+          entityType: 'SLICED_FILE' as FileEntityType,
+          entityId: slicedFile.id,
+        },
+        {
+          name: 'print_preview.jpg',
+          url: `https://s3.aws.com/fm5-images/sliced/${product.name.toLowerCase().replace(/ /g, '_')}_preview.jpg`,
+          size: 220000 + Math.floor(Math.random() * 80000),
+          s3Key: `images/sliced/${product.name.toLowerCase().replace(/ /g, '_')}_preview.jpg`,
+          mimeType: 'image/jpeg',
+          entityType: 'SLICED_FILE' as FileEntityType,
+          entityId: slicedFile.id,
+        },
+      ],
     });
 
     // Select random filaments for this product
@@ -327,6 +400,52 @@ async function main() {
       const availableFilaments = filaments.filter(f => !selectedFilaments.includes(f));
       const randomFilament = availableFilaments[Math.floor(Math.random() * availableFilaments.length)];
       selectedFilaments.push(randomFilament);
+    }
+
+    // Create SlicedFileFilament records for detailed filament usage
+    for (let j = 0; j < selectedFilaments.length; j++) {
+      const filament = selectedFilaments[j];
+      const totalWeight = slicedFile.totalFilamentWeight! / selectedFilaments.length; // Distribute weight across filaments
+      const totalLength = slicedFile.totalFilamentLength! / selectedFilaments.length;
+      const totalVolume = slicedFile.totalFilamentVolume! / selectedFilaments.length;
+      
+      await prisma.slicedFileFilament.create({
+        data: {
+          slicedFileId: slicedFile.id,
+          filamentIndex: j,
+          lengthUsed: totalLength,
+          volumeUsed: totalVolume,
+          weightUsed: totalWeight,
+          // Breakdown by usage type
+          modelLength: totalLength * 0.7, // 70% for model
+          modelVolume: totalVolume * 0.7,
+          modelWeight: totalWeight * 0.7,
+          supportLength: totalLength * 0.15, // 15% for supports
+          supportVolume: totalVolume * 0.15,
+          supportWeight: totalWeight * 0.15,
+          infillLength: totalLength * 0.4, // 40% of model for infill
+          infillVolume: totalVolume * 0.4,
+          infillWeight: totalWeight * 0.4,
+          wallLength: totalLength * 0.3, // 30% of model for walls
+          wallVolume: totalVolume * 0.3,
+          wallWeight: totalWeight * 0.3,
+          wasteLength: totalLength * 0.1, // 10% waste
+          wasteVolume: totalVolume * 0.1,
+          wasteWeight: totalWeight * 0.1,
+          towerLength: totalLength * 0.05, // 5% tower (if multi-material)
+          towerVolume: totalVolume * 0.05,
+          towerWeight: totalWeight * 0.05,
+          // Filament properties at slice time  
+          filamentType: materials.find(m => m.id === filament.materialTypeId)?.name || "PLA",
+          filamentColor: filament.color,
+          filamentVendor: filament.brandName,
+          density: 1.24, // Typical PLA density
+          diameter: filament.diameter,
+          nozzleTemp: 210 + Math.floor(Math.random() * 30), // 210-240°C
+          bedTemp: 60 + Math.floor(Math.random() * 20), // 60-80°C
+          filamentId: filament.id, // Link to existing filament
+        },
+      });
     }
 
     // Create the product

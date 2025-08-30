@@ -9,50 +9,81 @@ datasource db {
 }
 
 model ModelCategory {
-  id    Int     @id @unique @default(autoincrement())
+  id    Int     @id @default(autoincrement())
   name  String  @unique
   Model Model[]
 }
 
 model Model {
-  id              Int           @id @unique @default(autoincrement())
+  id              Int           @id @default(autoincrement())
   name            String        @unique
   modelCategoryId Int
   Category        ModelCategory @relation(fields: [modelCategoryId], references: [id])
   Filaments       Filament[]    @relation("FilamentToModel")
   ModelFiles      ModelFile[]
-  Product         Product[]
-  ModelImage      ModelImage[]
-  SlicedFiles     SlicedFile[]
+  ThreeMFFiles    ThreeMFFile[] // New relationship for 3MF containers
+  Products        Product[]
 }
 
 model ModelFile {
-  id          Int          @id @unique @default(autoincrement())
-  name        String       @unique
-  modelId     Int
-  url         String
-  size        Int
-  Filaments   Filament[]
-  Model       Model        @relation(fields: [modelId], references: [id])
-  SlicedFiles SlicedFile[]
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  modelId   Int
+  url       String
+  size      Int
+  s3Key     String?
+  fileType  String     // "stl", "obj", etc. (non-3MF files)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  Filaments Filament[]
+  Model     Model      @relation(fields: [modelId], references: [id])
 }
 
-model ModelImage {
-  id      Int    @id @unique @default(autoincrement())
-  name    String
-  modelId Int
-  url     String
-  size    Int
-  Model   Model  @relation(fields: [modelId], references: [id])
+// New ThreeMFFile entity for 3MF containers
+model ThreeMFFile {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  url       String
+  size      Int
+  s3Key     String?
+  modelId   Int      // Required parent
+  hasGcode  Boolean  @default(false) // .gcode.3mf vs .3mf
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Model       Model        @relation(fields: [modelId], references: [id])
+  SlicedFiles SlicedFile[] // Children sliced files
+}
+
+// Tagged union file system - replaces ModelImage
+model File {
+  id         Int            @id @default(autoincrement())
+  name       String
+  url        String
+  size       Int
+  s3Key      String?
+  mimeType   String?
+  entityType FileEntityType
+  entityId   Int            // References Model.id, ThreeMFFile.id, or SlicedFile.id
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@unique([entityType, entityId, name]) // Prevent duplicate filenames per entity
+}
+
+enum FileEntityType {
+  MODEL        // Standalone files uploaded to model
+  THREE_MF     // Images extracted from 3MF file
+  SLICED_FILE  // Images extracted from sliced file
 }
 
 model SlicedFile {
-  id      Int     @id @unique @default(autoincrement())
-  name    String  @unique
-  modelId Int
-  url     String
-  size    Int
-  s3Key   String? // S3 object key for file management
+  id            Int     @id @default(autoincrement())
+  name          String  @unique
+  threeMFFileId Int     // Required parent - no orphaned SlicedFiles
+  url           String
+  size          Int
+  s3Key         String? // S3 object key for file management
 
   // Basic print information
   printTimeMinutes Int? // from "model printing time"
@@ -81,16 +112,14 @@ model SlicedFile {
   updatedAt DateTime @updatedAt
 
   // Relationships
-  Model               Model                @relation(fields: [modelId], references: [id])
-  ModelFile           ModelFile?           @relation(fields: [modelFileId], references: [id])
-  modelFileId         Int?
-  Product             Product[]
+  ThreeMFFile         ThreeMFFile        @relation(fields: [threeMFFileId], references: [id])
+  Products            Product[]
   SlicedFileFilaments SlicedFileFilament[] // Junction table for multi-filament
 }
 
 // Junction table for multi-filament support
 model SlicedFileFilament {
-  id            Int @id @unique @default(autoincrement())
+  id            Int @id @default(autoincrement())
   slicedFileId  Int
   filamentIndex Int // 0, 1, 2, etc. for multi-filament prints
 
@@ -145,7 +174,7 @@ model SlicedFileFilament {
 }
 
 model Filament {
-  id                  Int                  @id @unique @default(autoincrement())
+  id                  Int                  @id @default(autoincrement())
   name                String
   color               String
   filamentTypeId      Int
@@ -166,7 +195,7 @@ model Filament {
 }
 
 model Product {
-  id           Int        @id @unique @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   name         String
   Filaments    Filament[]
   model        Model      @relation(fields: [modelId], references: [id])
@@ -177,27 +206,27 @@ model Product {
 }
 
 model FilamentType {
-  id          Int        @id @unique @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   name        String
   description String?
   Filament    Filament[]
 }
 
 model Brand {
-  id       Int        @id @unique @default(autoincrement())
+  id       Int        @id @default(autoincrement())
   name     String     @unique
   Filament Filament[]
 }
 
 model MaterialType {
-  id       Int        @id @unique @default(autoincrement())
+  id       Int        @id @default(autoincrement())
   name     String     @unique
   Filament Filament[]
 }
 
 // Dashboard Analytics Models
 model DashboardAnalytics {
-  id                    Int      @id @unique @default(autoincrement())
+  id                    Int      @id @default(autoincrement())
   date                  DateTime @default(now()) @db.Date
   totalFilaments        Int      @default(0)
   totalModels           Int      @default(0)
@@ -216,15 +245,15 @@ model DashboardAnalytics {
 }
 
 model RecentActivity {
-  id          Int                @id @unique @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   type        ActivityType
   title       String
   description String?
   entityType  String // "filament", "model", "product", "sliced_file"
   entityId    Int
   metadata    Json? // Flexible field for additional data
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 enum ActivityType {

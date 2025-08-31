@@ -29,7 +29,7 @@ export function transformModelsToTree(models: any[], modelImages?: Record<number
       size: file.size,
       url: file.url,
       fileExtension: file.name.split('.').pop() || '',
-      originalData: file,
+      originalData: { ...file, modelId: model.id },
     }));
 
     // Create nodes for 3MF containers
@@ -55,7 +55,7 @@ export function transformModelsToTree(models: any[], modelImages?: Record<number
         fileExtension: '3mf',
         hasGcode: threeMF.hasGcode,
         children: slicedFileNodes.length > 0 ? slicedFileNodes : undefined,
-        originalData: threeMF,
+        originalData: { ...threeMF, modelId: model.id },
       };
     });
 
@@ -69,7 +69,7 @@ export function transformModelsToTree(models: any[], modelImages?: Record<number
       url: image.url,
       fileExtension: image.name.split('.').pop() || '',
       mimeType: image.mimeType,
-      originalData: image,
+      originalData: { ...image, modelId: model.id },
     }));
 
     // Combine all child nodes

@@ -52,14 +52,17 @@ export default function ModelsTreeView({
       if (file.type === "modelImage") {
         // Delete from tagged union File system
         await deleteModelFilesMutation.mutateAsync({
+          modelId: file.originalData.modelId,
           imageFileIds: [file.originalData.id],
         });
       } else if (file.type === "modelFile") {
         await deleteModelFilesMutation.mutateAsync({
+          modelId: file.originalData.modelId,
           modelFileIds: [file.originalData.id],
         });
       } else if (file.type === "threeMFFile") {
         await deleteModelFilesMutation.mutateAsync({
+          modelId: file.originalData.modelId,
           threeMFFileIds: [file.originalData.id],
         });
       }

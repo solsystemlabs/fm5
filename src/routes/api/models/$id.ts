@@ -21,8 +21,9 @@ export const ServerRoute = createServerFileRoute("/api/models/$id").methods({
         where: { id: modelId },
         include: {
           ModelFiles: true,
-          ModelImage: true,
-          SlicedFiles: true,
+          ThreeMFFiles: {
+            include: { SlicedFiles: true }
+          },
         },
       });
 
@@ -46,8 +47,8 @@ export const ServerRoute = createServerFileRoute("/api/models/$id").methods({
         message: `Model "${model.name}" and all associated files deleted successfully`,
         deletedCounts: {
           modelFiles: model.ModelFiles.length,
-          modelImages: model.ModelImage.length,
-          slicedFiles: model.SlicedFiles.length,
+          threeMFFiles: model.ThreeMFFiles.length,
+          slicedFiles: model.ThreeMFFiles.reduce((count, threeMF) => count + threeMF.SlicedFiles.length, 0),
         }
       });
 

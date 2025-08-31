@@ -62,6 +62,18 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
       // Process uploaded files (extract ZIP, categorize, validate)
       const processedFiles = await processUploadedFiles(files);
 
+      logger.info('🔍 RAW PROCESSED FILES FROM PROCESSING SERVICE', {
+        modelId,
+        rawImages: processedFiles.images.length,
+        rawImagesList: processedFiles.images.map(img => img.name),
+        rawModelFiles: processedFiles.modelFiles.length,
+        rawModelFilesList: processedFiles.modelFiles.map(f => f.name),
+        rawThreeMFFiles: processedFiles.threeMFFiles.length,
+        rawThreeMFFilesList: processedFiles.threeMFFiles.map(f => f.name),
+        rawTotalSize: processedFiles.totalSize,
+        rawExtractedCount: processedFiles.extractedCount
+      });
+
       logger.info('Files processed successfully', {
         modelId,
         images: processedFiles.images.length,
@@ -73,10 +85,18 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
         totalSize: processedFiles.totalSize
       });
 
+      // Collect all images: standalone images + extracted 3MF images
+      const allImages = [
+        ...processedFiles.images.map(f => f.file),
+        ...processedFiles.threeMFFiles.flatMap(threeMF => 
+          threeMF.images.map(img => img.file)
+        )
+      ];
+
       // Upload files to S3
       const uploadResults = await uploadModelFilesAndImages(
         processedFiles.modelFiles.map(f => f.file),
-        processedFiles.images.map(f => f.file),
+        allImages,
         processedFiles.threeMFFiles.map(f => f.file),
         modelId
       );
@@ -93,9 +113,39 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
       });
 
       // Prepare database records
-      const modelFileRecords = [];
-      const modelImageRecords = [];
-      const threeMFFileRecords = [];
+      const modelFileRecords: Array<{
+        name: string;
+        modelId: number;
+        url: string;
+        size: number;
+        fileType: string;
+        s3Key: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+      }> = [];
+      
+      const modelImageRecords: Array<{
+        name: string;
+        url: string;
+        size: number;
+        s3Key: string | null;
+        mimeType: string;
+        entityType: string;
+        entityId: number;
+        createdAt: Date;
+        updatedAt: Date;
+      }> = [];
+      
+      const threeMFFileRecords: Array<{
+        name: string;
+        modelId: number;
+        url: string;
+        size: number;
+        s3Key: string | null;
+        hasGcode: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+      }> = [];
 
       // Process successful model file uploads
       for (const result of uploadResults.modelFiles) {
@@ -117,7 +167,11 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
       }
 
       // Process successful image uploads - use tagged union File system
-      for (const result of uploadResults.images) {
+      // We need to track which images are standalone vs extracted from 3MF files
+      const standaloneImageCount = processedFiles.images.length;
+      
+      for (let i = 0; i < uploadResults.images.length; i++) {
+        const result = uploadResults.images[i];
         if (!result.error) {
           // Determine MIME type from extension
           const fileExtension = result.filename.split('.').pop()?.toLowerCase() || '';
@@ -126,17 +180,22 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
                          fileExtension === 'gif' ? 'image/gif' :
                          fileExtension === 'webp' ? 'image/webp' : 'image/jpeg';
 
-          modelImageRecords.push({
-            name: result.filename,
-            url: result.s3Url,
-            size: result.size,
-            s3Key: result.s3Key || null,
-            mimeType,
-            entityType: 'MODEL',
-            entityId: modelId,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          });
+          // Determine if this is a standalone image or extracted from 3MF
+          if (i < standaloneImageCount) {
+            // This is a standalone model image
+            modelImageRecords.push({
+              name: result.filename,
+              url: result.s3Url,
+              size: result.size,
+              s3Key: result.s3Key || null,
+              mimeType,
+              entityType: 'MODEL',
+              entityId: modelId,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            });
+          }
+          // Note: 3MF extracted images will be handled after 3MF files are created
         }
       }
 
@@ -229,10 +288,76 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
             })
           : [];
 
+        // Create records for extracted 3MF images
+        const threeMFFiles = threeMFFileRecords.length > 0
+          ? await tx.threeMFFile.findMany({
+              where: {
+                modelId,
+                name: { in: threeMFFileRecords.map(r => r.name) }
+              }
+            })
+          : [];
+
+        // Create image records for 3MF extracted images
+        const threeMFImageRecords: Array<{
+          name: string;
+          url: string;
+          size: number;
+          s3Key: string | null;
+          mimeType: string;
+          entityType: string;
+          entityId: number;
+          createdAt: Date;
+          updatedAt: Date;
+        }> = [];
+
+        // Map extracted images to their parent 3MF files
+        const standaloneImageCount = processedFiles.images.length;
+        let imageIndex = standaloneImageCount; // Start after standalone images
+
+        for (const threeMFFile of threeMFFiles) {
+          const processedThreeMF = processedFiles.threeMFFiles.find(f => f.name === threeMFFile.name);
+          if (processedThreeMF && processedThreeMF.images.length > 0) {
+            for (const extractedImage of processedThreeMF.images) {
+              // Find the corresponding upload result
+              const uploadResult = uploadResults.images[imageIndex];
+              if (uploadResult && !uploadResult.error) {
+                const fileExtension = extractedImage.name.split('.').pop()?.toLowerCase() || '';
+                const mimeType = fileExtension === 'png' ? 'image/png' : 
+                               fileExtension === 'jpg' || fileExtension === 'jpeg' ? 'image/jpeg' :
+                               fileExtension === 'gif' ? 'image/gif' :
+                               fileExtension === 'webp' ? 'image/webp' : 'image/jpeg';
+
+                threeMFImageRecords.push({
+                  name: extractedImage.name,
+                  url: uploadResult.s3Url,
+                  size: uploadResult.size,
+                  s3Key: uploadResult.s3Key || null,
+                  mimeType,
+                  entityType: 'THREE_MF',
+                  entityId: threeMFFile.id,
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                });
+              }
+              imageIndex++;
+            }
+          }
+        }
+
+        // Create the 3MF extracted image records
+        const createdThreeMFImages = threeMFImageRecords.length > 0
+          ? await tx.file.createMany({
+              data: threeMFImageRecords,
+              skipDuplicates: true,
+            })
+          : { count: 0 };
+
         return {
           modelFilesCount: createdModelFiles.count,
           modelImagesCount: createdImageFiles.count,
           threeMFFilesCount: createdThreeMFFiles.count,
+          threeMFImagesCount: createdThreeMFImages.count,
           modelFiles,
           modelImages,
         };
@@ -253,10 +378,11 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
         modelFilesCreated: dbResults.modelFilesCount,
         modelImagesCreated: dbResults.modelImagesCount,
         threeMFFilesCreated: dbResults.threeMFFilesCount,
+        threeMFImagesCreated: dbResults.threeMFImagesCount,
         uploadErrors: uploadErrors.length
       });
 
-      const totalFiles = dbResults.modelFilesCount + dbResults.modelImagesCount + dbResults.threeMFFilesCount;
+      const totalFiles = dbResults.modelFilesCount + dbResults.modelImagesCount + dbResults.threeMFFilesCount + (dbResults.threeMFImagesCount || 0);
       const response = {
         success: true,
         message: `Successfully uploaded ${totalFiles} files`,
@@ -268,6 +394,7 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
             modelFilesUploaded: dbResults.modelFilesCount,
             modelImagesUploaded: dbResults.modelImagesCount,
             threeMFFilesUploaded: dbResults.threeMFFilesCount,
+            threeMFImagesUploaded: dbResults.threeMFImagesCount || 0,
             totalSize: processedFiles.totalSize,
           }
         },
@@ -376,7 +503,7 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
       // Delete files from database and collect S3 keys for cleanup
       const deletedFiles = await prisma.$transaction(async (tx) => {
         let deletedModelFiles = [];
-        let deletedModelImages = [];
+        let deletedImageFiles = [];
 
         if (modelFileIds.length > 0) {
           // Fetch files before deletion to get S3 keys
@@ -416,11 +543,11 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
                 entityId: modelId
               }
             });
-            deletedModelImages = modelImagesToDelete;
+            deletedImageFiles = modelImagesToDelete;
           }
         }
 
-        return { deletedModelFiles, deletedModelImages };
+        return { deletedModelFiles, deletedImageFiles };
       });
 
       // TODO: In a production system, we should also delete the files from S3
@@ -428,22 +555,22 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
       // For now, we'll just log the S3 keys that should be deleted
       const s3KeysToDelete = [
         ...deletedFiles.deletedModelFiles.map(f => f.url),
-        ...deletedFiles.deletedModelImages.map(f => f.url)
+        ...deletedFiles.deletedImageFiles.map(f => f.url)
       ];
 
       logger.info('Files deleted from database', {
         modelId,
         modelFilesDeleted: deletedFiles.deletedModelFiles.length,
-        modelImagesDeleted: deletedFiles.deletedModelImages.length,
+        imageFilesDeleted: deletedFiles.deletedImageFiles.length,
         s3KeysToDelete
       });
 
       return Response.json({
         success: true,
-        message: `Successfully deleted ${deletedFiles.deletedModelFiles.length + deletedFiles.deletedModelImages.length} files`,
+        message: `Successfully deleted ${deletedFiles.deletedModelFiles.length + deletedFiles.deletedImageFiles.length} files`,
         deletedCounts: {
           modelFiles: deletedFiles.deletedModelFiles.length,
-          modelImages: deletedFiles.deletedModelImages.length
+          imageFiles: deletedFiles.deletedImageFiles.length
         }
       });
 

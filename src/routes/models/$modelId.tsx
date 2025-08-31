@@ -7,6 +7,7 @@ import {
   PhotoIcon,
   ArrowDownTrayIcon,
   TrashIcon,
+  CubeIcon,
 } from "@heroicons/react/24/outline";
 import { Link } from "@tanstack/react-router";
 import { formatFileSize } from "@/lib/file-processing-service";
@@ -37,6 +38,8 @@ function ModelDetailPage() {
       const downloadEndpoint =
         file.type === "modelImage"
           ? `/api/download/model-image/${file.id}`
+          : file.type === "threeMFFile"
+          ? `/api/download/threemf-file/${file.id}`
           : `/api/download/model-file/${file.id}`;
 
       const response = await fetch(downloadEndpoint);
@@ -102,7 +105,8 @@ function ModelDetailPage() {
   }
 
   const modelFiles = modelFilesData?.modelFiles || [];
-  const modelImages = modelFilesData?.modelImages || [];
+  const threeMFFiles = modelFilesData?.threeMFFiles || [];
+  const modelImages = modelFilesData?.imageFiles || [];
   const summary = modelFilesData?.summary;
 
   if (!model) {
@@ -140,6 +144,16 @@ function ModelDetailPage() {
     ...modelFiles.map((file) => ({
       ...file,
       type: "modelFile" as const,
+      fileExtension: file.name.split(".").pop() || "",
+      Model: {
+        id: model.id,
+        name: model.name,
+        Category: model.Category,
+      },
+    })),
+    ...threeMFFiles.map((file) => ({
+      ...file,
+      type: "threeMFFile" as const,
       fileExtension: file.name.split(".").pop() || "",
       Model: {
         id: model.id,
@@ -189,7 +203,8 @@ function ModelDetailPage() {
                 <>
                   <span>{summary.totalFiles} files</span>
                   <span>{summary.modelFilesCount} model files</span>
-                  <span>{summary.modelImagesCount} images</span>
+                  <span>{summary.threeMFFilesCount} 3MF files</span>
+                  <span>{summary.imageFilesCount} images</span>
                   {summary.totalSize > 0 && (
                     <span>
                       {(summary.totalSize / 1024 / 1024).toFixed(1)}MB
@@ -255,18 +270,43 @@ function ModelDetailPage() {
                     <div className="flex-shrink-0">
                       {file.type === "modelImage" ? (
                         <PhotoIcon className="text-muted-foreground h-6 w-6" />
+                      ) : file.type === "threeMFFile" ? (
+                        <CubeIcon className="text-muted-foreground h-6 w-6" />
                       ) : (
                         <DocumentIcon className="text-muted-foreground h-6 w-6" />
                       )}
                     </div>
-                    <div>
-                      <p className="text-foreground text-sm font-medium">
-                        {file.name}
-                      </p>
-                      <p className="text-muted-foreground text-xs">
-                        {formatFileSize(file.size)} •{" "}
-                        {file.fileExtension.toUpperCase()}
-                      </p>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3">
+                        <div>
+                          <p className="text-foreground text-sm font-medium">
+                            {file.name}
+                          </p>
+                          <p className="text-muted-foreground text-xs">
+                            {formatFileSize(file.size)} •{" "}
+                            {file.fileExtension.toUpperCase()}
+                            {file.type === "threeMFFile" && file.extractedImages?.length > 0 && (
+                              <span> • {file.extractedImages.length} embedded image{file.extractedImages.length > 1 ? 's' : ''}</span>
+                            )}
+                          </p>
+                        </div>
+                        {file.type === "threeMFFile" && file.extractedImages?.length > 0 && (
+                          <div className="flex space-x-2">
+                            {file.extractedImages.map((image: any) => (
+                              <img
+                                key={image.id}
+                                src={image.url}
+                                alt={image.name}
+                                className="h-12 w-12 rounded border object-cover"
+                                onError={(e) => {
+                                  // Hide broken images
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                }}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">

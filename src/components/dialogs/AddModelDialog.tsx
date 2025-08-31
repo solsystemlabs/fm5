@@ -69,12 +69,17 @@ export default function AddModelDialog({
         // Create the model first
         const createdModel = await createModelMutation.mutateAsync(value);
 
+        if (!createdModel) {
+          throw new Error("Failed to create model");
+        }
+
         // If we have processed files, queue them for background upload
-        if (processedFiles && (processedFiles.images.length > 0 || processedFiles.modelFiles.length > 0)) {
+        if (processedFiles && (processedFiles.images.length > 0 || processedFiles.modelFiles.length > 0 || processedFiles.threeMFFiles.length > 0)) {
           // Convert processed files back to File objects for upload
           const filesToUpload = [
             ...processedFiles.images.map(img => img.file),
-            ...processedFiles.modelFiles.map(model => model.file)
+            ...processedFiles.modelFiles.map(model => model.file),
+            ...processedFiles.threeMFFiles.map(threeMF => threeMF.file)
           ];
           
           const taskId = queueUpload(createdModel.id, createdModel.name, filesToUpload);
@@ -344,7 +349,7 @@ export default function AddModelDialog({
                 </div>
                 {processedFiles && (
                   <div className="text-sm text-muted-foreground">
-                    {processedFiles.images.length} images, {processedFiles.modelFiles.length} model files
+                    {processedFiles.images.length} images, {processedFiles.modelFiles.length} model files, {processedFiles.threeMFFiles.length} 3MF files
                     {processedFiles.totalSize > 0 && (
                       <span> • {formatFileSize(processedFiles.totalSize)}</span>
                     )}

@@ -2,123 +2,69 @@
 
 import type { FilamentType, Prisma } from "@prisma/client";
 
-export interface MaterialType {
-  id: number;
-  name: string;
-}
+export type MaterialType = Prisma.MaterialTypeGetPayload<{}>;
 
-export interface ModelCategory {
-  id: number;
-  name: string;
-}
+export type ModelCategory = Prisma.ModelCategoryGetPayload<{}>;
 
-export interface Brand {
-  id: number;
-  name: string;
-}
+export type Brand = Prisma.BrandGetPayload<{}>;
 
-export interface Model {
-  id: number;
-  name: string;
-  modelCategoryId: number;
-  Category: ModelCategory;
-  Filaments?: Filament[];
-  ModelFiles?: any[];
-  ModelImage?: any[];
-  SlicedFiles?: SlicedFile[];
-}
+export type Model = Prisma.ModelGetPayload<{
+  include: {
+    Category: true;
+    Filaments: {
+      include: { Material: true; Type: true; Brand: true };
+    };
+    ModelFiles: true;
+    ThreeMFFiles: {
+      include: { SlicedFiles: true };
+    };
+  };
+}>;
 
-export interface SlicedFileFilament {
-  id: number;
-  slicedFileId: number;
-  filamentIndex: number;
+export type ModelFile = Prisma.ModelFileGetPayload<{}>;
 
-  // Total usage
-  lengthUsed?: number;
-  volumeUsed?: number;
-  weightUsed?: number;
+export type ThreeMFFile = Prisma.ThreeMFFileGetPayload<{
+  include: { SlicedFiles: true };
+}>;
 
-  // Usage breakdown by purpose (when available)
-  modelLength?: number;
-  modelVolume?: number;
-  modelWeight?: number;
-  supportLength?: number;
-  supportVolume?: number;
-  supportWeight?: number;
-  towerLength?: number;
-  towerVolume?: number;
-  towerWeight?: number;
-  wasteLength?: number;
-  wasteVolume?: number;
-  wasteWeight?: number;
-  infillLength?: number;
-  infillVolume?: number;
-  infillWeight?: number;
-  wallLength?: number;
-  wallVolume?: number;
-  wallWeight?: number;
+export type File = Prisma.FileGetPayload<{}>;
 
-  // Filament properties
-  filamentType?: string;
-  filamentColor?: string;
-  filamentVendor?: string;
-  density?: number;
-  diameter?: number;
-  nozzleTemp?: number;
-  bedTemp?: number;
-  filamentId?: number;
-}
+export type SlicedFileFilament = Prisma.SlicedFileFilamentGetPayload<{
+  include: { Filament: { include: { Brand: true; Material: true; Type: true } } };
+}>;
 
-export interface SlicedFile {
-  id: number;
-  name: string;
-  modelId: number;
-  url: string;
-  size: number;
-  s3Key?: string;
-  modelFileId?: number;
+export type SlicedFile = Prisma.SlicedFileGetPayload<{
+  include: {
+    SlicedFileFilaments: {
+      include: { Filament: { include: { Brand: true; Material: true; Type: true } } };
+    };
+    ThreeMFFile: true;
+  };
+}>;
 
-  // Basic print information
-  printTimeMinutes?: number;
-  totalTimeMinutes?: number;
-  layerCount?: number;
-  layerHeight?: number;
-  maxZHeight?: number;
-
-  // Slicer information
-  slicerName?: string;
-  slicerVersion?: string;
-  profileName?: string;
-
-  // Printer settings
-  nozzleDiameter?: number;
-  bedType?: string;
-  bedTemperature?: number;
-
-  // Filament totals (aggregated across all filaments)
-  totalFilamentLength?: number;
-  totalFilamentVolume?: number;
-  totalFilamentWeight?: number;
-
-  // Timestamps
-  createdAt: string;
-  updatedAt: string;
-
-  // Relationships
-  SlicedFileFilaments?: SlicedFileFilament[];
-  ModelFile?: any; // Can be expanded later if needed
-}
-
-export interface Product {
-  id: number;
-  name: string;
-  modelId: number;
-  model: Model;
-  price: number | null;
-  slicedFileId: number;
-  slicedFile: SlicedFile;
-  Filaments?: Filament[];
-}
+export type Product = Prisma.ProductGetPayload<{
+  include: {
+    Model: {
+      include: {
+        Category: true;
+        Filaments: {
+          include: { Material: true; Type: true; Brand: true };
+        };
+      };
+    };
+    SlicedFile: {
+      include: {
+        SlicedFileFilaments: {
+          include: { Filament: { include: { Brand: true; Material: true; Type: true } } };
+        };
+        ThreeMFFile: true;
+      };
+    };
+    Filaments: {
+      include: { Material: true; Type: true; Brand: true };
+    };
+  };
+}>;
 
 export type Filament = Prisma.FilamentGetPayload<{
   include: { Material: true; Type: true; Models: true };

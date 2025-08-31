@@ -15,7 +15,9 @@ export const ServerRoute = createServerFileRoute("/api/models").methods({
             },
           },
           ModelFiles: true,
-          ModelImage: true,
+          ThreeMFFiles: {
+            include: { SlicedFiles: true }
+          },
         },
         orderBy: {
           name: "asc",
@@ -62,7 +64,9 @@ export const ServerRoute = createServerFileRoute("/api/models").methods({
             },
           },
           ModelFiles: true,
-          ModelImage: true,
+          ThreeMFFiles: {
+            include: { SlicedFiles: true }
+          },
         },
       });
 

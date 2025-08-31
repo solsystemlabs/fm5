@@ -27,7 +27,7 @@ model Model {
 
 model ModelFile {
   id        Int        @id @default(autoincrement())
-  name      String     @unique
+  name      String
   modelId   Int
   url       String
   size      Int
@@ -37,12 +37,14 @@ model ModelFile {
   updatedAt DateTime   @updatedAt
   Filaments Filament[]
   Model     Model      @relation(fields: [modelId], references: [id])
+
+  @@unique([modelId, name]) // Allow same filename across different models
 }
 
 // New ThreeMFFile entity for 3MF containers
 model ThreeMFFile {
   id        Int      @id @default(autoincrement())
-  name      String   @unique
+  name      String
   url       String
   size      Int
   s3Key     String?
@@ -53,6 +55,8 @@ model ThreeMFFile {
 
   Model       Model        @relation(fields: [modelId], references: [id])
   SlicedFiles SlicedFile[] // Children sliced files
+
+  @@unique([modelId, name]) // Allow same filename across different models
 }
 
 // Tagged union file system - replaces ModelImage
@@ -79,7 +83,7 @@ enum FileEntityType {
 
 model SlicedFile {
   id            Int     @id @default(autoincrement())
-  name          String  @unique
+  name          String
   threeMFFileId Int     // Required parent - no orphaned SlicedFiles
   url           String
   size          Int
@@ -115,6 +119,8 @@ model SlicedFile {
   ThreeMFFile         ThreeMFFile        @relation(fields: [threeMFFileId], references: [id])
   Products            Product[]
   SlicedFileFilaments SlicedFileFilament[] // Junction table for multi-filament
+
+  @@unique([threeMFFileId, name]) // Allow same filename across different 3MF files
 }
 
 // Junction table for multi-filament support

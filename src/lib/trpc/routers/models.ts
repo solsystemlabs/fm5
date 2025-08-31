@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 import { router, publicProcedure, handlePrismaError } from '../init';
 
 // Input validation schemas
@@ -81,7 +82,8 @@ export const modelsRouter = router({
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
       try {
-        const [modelFiles, threeMFFiles, imageFiles] = await Promise.all([
+        // First get ModelFiles and ThreeMF files
+        const [modelFiles, threeMFFiles] = await Promise.all([
           ctx.prisma.modelFile.findMany({
             where: { modelId: input.id },
             orderBy: { id: 'desc' }
@@ -92,26 +94,54 @@ export const modelsRouter = router({
               SlicedFiles: true,
             },
             orderBy: { id: 'desc' }
-          }),
-          ctx.prisma.file.findMany({
-            where: { 
-              entityType: 'MODEL',
-              entityId: input.id 
-            },
-            orderBy: { id: 'desc' }
           })
         ]);
 
+        // Then get all related images
+        const imageFiles = await ctx.prisma.file.findMany({
+          where: { 
+            OR: [
+              {
+                entityType: 'MODEL',
+                entityId: input.id 
+              },
+              ...(threeMFFiles.length > 0 ? [{
+                entityType: 'THREE_MF' as const,
+                entityId: { in: threeMFFiles.map(f => f.id) }
+              }] : [])
+            ]
+          },
+          orderBy: { id: 'desc' }
+        });
+
+        // Group extracted images by their parent ThreeMF file
+        const extractedImagesByThreeMF = imageFiles
+          .filter(file => file.entityType === 'THREE_MF')
+          .reduce((acc, file) => {
+            if (!acc[file.entityId]) acc[file.entityId] = [];
+            acc[file.entityId].push(file);
+            return acc;
+          }, {} as Record<number, typeof imageFiles>);
+
+        // Add extracted images to ThreeMF files
+        const threeMFFilesWithImages = threeMFFiles.map(threeMFFile => ({
+          ...threeMFFile,
+          extractedImages: extractedImagesByThreeMF[threeMFFile.id] || []
+        }));
+
+        // Filter to only get model-level images
+        const modelImages = imageFiles.filter(file => file.entityType === 'MODEL');
+
         return {
           modelFiles,
-          threeMFFiles,
-          imageFiles,
+          threeMFFiles: threeMFFilesWithImages,
+          imageFiles: modelImages,
           summary: {
-            totalFiles: modelFiles.length + threeMFFiles.length + imageFiles.length,
+            totalFiles: modelFiles.length + threeMFFilesWithImages.length + modelImages.length,
             modelFilesCount: modelFiles.length,
-            threeMFFilesCount: threeMFFiles.length,
-            imageFilesCount: imageFiles.length,
-            totalSize: [...modelFiles, ...threeMFFiles, ...imageFiles].reduce((sum, file) => sum + file.size, 0)
+            threeMFFilesCount: threeMFFilesWithImages.length,
+            imageFilesCount: modelImages.length,
+            totalSize: [...modelFiles, ...threeMFFilesWithImages, ...modelImages].reduce((sum, file) => sum + file.size, 0)
           }
         };
       } catch (error) {
@@ -219,9 +249,9 @@ export const modelsRouter = router({
 
         // Delete files from database and collect information for cleanup
         const deletedFiles = await ctx.prisma.$transaction(async (tx) => {
-          let deletedModelFiles = [];
-          let deletedThreeMFFiles = [];
-          let deletedImageFiles = [];
+          let deletedModelFiles: Prisma.ModelFileGetPayload<{}>[] = [];
+          let deletedThreeMFFiles: Prisma.ThreeMFFileGetPayload<{}>[] = [];
+          let deletedImageFiles: Prisma.FileGetPayload<{}>[] = [];
 
           if (modelFileIds.length > 0) {
             // Fetch files before deletion to get S3 keys

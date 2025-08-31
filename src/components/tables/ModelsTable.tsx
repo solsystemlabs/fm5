@@ -1,4 +1,4 @@
-import type { Model, ModelFile, ModelImage } from "@prisma/client";
+import type { Model, ModelFile, ThreeMFFile, File } from "@prisma/client";
 import type { ReactNode } from "react";
 import { Cell, TableBody } from "react-aria-components";
 import { DocumentIcon, PhotoIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
@@ -26,7 +26,7 @@ interface ExtendedModel extends Model {
     };
   }>;
   ModelFiles: ModelFile[];
-  ModelImage: ModelImage[];
+  ThreeMFFiles: ThreeMFFile[];
 }
 
 export default function ModelsTable({ data }: { data: ExtendedModel[] }): ReactNode {
@@ -51,13 +51,8 @@ export default function ModelsTable({ data }: { data: ExtendedModel[] }): ReactN
       </FMTableHeader>
       <TableBody>
         {data.map((model) => {
-          // Convert ModelImages to ImageFile format for the thumbnail grid
-          const imageFiles: ImageFile[] = model.ModelImage.map((image) => ({
-            id: image.id,
-            name: image.name,
-            url: image.url,
-            size: image.size,
-          }));
+          // Note: Images are now in the tagged union File system and would need to be fetched separately
+          const imageFiles: ImageFile[] = [];
 
           return (
             <FMRow key={model.id} className="hover:bg-muted/50 transition-colors group cursor-pointer">
@@ -80,7 +75,7 @@ export default function ModelsTable({ data }: { data: ExtendedModel[] }): ReactN
                 <div className="text-muted-foreground mt-1 flex flex-col sm:hidden">
                   <span>{model.Category.name}</span>
                   <span className="text-xs">
-                    {model.ModelFiles.length + model.ModelImage.length} files
+                    {model.ModelFiles.length + model.ThreeMFFiles.length} files
                   </span>
                 </div>
               </Cell>
@@ -93,10 +88,10 @@ export default function ModelsTable({ data }: { data: ExtendedModel[] }): ReactN
               {/* File Counts */}
               <FMCell className="hidden sm:table-cell">
                 <div className="flex items-center space-x-3 text-sm text-muted-foreground">
-                  {model.ModelImage.length > 0 && (
+                  {model.ThreeMFFiles.length > 0 && (
                     <div className="flex items-center space-x-1 group-hover:text-blue-500 transition-colors">
                       <PhotoIcon className="h-4 w-4" />
-                      <span>{model.ModelImage.length}</span>
+                      <span>{model.ThreeMFFiles.length}</span>
                     </div>
                   )}
                   {model.ModelFiles.length > 0 && (
@@ -105,7 +100,7 @@ export default function ModelsTable({ data }: { data: ExtendedModel[] }): ReactN
                       <span>{model.ModelFiles.length}</span>
                     </div>
                   )}
-                  {model.ModelFiles.length === 0 && model.ModelImage.length === 0 && (
+                  {model.ModelFiles.length === 0 && model.ThreeMFFiles.length === 0 && (
                     <span className="text-xs">No files</span>
                   )}
                 </div>

@@ -43,6 +43,7 @@ import { ServerRoute as ApiFilamentsFilamentIdServerRouteImport } from './routes
 import { ServerRoute as ApiSlicedFilesIdDownloadServerRouteImport } from './routes/api/sliced-files/$id/download'
 import { ServerRoute as ApiModelsIdFilesServerRouteImport } from './routes/api/models/$id/files'
 import { ServerRoute as ApiFilamentsFilamentIdModelsServerRouteImport } from './routes/api/filaments.$filamentId.models'
+import { ServerRoute as ApiDownloadThreemfFileFileIdServerRouteImport } from './routes/api/download/threemf-file/$fileId'
 import { ServerRoute as ApiDownloadModelImageImageIdServerRouteImport } from './routes/api/download/model-image/$imageId'
 import { ServerRoute as ApiDownloadModelFileFileIdServerRouteImport } from './routes/api/download/model-file/$fileId'
 
@@ -214,6 +215,12 @@ const ApiFilamentsFilamentIdModelsServerRoute =
     path: '/models',
     getParentRoute: () => ApiFilamentsFilamentIdServerRoute,
   } as any)
+const ApiDownloadThreemfFileFileIdServerRoute =
+  ApiDownloadThreemfFileFileIdServerRouteImport.update({
+    id: '/api/download/threemf-file/$fileId',
+    path: '/api/download/threemf-file/$fileId',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 const ApiDownloadModelImageImageIdServerRoute =
   ApiDownloadModelImageImageIdServerRouteImport.update({
     id: '/api/download/model-image/$imageId',
@@ -331,6 +338,7 @@ export interface FileServerRoutesByFullPath {
   '/api/trpc/$': typeof ApiTrpcSplatServerRoute
   '/api/download/model-file/$fileId': typeof ApiDownloadModelFileFileIdServerRoute
   '/api/download/model-image/$imageId': typeof ApiDownloadModelImageImageIdServerRoute
+  '/api/download/threemf-file/$fileId': typeof ApiDownloadThreemfFileFileIdServerRoute
   '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
   '/api/models/$id/files': typeof ApiModelsIdFilesServerRoute
   '/api/sliced-files/$id/download': typeof ApiSlicedFilesIdDownloadServerRoute
@@ -358,6 +366,7 @@ export interface FileServerRoutesByTo {
   '/api/trpc/$': typeof ApiTrpcSplatServerRoute
   '/api/download/model-file/$fileId': typeof ApiDownloadModelFileFileIdServerRoute
   '/api/download/model-image/$imageId': typeof ApiDownloadModelImageImageIdServerRoute
+  '/api/download/threemf-file/$fileId': typeof ApiDownloadThreemfFileFileIdServerRoute
   '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
   '/api/models/$id/files': typeof ApiModelsIdFilesServerRoute
   '/api/sliced-files/$id/download': typeof ApiSlicedFilesIdDownloadServerRoute
@@ -386,6 +395,7 @@ export interface FileServerRoutesById {
   '/api/trpc/$': typeof ApiTrpcSplatServerRoute
   '/api/download/model-file/$fileId': typeof ApiDownloadModelFileFileIdServerRoute
   '/api/download/model-image/$imageId': typeof ApiDownloadModelImageImageIdServerRoute
+  '/api/download/threemf-file/$fileId': typeof ApiDownloadThreemfFileFileIdServerRoute
   '/api/filaments/$filamentId/models': typeof ApiFilamentsFilamentIdModelsServerRoute
   '/api/models/$id/files': typeof ApiModelsIdFilesServerRoute
   '/api/sliced-files/$id/download': typeof ApiSlicedFilesIdDownloadServerRoute
@@ -415,6 +425,7 @@ export interface FileServerRouteTypes {
     | '/api/trpc/$'
     | '/api/download/model-file/$fileId'
     | '/api/download/model-image/$imageId'
+    | '/api/download/threemf-file/$fileId'
     | '/api/filaments/$filamentId/models'
     | '/api/models/$id/files'
     | '/api/sliced-files/$id/download'
@@ -442,6 +453,7 @@ export interface FileServerRouteTypes {
     | '/api/trpc/$'
     | '/api/download/model-file/$fileId'
     | '/api/download/model-image/$imageId'
+    | '/api/download/threemf-file/$fileId'
     | '/api/filaments/$filamentId/models'
     | '/api/models/$id/files'
     | '/api/sliced-files/$id/download'
@@ -469,6 +481,7 @@ export interface FileServerRouteTypes {
     | '/api/trpc/$'
     | '/api/download/model-file/$fileId'
     | '/api/download/model-image/$imageId'
+    | '/api/download/threemf-file/$fileId'
     | '/api/filaments/$filamentId/models'
     | '/api/models/$id/files'
     | '/api/sliced-files/$id/download'
@@ -492,6 +505,7 @@ export interface RootServerRouteChildren {
   ApiTrpcSplatServerRoute: typeof ApiTrpcSplatServerRoute
   ApiDownloadModelFileFileIdServerRoute: typeof ApiDownloadModelFileFileIdServerRoute
   ApiDownloadModelImageImageIdServerRoute: typeof ApiDownloadModelImageImageIdServerRoute
+  ApiDownloadThreemfFileFileIdServerRoute: typeof ApiDownloadThreemfFileFileIdServerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -724,6 +738,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiFilamentsFilamentIdModelsServerRouteImport
       parentRoute: typeof ApiFilamentsFilamentIdServerRoute
     }
+    '/api/download/threemf-file/$fileId': {
+      id: '/api/download/threemf-file/$fileId'
+      path: '/api/download/threemf-file/$fileId'
+      fullPath: '/api/download/threemf-file/$fileId'
+      preLoaderRoute: typeof ApiDownloadThreemfFileFileIdServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/download/model-image/$imageId': {
       id: '/api/download/model-image/$imageId'
       path: '/api/download/model-image/$imageId'
@@ -862,6 +883,8 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiDownloadModelFileFileIdServerRoute: ApiDownloadModelFileFileIdServerRoute,
   ApiDownloadModelImageImageIdServerRoute:
     ApiDownloadModelImageImageIdServerRoute,
+  ApiDownloadThreemfFileFileIdServerRoute:
+    ApiDownloadThreemfFileFileIdServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport
   ._addFileChildren(rootServerRouteChildren)

@@ -139,6 +139,26 @@ export function generateModelImageS3Key(
   return s3Key;
 }
 
+export function generateThreeMFFileS3Key(
+  modelId: number,
+  filename: string,
+): string {
+  const config = getS3Config();
+  const sanitizedFilename = sanitizeFilename(filename);
+
+  const s3Key = `${config.projectName}/${config.environment}/threeMFFiles/model-${modelId}/${sanitizedFilename}`;
+
+  logger.info("Generated 3MF file S3 key", {
+    modelId,
+    originalFilename: filename,
+    sanitizedFilename,
+    s3Key,
+    environment: config.environment,
+  });
+
+  return s3Key;
+}
+
 /**
  * Upload file to S3
  */
@@ -312,7 +332,7 @@ export async function upload3MFFile(
   }
 
   // Generate S3 key
-  const s3Key = generateS3Key(modelId, file.name);
+  const s3Key = generateThreeMFFileS3Key(modelId, file.name);
 
   // Set appropriate content type for 3MF files
   const contentType = "application/vnd.ms-3mfdocument";

@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { router, publicProcedure, handlePrismaError } from '../init';
+import { z } from "zod";
+import { router, publicProcedure, handlePrismaError } from "../init";
 
 // Input validation schema for creating filaments (matching existing API)
 const createFilamentSchema = z.object({
@@ -56,10 +56,7 @@ export const filamentsRouter = router({
             },
           },
         },
-        orderBy: [
-          { Material: { name: 'asc' } },
-          { color: 'asc' }
-        ]
+        orderBy: [{ Material: { name: "asc" } }, { color: "asc" }],
       });
 
       // Group by material type
@@ -78,7 +75,6 @@ export const filamentsRouter = router({
     }
   }),
 
-  // Get single filament by ID
   byId: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
@@ -137,11 +133,12 @@ export const filamentsRouter = router({
             diameter: input.diameter,
             cost: input.cost,
             grams: input.grams,
-            Models: input.modelIds && input.modelIds.length > 0
-              ? {
-                  connect: input.modelIds.map((id) => ({ id })),
-                }
-              : undefined,
+            Models:
+              input.modelIds && input.modelIds.length > 0
+                ? {
+                    connect: input.modelIds.map((id) => ({ id })),
+                  }
+                : undefined,
           },
           include: {
             Material: true,
@@ -165,16 +162,17 @@ export const filamentsRouter = router({
     .mutation(async ({ ctx, input }) => {
       try {
         const { id, modelIds, ...updateData } = input;
-        
+
         return await ctx.prisma.filament.update({
           where: { id },
           data: {
             ...updateData,
-            Models: modelIds !== undefined
-              ? {
-                  set: modelIds.map((id) => ({ id })),
-                }
-              : undefined,
+            Models:
+              modelIds !== undefined
+                ? {
+                    set: modelIds.map((id) => ({ id })),
+                  }
+                : undefined,
           },
           include: {
             Material: true,
@@ -205,3 +203,4 @@ export const filamentsRouter = router({
       }
     }),
 });
+

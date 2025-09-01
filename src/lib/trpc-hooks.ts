@@ -1,9 +1,3 @@
-/**
- * This file provides React Query hooks using tRPC for type safety.
- * It maintains compatibility with the existing patterns while adding
- * end-to-end type safety.
- */
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "./trpc/client";
 
@@ -327,7 +321,10 @@ export function useDeleteThreeMFFileTRPC() {
 
 // ===== FILES (Tagged Union System) =====
 
-export function useFilesByEntityTRPC(entityType: 'MODEL' | 'THREE_MF' | 'SLICED_FILE', entityId: number) {
+export function useFilesByEntityTRPC(
+  entityType: "MODEL" | "THREE_MF" | "SLICED_FILE",
+  entityId: number,
+) {
   const trpc = useTRPC();
   return useQuery(trpc.files.byEntity.queryOptions({ entityType, entityId }));
 }
@@ -490,4 +487,3 @@ export function useCreateModelCategoryTRPC() {
     }),
   );
 }
-

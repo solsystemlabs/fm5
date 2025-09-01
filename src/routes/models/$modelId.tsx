@@ -1,17 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { z } from "zod";
+import ImagePreviewGallery from "@/components/ImagePreviewGallery";
+import { formatFileSize } from "@/lib/file-processing-service";
 import { useModelFilesByModelTRPC, useModelsTRPC } from "@/lib/trpc-hooks";
 import {
+  ArrowDownTrayIcon,
   ChevronLeftIcon,
+  CubeIcon,
   DocumentIcon,
   PhotoIcon,
-  ArrowDownTrayIcon,
-  TrashIcon,
-  CubeIcon,
 } from "@heroicons/react/24/outline";
-import { Link } from "@tanstack/react-router";
-import { formatFileSize } from "@/lib/file-processing-service";
-import ImagePreviewGallery from "@/components/ImagePreviewGallery";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/models/$modelId")({
   component: ModelDetailPage,
@@ -29,18 +26,16 @@ function ModelDetailPage() {
   const isLoading = filesLoading || modelsLoading;
   const error = filesError;
 
-  // Find the specific model from the models list
   const model = modelsData?.find((m) => m.id === parseInt(modelId));
 
-  // Handle file download
   const handleFileDownload = async (file: any) => {
     try {
       const downloadEndpoint =
         file.type === "modelImage"
           ? `/api/download/model-image/${file.id}`
           : file.type === "threeMFFile"
-          ? `/api/download/threemf-file/${file.id}`
-          : `/api/download/model-file/${file.id}`;
+            ? `/api/download/threemf-file/${file.id}`
+            : `/api/download/model-file/${file.id}`;
 
       const response = await fetch(downloadEndpoint);
 
@@ -285,27 +280,35 @@ function ModelDetailPage() {
                           <p className="text-muted-foreground text-xs">
                             {formatFileSize(file.size)} •{" "}
                             {file.fileExtension.toUpperCase()}
-                            {file.type === "threeMFFile" && file.extractedImages?.length > 0 && (
-                              <span> • {file.extractedImages.length} embedded image{file.extractedImages.length > 1 ? 's' : ''}</span>
-                            )}
+                            {file.type === "threeMFFile" &&
+                              file.extractedImages?.length > 0 && (
+                                <span>
+                                  {" "}
+                                  • {file.extractedImages.length} embedded image
+                                  {file.extractedImages.length > 1 ? "s" : ""}
+                                </span>
+                              )}
                           </p>
                         </div>
-                        {file.type === "threeMFFile" && file.extractedImages?.length > 0 && (
-                          <div className="flex space-x-2">
-                            {file.extractedImages.map((image: any) => (
-                              <img
-                                key={image.id}
-                                src={image.url}
-                                alt={image.name}
-                                className="h-12 w-12 rounded border object-cover"
-                                onError={(e) => {
-                                  // Hide broken images
-                                  (e.target as HTMLImageElement).style.display = 'none';
-                                }}
-                              />
-                            ))}
-                          </div>
-                        )}
+                        {file.type === "threeMFFile" &&
+                          file.extractedImages?.length > 0 && (
+                            <div className="flex space-x-2">
+                              {file.extractedImages.map((image: any) => (
+                                <img
+                                  key={image.id}
+                                  src={image.url}
+                                  alt={image.name}
+                                  className="h-12 w-12 rounded border object-cover"
+                                  onError={(e) => {
+                                    // Hide broken images
+                                    (
+                                      e.target as HTMLImageElement
+                                    ).style.display = "none";
+                                  }}
+                                />
+                              ))}
+                            </div>
+                          )}
                       </div>
                     </div>
                   </div>
@@ -327,4 +330,3 @@ function ModelDetailPage() {
     </div>
   );
 }
-

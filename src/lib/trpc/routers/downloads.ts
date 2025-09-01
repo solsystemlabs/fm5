@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { router, publicProcedure, handlePrismaError } from '../init';
+import { z } from "zod";
+import { router, publicProcedure, handlePrismaError } from "../init";
 
 // Note: This router provides download metadata and signed URLs.
 // Actual file streaming still needs to be handled by API routes due to tRPC limitations.
@@ -93,7 +93,7 @@ export const downloadsRouter = router({
           filename: threeMFFile.name,
           size: threeMFFile.size,
           hasGcode: threeMFFile.hasGcode,
-          contentType: 'application/vnd.ms-package.3dmanufacturing-3dmodel+xml',
+          contentType: "application/vnd.ms-package.3dmanufacturing-3dmodel+xml",
           model: threeMFFile.Model,
         };
       } catch (error) {
@@ -130,7 +130,7 @@ export const downloadsRouter = router({
           downloadUrl: slicedFile.url,
           filename: slicedFile.name,
           size: slicedFile.size,
-          contentType: 'text/plain', // .gcode files are plain text
+          contentType: "text/plain", // .gcode files are plain text
           printTimeMinutes: slicedFile.printTimeMinutes,
           slicerName: slicedFile.slicerName,
           slicerVersion: slicedFile.slicerVersion,
@@ -143,10 +143,12 @@ export const downloadsRouter = router({
 
   // Get batch download URLs for multiple files
   batch: publicProcedure
-    .input(z.object({ 
-      fileIds: z.array(z.number()).min(1, "At least one file ID required"),
-      entityType: z.enum(['MODEL', 'THREE_MF', 'SLICED_FILE']).optional(),
-    }))
+    .input(
+      z.object({
+        fileIds: z.array(z.number()).min(1, "At least one file ID required"),
+        entityType: z.enum(["MODEL", "THREE_MF", "SLICED_FILE"]).optional(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       try {
         const whereClause: any = {
@@ -161,7 +163,7 @@ export const downloadsRouter = router({
           where: whereClause,
         });
 
-        return files.map(file => ({
+        return files.map((file) => ({
           fileId: file.id,
           downloadUrl: file.url,
           filename: file.name,
@@ -178,27 +180,28 @@ export const downloadsRouter = router({
 
 // Helper function to determine content type from filename
 function getContentTypeFromFilename(filename: string): string {
-  const extension = filename.toLowerCase().split('.').pop();
-  
+  const extension = filename.toLowerCase().split(".").pop();
+
   switch (extension) {
-    case 'png':
-      return 'image/png';
-    case 'jpg':
-    case 'jpeg':
-      return 'image/jpeg';
-    case 'gif':
-      return 'image/gif';
-    case 'webp':
-      return 'image/webp';
-    case 'stl':
-      return 'application/sla';
-    case 'obj':
-      return 'text/plain';
-    case '3mf':
-      return 'application/vnd.ms-package.3dmanufacturing-3dmodel+xml';
-    case 'gcode':
-      return 'text/plain';
+    case "png":
+      return "image/png";
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg";
+    case "gif":
+      return "image/gif";
+    case "webp":
+      return "image/webp";
+    case "stl":
+      return "application/sla";
+    case "obj":
+      return "text/plain";
+    case "3mf":
+      return "application/vnd.ms-package.3dmanufacturing-3dmodel+xml";
+    case "gcode":
+      return "text/plain";
     default:
-      return 'application/octet-stream';
+      return "application/octet-stream";
   }
 }
+

@@ -82,9 +82,6 @@ export function sanitizeFilename(filename: string): string {
   );
 }
 
-/**
- * Generate S3 key following the hierarchy: {PROJECT_NAME}/slicedFiles/{ENVIRONMENT}/model-{MODEL_ID}/{filename}
- */
 export function generateS3Key(modelId: number, filename: string): string {
   const config = getS3Config();
   const sanitizedFilename = sanitizeFilename(filename);
@@ -102,9 +99,6 @@ export function generateS3Key(modelId: number, filename: string): string {
   return s3Key;
 }
 
-/**
- * Generate S3 key for model files following: {PROJECT_NAME}/{ENVIRONMENT}/modelFiles/model-{MODEL_ID}/{filename}
- */
 export function generateModelFileS3Key(
   modelId: number,
   filename: string,
@@ -125,9 +119,6 @@ export function generateModelFileS3Key(
   return s3Key;
 }
 
-/**
- * Generate S3 key for model images following: {PROJECT_NAME}/{ENVIRONMENT}/imageFiles/model-{MODEL_ID}/{filename}
- */
 export function generateModelImageS3Key(
   modelId: number,
   filename: string,

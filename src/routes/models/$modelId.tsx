@@ -1,12 +1,13 @@
 import ImagePreviewGallery from "@/components/ImagePreviewGallery";
 import { formatFileSize } from "@/lib/file-processing-service";
-import { useModelFilesByModelTRPC, useModelsTRPC } from "@/lib/trpc-hooks";
+import { useModelFilesByModelTRPC, useModelsTRPC, useSlicedFilesByModelTRPC } from "@/lib/trpc-hooks";
 import {
   ArrowDownTrayIcon,
   ChevronLeftIcon,
   CubeIcon,
   DocumentIcon,
   PhotoIcon,
+  PlayIcon,
 } from "@heroicons/react/24/outline";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
@@ -22,9 +23,14 @@ function ModelDetailPage() {
     error: filesError,
   } = useModelFilesByModelTRPC(parseInt(modelId));
   const { data: modelsData, isLoading: modelsLoading } = useModelsTRPC();
+  const {
+    data: slicedFilesData = [],
+    isLoading: slicedFilesLoading,
+    error: slicedFilesError,
+  } = useSlicedFilesByModelTRPC(parseInt(modelId));
 
-  const isLoading = filesLoading || modelsLoading;
-  const error = filesError;
+  const isLoading = filesLoading || modelsLoading || slicedFilesLoading;
+  const error = filesError || slicedFilesError;
 
   const model = modelsData?.find((m) => m.id === parseInt(modelId));
 
@@ -35,7 +41,9 @@ function ModelDetailPage() {
           ? `/api/download/model-image/${file.id}`
           : file.type === "threeMFFile"
             ? `/api/download/threemf-file/${file.id}`
-            : `/api/download/model-file/${file.id}`;
+            : file.type === "slicedFile"
+              ? `/api/download/sliced-files/${file.id}/download`
+              : `/api/download/model-file/${file.id}`;
 
       const response = await fetch(downloadEndpoint);
 
@@ -199,6 +207,7 @@ function ModelDetailPage() {
                   <span>{summary.totalFiles} files</span>
                   <span>{summary.modelFilesCount} model files</span>
                   <span>{summary.threeMFFilesCount} 3MF files</span>
+                  <span>{slicedFilesData.length} sliced files</span>
                   <span>{summary.imageFilesCount} images</span>
                   {summary.totalSize > 0 && (
                     <span>
@@ -229,6 +238,67 @@ function ModelDetailPage() {
         </div>
       </div>
 
+      {/* Sliced Files Section - Priority */}
+      {slicedFilesData.length > 0 && (
+        <div className="bg-card rounded-lg shadow">
+          <div className="border-border border-b p-6">
+            <h2 className="text-foreground text-xl font-semibold flex items-center space-x-2">
+              <PlayIcon className="h-6 w-6 text-green-600" />
+              <span>Ready to Print ({slicedFilesData.length})</span>
+            </h2>
+            <p className="text-muted-foreground mt-1">
+              Pre-sliced files ready for 3D printing.
+            </p>
+          </div>
+          <div className="p-6">
+            <div className="space-y-4">
+              {slicedFilesData.map((slicedFile) => (
+                <div
+                  key={slicedFile.id}
+                  className="border-border flex items-center justify-between rounded-lg border p-4 bg-green-50/50 dark:bg-green-900/10"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="flex-shrink-0">
+                      <PlayIcon className="text-green-600 h-6 w-6" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3">
+                        <div>
+                          <p className="text-foreground text-sm font-medium">
+                            {slicedFile.name}
+                          </p>
+                          <p className="text-muted-foreground text-xs">
+                            {formatFileSize(slicedFile.size)} • GCODE
+                            {slicedFile.printTimeMinutes && (
+                              <span>
+                                {" "}
+                                • {Math.floor(slicedFile.printTimeMinutes / 60)}h {slicedFile.printTimeMinutes % 60}m print time
+                              </span>
+                            )}
+                            {slicedFile.slicerName && (
+                              <span> • {slicedFile.slicerName}</span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => handleFileDownload({ ...slicedFile, type: "slicedFile" })}
+                      className="text-muted-foreground hover:text-primary hover:bg-muted inline-flex items-center rounded-md p-2 transition-colors"
+                      title="Download sliced file"
+                    >
+                      <ArrowDownTrayIcon className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Image Gallery */}
       {imageFiles.length > 0 && (
         <div className="bg-card rounded-lg p-6 shadow">
@@ -244,9 +314,9 @@ function ModelDetailPage() {
       {/* Files Table */}
       <div className="bg-card rounded-lg shadow">
         <div className="border-border border-b p-6">
-          <h2 className="text-foreground text-xl font-semibold">Files</h2>
+          <h2 className="text-foreground text-xl font-semibold">Source Files</h2>
           <p className="text-muted-foreground mt-1">
-            All files and images associated with this model.
+            Original model files, 3MF files, and images associated with this model.
           </p>
         </div>
         <div className="p-6">
@@ -288,6 +358,15 @@ function ModelDetailPage() {
                                   {file.extractedImages.length > 1 ? "s" : ""}
                                 </span>
                               )}
+                            {file.type === "threeMFFile" && (() => {
+                              const slicedFilesForThisMF = slicedFilesData.filter(sf => sf.threeMFFileId === file.id);
+                              return slicedFilesForThisMF.length > 0 && (
+                                <span className="text-green-600">
+                                  {" "}
+                                  • {slicedFilesForThisMF.length} sliced file{slicedFilesForThisMF.length > 1 ? "s" : ""}
+                                </span>
+                              );
+                            })()}
                           </p>
                         </div>
                         {file.type === "threeMFFile" &&

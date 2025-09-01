@@ -2,10 +2,9 @@ import { useModelsTRPC } from "@/lib/trpc-hooks";
 import { useTRPC } from "@/lib/trpc/client";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import ModelsTreeView from "../../components/trees/ModelsTreeView";
+import ModelsTable from "../../components/tables/ModelsTable";
 import FMButton from "../../components/ui/FMButton";
 import AddModelDialog from "../../components/dialogs/AddModelDialog";
-import { transformModelsToTree } from "@/lib/tree-utils";
 
 export const Route = createFileRoute("/models/")({
   component: ModelsPage,
@@ -50,17 +49,13 @@ function ModelsPage() {
       return acc;
     }, {} as Record<number, any[]>);
 
-  // Transform flat models data into tree structure
-  const treeData = transformModelsToTree(models, imagesByModel);
-
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="flex">
         <div className="sm:flex-auto">
           <h1 className="text-foreground text-base font-semibold">Models</h1>
           <p className="text-muted-foreground mt-2 text-sm">
-            Explore your 3D models in a hierarchical view. Expand models to see
-            their associated files and images.
+            Manage your 3D models. Click on a model to view its files and details.
           </p>
         </div>
         <AddModelDialog
@@ -76,9 +71,18 @@ function ModelsPage() {
         <div className="mt-8 p-8 text-center">
           <p className="text-muted-foreground">Loading models...</p>
         </div>
+      ) : models.length === 0 ? (
+        <div className="mt-8 py-12 text-center">
+          <h3 className="text-foreground mb-2 text-lg font-medium">
+            No models found
+          </h3>
+          <p className="text-muted-foreground">
+            Create your first model to see it here with its associated files.
+          </p>
+        </div>
       ) : (
         <div className="mt-8">
-          <ModelsTreeView data={treeData.models} />
+          <ModelsTable data={models} imagesByModel={imagesByModel} />
         </div>
       )}
     </div>

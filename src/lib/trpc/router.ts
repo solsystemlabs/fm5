@@ -1,3 +1,4 @@
+import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
 import { router } from './init';
 import { filamentsRouter } from './routers/filaments';
 import { modelsRouter } from './routers/models';
@@ -27,3 +28,7 @@ export const appRouter = router({
 });
 
 export type AppRouter = typeof appRouter;
+
+// Export type helpers for client-side usage
+export type RouterInputs = inferRouterInputs<AppRouter>;
+export type RouterOutputs = inferRouterOutputs<AppRouter>;

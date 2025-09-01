@@ -327,7 +327,7 @@ export async function extract3MFImages(
         logger.warn("Failed to extract image from 3MF", {
           filename,
           threeMFFile: threeMFFile.name,
-          error: error instanceof Error ? error.message : "Unknown error",
+          error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : "Unknown error"),
         });
       }
     }
@@ -341,7 +341,7 @@ export async function extract3MFImages(
   } catch (error) {
     logger.error("3MF image extraction failed", {
       filename: threeMFFile.name,
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : "Unknown error"),
     });
     // Return empty array instead of throwing - 3MF might not have images
     return [];
@@ -416,7 +416,7 @@ export async function extractZipFiles(zipFile: File): Promise<ProcessedFiles> {
       } catch (error) {
         logger.warn("Failed to extract file from ZIP", {
           filename,
-          error: error instanceof Error ? error.message : "Unknown error",
+          error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : "Unknown error"),
         });
       }
     }
@@ -433,7 +433,7 @@ export async function extractZipFiles(zipFile: File): Promise<ProcessedFiles> {
   } catch (error) {
     logger.error("ZIP extraction failed", {
       filename: zipFile.name,
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : "Unknown error"),
     });
     throw new Error(
       `Failed to extract ZIP file: ${error instanceof Error ? error.message : "Unknown error"}`,
@@ -482,7 +482,7 @@ export async function extractZipFilesWithProgress(
       filesToProcess: filesToProcess.length,
       fileList: filesToProcess.map(([filename, zipEntry]) => ({
         name: filename,
-        size: zipEntry._data?.uncompressedSize || 0,
+        size: 0, // JSZip doesn't expose uncompressed size in TypeScript definitions
         dir: zipEntry.dir,
         extension: getFileExtension(filename),
         mimeType: getMimeTypeFromFilename(filename),
@@ -580,7 +580,7 @@ export async function extractZipFilesWithProgress(
       } catch (error) {
         logger.warn("Failed to extract file from ZIP", {
           filename,
-          error: error instanceof Error ? error.message : "Unknown error",
+          error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : "Unknown error"),
         });
         processedFiles++;
       }
@@ -611,7 +611,7 @@ export async function extractZipFilesWithProgress(
   } catch (error) {
     logger.error("Enhanced ZIP extraction failed", {
       filename: zipFile.name,
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : "Unknown error"),
     });
     throw new Error(
       `Failed to extract ZIP file: ${error instanceof Error ? error.message : "Unknown error"}`,
@@ -686,7 +686,7 @@ export async function categorizeFiles(files: File[]): Promise<ProcessedFiles> {
     } catch (error) {
       logger.warn("Failed to process file", {
         filename: file.name,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : "Unknown error"),
       });
     }
   }
@@ -737,7 +737,7 @@ async function getProcessableFileCountFromZip(zipFile: File): Promise<number> {
   } catch (error) {
     logger.warn("Failed to pre-scan ZIP file", {
       filename: zipFile.name,
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : "Unknown error"),
     });
     return 1; // Fallback to at least 1 file
   }
@@ -856,7 +856,7 @@ export async function processUploadedFiles(
     } catch (error) {
       logger.warn("Failed to process 3MF container", {
         filename: threeMFFile.name,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : "Unknown error"),
         stack: error instanceof Error ? error.stack : undefined,
       });
     }

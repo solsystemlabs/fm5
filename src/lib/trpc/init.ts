@@ -20,7 +20,7 @@ export const router = t.router;
 export const publicProcedure = t.procedure;
 
 // Common error handler
-export const handlePrismaError = (error: unknown, fallbackMessage: string) => {
+export const handlePrismaError = (error: unknown, fallbackMessage: string): never => {
   console.error(fallbackMessage, error);
   
   if (error instanceof z.ZodError) {

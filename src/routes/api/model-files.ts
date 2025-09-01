@@ -22,13 +22,9 @@ export const ServerRoute = createServerFileRoute("/api/model-files").methods({
       });
 
       // Also fetch model images for comprehensive file listing
-      const modelImages = await prisma.modelImage.findMany({
-        include: {
-          Model: {
-            include: {
-              Category: true,
-            },
-          },
+      const modelImages = await prisma.file.findMany({
+        where: {
+          entityType: 'MODEL'
         },
         orderBy: {
           id: "desc", // Most recent first
@@ -75,7 +71,7 @@ export const ServerRoute = createServerFileRoute("/api/model-files").methods({
 
     } catch (error) {
       logger.error("Error fetching model files", {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : 'Unknown error'),
         stack: error instanceof Error ? error.stack : undefined
       });
       
@@ -123,14 +119,20 @@ export const ServerRoute = createServerFileRoute("/api/model-files").methods({
         deletedCount = deleteResult.count;
       } else {
         // Get the images before deletion to collect S3 URLs
-        const imagesToDelete = await prisma.modelImage.findMany({
-          where: { id: { in: fileIds } }
+        const imagesToDelete = await prisma.file.findMany({
+          where: { 
+            id: { in: fileIds },
+            entityType: 'MODEL'
+          }
         });
 
         s3UrlsToDelete = imagesToDelete.map(i => i.url);
 
-        const deleteResult = await prisma.modelImage.deleteMany({
-          where: { id: { in: fileIds } }
+        const deleteResult = await prisma.file.deleteMany({
+          where: { 
+            id: { in: fileIds },
+            entityType: 'MODEL'
+          }
         });
 
         deletedCount = deleteResult.count;
@@ -152,7 +154,7 @@ export const ServerRoute = createServerFileRoute("/api/model-files").methods({
 
     } catch (error) {
       logger.error("Error deleting model files", {
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : 'Unknown error')
       });
 
       return Response.json(

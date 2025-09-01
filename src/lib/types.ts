@@ -30,13 +30,13 @@ export type ThreeMFFile = Prisma.ThreeMFFileGetPayload<{
 export type File = Prisma.FileGetPayload<{}>;
 
 export type SlicedFileFilament = Prisma.SlicedFileFilamentGetPayload<{
-  include: { Filament: { include: { Brand: true; Material: true; Type: true } } };
+  include: { filament: { include: { Brand: true; Material: true; Type: true } } };
 }>;
 
 export type SlicedFile = Prisma.SlicedFileGetPayload<{
   include: {
     SlicedFileFilaments: {
-      include: { Filament: { include: { Brand: true; Material: true; Type: true } } };
+      include: { filament: { include: { Brand: true; Material: true; Type: true } } };
     };
     ThreeMFFile: true;
   };
@@ -44,7 +44,7 @@ export type SlicedFile = Prisma.SlicedFileGetPayload<{
 
 export type Product = Prisma.ProductGetPayload<{
   include: {
-    Model: {
+    model: {
       include: {
         Category: true;
         Filaments: {
@@ -52,10 +52,10 @@ export type Product = Prisma.ProductGetPayload<{
         };
       };
     };
-    SlicedFile: {
+    slicedFile: {
       include: {
         SlicedFileFilaments: {
-          include: { Filament: { include: { Brand: true; Material: true; Type: true } } };
+          include: { filament: { include: { Brand: true; Material: true; Type: true } } };
         };
         ThreeMFFile: true;
       };

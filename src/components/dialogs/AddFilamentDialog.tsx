@@ -253,7 +253,7 @@ export default function AddFilamentDialog({
                     (key as string);
                   field.handleChange(selectedBrandName);
                 }}
-                onCreateItem={(name) => createBrandMutation.mutateAsync(name)}
+                onCreateItem={(name) => createBrandMutation.mutateAsync({ name })}
                 isCreating={createBrandMutation.isPending}
                 placeholder="Select a brand"
                 label="Brand"
@@ -290,7 +290,7 @@ export default function AddFilamentDialog({
               selectedKey={field.state.value}
               onSelectionChange={(key) => field.handleChange(key as number)}
               onCreateItem={(name) =>
-                createMaterialTypeMutation.mutateAsync(name)
+                createMaterialTypeMutation.mutateAsync({ name })
               }
               isCreating={createMaterialTypeMutation.isPending}
               placeholder="Select a material type"
@@ -327,7 +327,7 @@ export default function AddFilamentDialog({
               selectedKey={field.state.value}
               onSelectionChange={(key) => field.handleChange(key as number)}
               onCreateItem={(name) =>
-                createFilamentTypeMutation.mutateAsync(name)
+                createFilamentTypeMutation.mutateAsync({ name })
               }
               isCreating={createFilamentTypeMutation.isPending}
               placeholder="Select a filament type"

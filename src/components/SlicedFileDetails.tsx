@@ -167,7 +167,7 @@ export default function SlicedFileDetails({ slicedFile }: SlicedFileDetailsProps
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Model ID:</span>
-              <span className="font-medium">{slicedFile.modelId}</span>
+              <span className="font-medium">{slicedFile.ThreeMFFile.modelId}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">Download:</span>

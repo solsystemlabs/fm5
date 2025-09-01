@@ -247,7 +247,7 @@ export default function AddModelDialog({
               isLoading={categoriesLoading}
               selectedKey={field.state.value}
               onSelectionChange={(key) => field.handleChange(key as number)}
-              onCreateItem={createModelCategoryMutation.mutateAsync}
+              onCreateItem={(name) => createModelCategoryMutation.mutateAsync({ name })}
               isCreating={createModelCategoryMutation.isPending}
               placeholder="Select a category"
               label="Category"

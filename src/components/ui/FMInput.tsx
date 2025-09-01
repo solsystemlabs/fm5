@@ -3,14 +3,14 @@ import type { ReactNode } from "react";
 import { Input, type InputProps } from "react-aria-components";
 import { twMerge } from "tailwind-merge";
 
-type FMInputProps = {
+interface FMInputProps extends Omit<InputProps, "className" | "size"> {
   size?: "sm" | "md" | "lg";
   fullWidth?: boolean;
   className?: string;
-} & Omit<InputProps, "className">;
+}
 
 export default function FMInput({
-  size = "md" as const,
+  size = "md",
   fullWidth = true,
   className,
   ...props

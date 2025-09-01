@@ -387,7 +387,7 @@ export async function uploadLargeFileToS3(
     totalParts: Math.ceil(file.size / partSize),
   });
 
-  let uploadId: string;
+  let uploadId: string | undefined;
 
   try {
     // Step 1: Initiate multipart upload
@@ -763,7 +763,7 @@ export async function uploadModelFilesAndImages(
       logger.error("Failed to upload model file", {
         filename: file.name,
         modelId,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : "Unknown error"),
       });
       result.modelFiles.push({
         s3Key: "",
@@ -784,7 +784,7 @@ export async function uploadModelFilesAndImages(
       logger.error("Failed to upload model image", {
         filename: file.name,
         modelId,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : "Unknown error"),
       });
       result.images.push({
         s3Key: "",
@@ -805,7 +805,7 @@ export async function uploadModelFilesAndImages(
       logger.error("Failed to upload 3MF file", {
         filename: file.name,
         modelId,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : "Unknown error"),
       });
       result.threeMFFiles.push({
         s3Key: "",

@@ -45,7 +45,16 @@ export const slicedFilesRouter = router({
           SlicedFileFilaments: {
             orderBy: {
               filamentIndex: "asc"
-            }
+            },
+            include: {
+              filament: {
+                include: {
+                  Brand: true,
+                  Material: true,
+                  Type: true,
+                },
+              },
+            },
           },
           ThreeMFFile: {
             include: {
@@ -113,7 +122,16 @@ export const slicedFilesRouter = router({
           data: input,
           include: {
             SlicedFileFilaments: {
-              orderBy: { filamentIndex: "asc" }
+              orderBy: { filamentIndex: "asc" },
+              include: {
+                filament: {
+                  include: {
+                    Brand: true,
+                    Material: true,
+                    Type: true,
+                  },
+                },
+              },
             },
             ThreeMFFile: {
               include: {
@@ -143,7 +161,16 @@ export const slicedFilesRouter = router({
           data: updateData,
           include: {
             SlicedFileFilaments: {
-              orderBy: { filamentIndex: "asc" }
+              orderBy: { filamentIndex: "asc" },
+              include: {
+                filament: {
+                  include: {
+                    Brand: true,
+                    Material: true,
+                    Type: true,
+                  },
+                },
+              },
             },
             ThreeMFFile: {
               include: {
@@ -187,7 +214,16 @@ export const slicedFilesRouter = router({
             SlicedFileFilaments: {
               orderBy: {
                 filamentIndex: "asc"
-              }
+              },
+              include: {
+                filament: {
+                  include: {
+                    Brand: true,
+                    Material: true,
+                    Type: true,
+                  },
+                },
+              },
             },
             ThreeMFFile: {
               include: {
@@ -223,7 +259,16 @@ export const slicedFilesRouter = router({
             SlicedFileFilaments: {
               orderBy: {
                 filamentIndex: "asc"
-              }
+              },
+              include: {
+                filament: {
+                  include: {
+                    Brand: true,
+                    Material: true,
+                    Type: true,
+                  },
+                },
+              },
             },
             ThreeMFFile: {
               include: {

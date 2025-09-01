@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, FileEntityType } from "@prisma/client";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { processUploadedFiles, cleanupPreviews } from "@/lib/file-processing-service";
@@ -130,7 +130,7 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
         size: number;
         s3Key: string | null;
         mimeType: string;
-        entityType: string;
+        entityType: FileEntityType;
         entityId: number;
         createdAt: Date;
         updatedAt: Date;
@@ -189,7 +189,7 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
               size: result.size,
               s3Key: result.s3Key || null,
               mimeType,
-              entityType: 'MODEL',
+              entityType: FileEntityType.MODEL,
               entityId: modelId,
               createdAt: new Date(),
               updatedAt: new Date(),
@@ -281,7 +281,7 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
         const modelImages = modelImageRecords.length > 0
           ? await tx.file.findMany({
               where: {
-                entityType: 'MODEL',
+                entityType: FileEntityType.MODEL,
                 entityId: modelId,
                 name: { in: modelImageRecords.map(r => r.name) }
               }
@@ -305,7 +305,7 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
           size: number;
           s3Key: string | null;
           mimeType: string;
-          entityType: string;
+          entityType: FileEntityType;
           entityId: number;
           createdAt: Date;
           updatedAt: Date;
@@ -334,7 +334,7 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
                   size: uploadResult.size,
                   s3Key: uploadResult.s3Key || null,
                   mimeType,
-                  entityType: 'THREE_MF',
+                  entityType: FileEntityType.THREE_MF,
                   entityId: threeMFFile.id,
                   createdAt: new Date(),
                   updatedAt: new Date(),
@@ -409,7 +409,7 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
     } catch (error) {
       logger.error('File upload failed', {
         params,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : 'Unknown error'),
         stack: error instanceof Error ? error.stack : undefined
       });
 
@@ -445,7 +445,7 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
         }),
         prisma.file.findMany({
           where: { 
-            entityType: 'MODEL',
+            entityType: FileEntityType.MODEL,
             entityId: modelId 
           },
           orderBy: { id: 'desc' }
@@ -466,7 +466,7 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
     } catch (error) {
       logger.error('Failed to fetch model files', {
         params,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : 'Unknown error')
       });
 
       if (error instanceof z.ZodError) {
@@ -502,8 +502,29 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
 
       // Delete files from database and collect S3 keys for cleanup
       const deletedFiles = await prisma.$transaction(async (tx) => {
-        let deletedModelFiles = [];
-        let deletedImageFiles = [];
+        let deletedModelFiles: Array<{
+          id: number;
+          name: string;
+          size: number;
+          modelId: number;
+          url: string;
+          s3Key: string | null;
+          fileType: string;
+          createdAt: Date;
+          updatedAt: Date;
+        }> = [];
+        let deletedImageFiles: Array<{
+          id: number;
+          name: string;
+          size: number;
+          url: string;
+          s3Key: string | null;
+          mimeType: string | null;
+          entityType: FileEntityType;
+          entityId: number;
+          createdAt: Date;
+          updatedAt: Date;
+        }> = [];
 
         if (modelFileIds.length > 0) {
           // Fetch files before deletion to get S3 keys
@@ -530,7 +551,7 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
           const modelImagesToDelete = await tx.file.findMany({
             where: {
               id: { in: modelImageIds },
-              entityType: 'MODEL',
+              entityType: FileEntityType.MODEL,
               entityId: modelId // Ensure images belong to this model
             }
           });
@@ -539,7 +560,7 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
             await tx.file.deleteMany({
               where: {
                 id: { in: modelImageIds },
-                entityType: 'MODEL',
+                entityType: FileEntityType.MODEL,
                 entityId: modelId
               }
             });
@@ -577,7 +598,7 @@ export const ServerRoute = createServerFileRoute("/api/models/$id/files").method
     } catch (error) {
       logger.error('Failed to delete model files', {
         params,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : 'Unknown error')
       });
 
       if (error instanceof z.ZodError) {

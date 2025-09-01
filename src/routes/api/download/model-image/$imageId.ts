@@ -82,7 +82,7 @@ export const ServerRoute = createServerFileRoute("/api/download/model-image/$ima
     } catch (error) {
       logger.error('Failed to generate download URL', {
         params,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error : new Error(error instanceof Error ? error.message : 'Unknown error'),
         stack: error instanceof Error ? error.stack : undefined
       });
 

@@ -1,5 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "./trpc/client";
+import type { 
+  FilamentInput,
+  FilamentOutput,
+  ModelInput,
+  ModelOutput,
+  RouterInputs,
+  RouterOutputs 
+} from "./trpc/client";
 
 // ===== FILAMENTS =====
 

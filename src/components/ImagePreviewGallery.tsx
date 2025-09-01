@@ -19,7 +19,7 @@ import {
 } from "react-aria-components";
 
 export interface ImageFile {
-  id?: number;
+  id?: number | string;
   name: string;
   url: string;
   size: number;

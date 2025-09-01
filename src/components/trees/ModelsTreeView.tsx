@@ -5,6 +5,7 @@ import {
   Tree,
   TreeItem,
   TreeItemContent,
+  type Key,
 } from "react-aria-components";
 import {
   ChevronRightIcon,
@@ -31,7 +32,7 @@ export default function ModelsTreeView({
   data,
   className = "",
 }: ModelsTreeViewProps): ReactNode {
-  const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
+  const [expandedKeys, setExpandedKeys] = useState<Set<Key>>(new Set());
   const deleteModelFilesMutation = useDeleteModelFilesTRPC();
   const navigate = useNavigate();
 

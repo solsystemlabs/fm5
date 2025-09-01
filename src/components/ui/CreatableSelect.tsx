@@ -27,7 +27,7 @@ export type CreatableSelectProps<T extends CreatableSelectItem> = {
   isLoading?: boolean;
   selectedKey: string | number | null;
   onSelectionChange: (key: string | number) => void;
-  onCreateItem: (name: string) => Promise<T>;
+  onCreateItem: (name: string) => Promise<T | undefined>;
   isCreating?: boolean;
   placeholder: string;
   label: string;
@@ -66,10 +66,12 @@ export default function CreatableSelect<T extends CreatableSelectItem>({
 
     try {
       const newItem = await onCreateItem(createValue.trim());
-      onSelectionChange(newItem.id);
-      setCreateValue("");
-      setIsCreatingMode(false);
-      state.close(); // Close the popover after successful creation
+      if (newItem) {
+        onSelectionChange(newItem.id);
+        setCreateValue("");
+        setIsCreatingMode(false);
+        state.close(); // Close the popover after successful creation
+      }
     } catch (error) {
       // Error handling is done by the mutation hook
       console.error("Failed to create item:", error);

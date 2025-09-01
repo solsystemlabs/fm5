@@ -249,9 +249,9 @@ export const modelsRouter = router({
 
         // Delete files from database and collect information for cleanup
         const deletedFiles = await ctx.prisma.$transaction(async (tx) => {
-          let deletedModelFiles: Prisma.ModelFileGetPayload<{}>[] = [];
-          let deletedThreeMFFiles: Prisma.ThreeMFFileGetPayload<{}>[] = [];
-          let deletedImageFiles: Prisma.FileGetPayload<{}>[] = [];
+          let deletedModelFiles: Awaited<ReturnType<typeof tx.modelFile.findMany>> = [];
+          let deletedThreeMFFiles: Awaited<ReturnType<typeof tx.threeMFFile.findMany>> = [];
+          let deletedImageFiles: Awaited<ReturnType<typeof tx.file.findMany>> = [];
 
           if (modelFileIds.length > 0) {
             // Fetch files before deletion to get S3 keys

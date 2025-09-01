@@ -3,6 +3,38 @@ import { createTRPCClient, httpBatchLink } from '@trpc/client';
 import { QueryClient } from '@tanstack/react-query';
 import type { AppRouter } from './router';
 
+// Re-export all router types for convenience
+export type { 
+  AppRouter, 
+  RouterInputs, 
+  RouterOutputs 
+} from './router';
+
+// Re-export typed client types
+export type {
+  FilamentInput,
+  FilamentOutput,
+  FilamentListOutput,
+  ModelInput,
+  ModelOutput,
+  ModelListOutput,
+  ModelFilesOutput,
+  SlicedFileInput,
+  SlicedFileOutput,
+  SlicedFileListOutput,
+  ThreeMFFileOutput,
+  ThreeMFFileListOutput,
+  BrandOutput,
+  MaterialTypeOutput,
+  FilamentTypeOutput,
+  ModelCategoryOutput,
+  DashboardAnalyticsOutput,
+  DashboardOverviewOutput,
+  ProductInput,
+  ProductOutput,
+  ProductListOutput
+} from './types';
+
 // Create QueryClient factory for better SSR support
 export function makeQueryClient() {
   return new QueryClient({

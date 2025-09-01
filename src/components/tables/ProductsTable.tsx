@@ -84,7 +84,7 @@ export default function ProductsTable({ data }: { data: Product[] }): ReactNode 
                 title="Delete Product"
                 description="Are you sure you want to delete this product? This action cannot be undone."
                 itemName={product.name}
-                onConfirm={() => deleteProduct.mutate(product.id)}
+                onConfirm={() => deleteProduct.mutate({ id: product.id })}
                 isLoading={deleteProduct.isPending}
               />
             </FMCell>

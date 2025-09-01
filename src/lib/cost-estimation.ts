@@ -101,8 +101,8 @@ export function calculatePrintCost(
       
       return {
         filamentIndex: filament.filamentIndex,
-        filamentType: filament.filamentType,
-        filamentColor: filament.filamentColor,
+        filamentType: filament.filamentType || undefined,
+        filamentColor: filament.filamentColor || undefined,
         weightUsed,
         costPerGram,
         totalCost,

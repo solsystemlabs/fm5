@@ -23,7 +23,7 @@ function formatFileSize(bytes: number): string {
   return `${size.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
 }
 
-function formatTime(minutes?: number): string {
+function formatTime(minutes?: number | null): string {
   if (!minutes) return 'N/A';
   
   const hours = Math.floor(minutes / 60);
@@ -35,7 +35,7 @@ function formatTime(minutes?: number): string {
   return `${mins}m`;
 }
 
-function formatLength(mm?: number): string {
+function formatLength(mm?: number | null): string {
   if (!mm) return 'N/A';
   
   if (mm >= 1000) {
@@ -44,7 +44,7 @@ function formatLength(mm?: number): string {
   return `${mm.toFixed(0)}mm`;
 }
 
-function formatWeight(grams?: number): string {
+function formatWeight(grams?: number | null): string {
   if (!grams) return 'N/A';
   return `${grams.toFixed(1)}g`;
 }
@@ -224,7 +224,7 @@ export default function SlicedFilesTable({
                   title="Delete Sliced File"
                   description="Are you sure you want to delete this sliced file? This action cannot be undone."
                   itemName={slicedFile.name}
-                  onConfirm={() => deleteSlicedFile.mutate(slicedFile.id)}
+                  onConfirm={() => deleteSlicedFile.mutate({ id: slicedFile.id })}
                   isLoading={deleteSlicedFile.isPending}
                   triggerClassName="text-sm font-medium p-0 bg-transparent text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                 />

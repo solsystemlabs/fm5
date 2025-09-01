@@ -8,13 +8,13 @@ export default function FMTable({
   children,
   wrapperClassName,
   tableClassName,
-  onAction,
+  onRowAction,
   ...props
 }: {
   children: ReactNode;
   wrapperClassName?: string;
   tableClassName?: string;
-  onAction?: (key: React.Key) => void;
+  onRowAction?: (key: React.Key) => void;
   [key: string]: any;
 }): ReactNode {
   return (
@@ -30,7 +30,7 @@ export default function FMTable({
         className={twMerge(
           clsx("divide-border relative min-w-full divide-y", tableClassName),
         )}
-        {...(onAction && { onAction })}
+        {...(onRowAction && { onRowAction })}
         {...props}
       >
         {children}

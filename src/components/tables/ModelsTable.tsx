@@ -40,7 +40,7 @@ export default function ModelsTable({
   };
 
   return (
-    <FMTable onAction={handleRowAction}>
+    <FMTable onRowAction={handleRowAction}>
       <FMTableHeader>
         <FMTableHeader.Row>
           <FMColumn className="w-12 rounded-tl-lg py-3.5 pr-3 pl-4 text-left sm:pl-6">
@@ -77,6 +77,7 @@ export default function ModelsTable({
           return (
             <FMRow
               key={model.id}
+              id={model.id}
               className="hover:bg-muted/50 group cursor-pointer transition-colors"
             >
               {/* Image Thumbnails */}

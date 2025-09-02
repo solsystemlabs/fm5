@@ -1,0 +1,24 @@
+# Cloudflare Pages configuration for FM5 Manager
+name = "fm5-manager"
+compatibility_date = "2024-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Pages-specific configuration
+pages_build_output_dir = "./dist"
+
+# Environment-specific configuration for Pages
+# Note: Cloudflare Pages only supports "preview" and "production" environments
+[env.preview]
+vars = { NODE_ENV = "staging", PROJECT_NAME = "fm5-manager" }
+
+[env.production]  
+vars = { NODE_ENV = "production", PROJECT_NAME = "fm5-manager" }
+
+# Headers for security
+[[headers]]
+for = "/*"
+[headers.values]
+X-Frame-Options = "DENY"
+X-Content-Type-Options = "nosniff"
+Referrer-Policy = "strict-origin-when-cross-origin"
+Permissions-Policy = "camera=(), microphone=(), geolocation=()"

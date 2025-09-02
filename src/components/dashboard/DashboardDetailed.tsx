@@ -7,6 +7,7 @@ import {
   ClockIcon,
   ChartBarIcon
 } from "@heroicons/react/24/outline";
+import { useNavigate } from "@tanstack/react-router";
 import { ColorLabel } from "@/components/color/ColorLabel";
 
 interface DetailedData {
@@ -45,7 +46,7 @@ interface DetailedData {
     id: number;
     name: string;
     Category: { name: string };
-    ModelImage: Array<{ url: string; name: string }>;
+    images: Array<{ url: string; name: string }>;
   }>;
 }
 
@@ -54,6 +55,7 @@ interface DashboardDetailedProps {
 }
 
 export function DashboardDetailed({ data }: DashboardDetailedProps) {
+  const navigate = useNavigate();
   const formatTime = (minutes: number | null) => {
     if (!minutes) return "—";
     const hours = Math.floor(minutes / 60);
@@ -280,11 +282,15 @@ export function DashboardDetailed({ data }: DashboardDetailedProps) {
         <div className="p-6">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
             {data.recentModels.map((model) => (
-              <div key={model.id} className="group cursor-pointer">
+              <div 
+                key={model.id} 
+                className="group cursor-pointer"
+                onClick={() => navigate({ to: '/models/$modelId', params: { modelId: model.id.toString() } })}
+              >
                 <div className="aspect-square bg-surface-1 rounded-lg border border-border overflow-hidden mb-3">
-                  {model.ModelImage[0] ? (
+                  {model.images[0] ? (
                     <img 
-                      src={model.ModelImage[0].url} 
+                      src={model.images[0].url} 
                       alt={model.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />

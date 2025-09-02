@@ -1,14 +1,21 @@
 import ImagePreviewGallery from "@/components/ImagePreviewGallery";
+import SlicedFilesGrid from "@/components/SlicedFilesGrid";
+import AddSlicedFileDialog from "@/components/dialogs/AddSlicedFileDialog";
 import { formatFileSize } from "@/lib/file-processing-service";
 import { useModelFilesByModelTRPC, useModelsTRPC, useSlicedFilesByModelTRPC } from "@/lib/trpc-hooks";
 import {
   ArrowDownTrayIcon,
+  ArrowUpTrayIcon,
   ChevronLeftIcon,
   CubeIcon,
   DocumentIcon,
   PhotoIcon,
   PlayIcon,
+  PlusIcon,
 } from "@heroicons/react/24/outline";
+import { useState } from "react";
+import FMButton from "@/components/ui/FMButton";
+import type { SlicedFile } from "@/lib/types";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/models/$modelId")({
@@ -17,6 +24,9 @@ export const Route = createFileRoute("/models/$modelId")({
 
 function ModelDetailPage() {
   const { modelId } = Route.useParams();
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [selectedThreeMFFileId, setSelectedThreeMFFileId] = useState<number | undefined>();
+  
   const {
     data: modelFilesData,
     isLoading: filesLoading,
@@ -27,12 +37,14 @@ function ModelDetailPage() {
     data: slicedFilesData = [],
     isLoading: slicedFilesLoading,
     error: slicedFilesError,
+    refetch: refetchSlicedFiles,
   } = useSlicedFilesByModelTRPC(parseInt(modelId));
 
   const isLoading = filesLoading || modelsLoading || slicedFilesLoading;
   const error = filesError || slicedFilesError;
 
   const model = modelsData?.find((m) => m.id === parseInt(modelId));
+
 
   const handleFileDownload = async (file: any) => {
     try {
@@ -239,65 +251,36 @@ function ModelDetailPage() {
       </div>
 
       {/* Sliced Files Section - Priority */}
-      {slicedFilesData.length > 0 && (
-        <div className="bg-card rounded-lg shadow">
-          <div className="border-border border-b p-6">
-            <h2 className="text-foreground text-xl font-semibold flex items-center space-x-2">
-              <PlayIcon className="h-6 w-6 text-green-600" />
-              <span>Ready to Print ({slicedFilesData.length})</span>
-            </h2>
-            <p className="text-muted-foreground mt-1">
-              Pre-sliced files ready for 3D printing.
-            </p>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              {slicedFilesData.map((slicedFile) => (
-                <div
-                  key={slicedFile.id}
-                  className="border-border flex items-center justify-between rounded-lg border p-4 bg-green-50/50 dark:bg-green-900/10"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="flex-shrink-0">
-                      <PlayIcon className="text-green-600 h-6 w-6" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3">
-                        <div>
-                          <p className="text-foreground text-sm font-medium">
-                            {slicedFile.name}
-                          </p>
-                          <p className="text-muted-foreground text-xs">
-                            {formatFileSize(slicedFile.size)} • GCODE
-                            {slicedFile.printTimeMinutes && (
-                              <span>
-                                {" "}
-                                • {Math.floor(slicedFile.printTimeMinutes / 60)}h {slicedFile.printTimeMinutes % 60}m print time
-                              </span>
-                            )}
-                            {slicedFile.slicerName && (
-                              <span> • {slicedFile.slicerName}</span>
-                            )}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => handleFileDownload({ ...slicedFile, type: "slicedFile" })}
-                      className="text-muted-foreground hover:text-primary hover:bg-muted inline-flex items-center rounded-md p-2 transition-colors"
-                      title="Download sliced file"
-                    >
-                      <ArrowDownTrayIcon className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+      <div className="bg-card rounded-lg shadow">
+        <div className="p-6">
+          <SlicedFilesGrid
+            slicedFiles={slicedFilesData}
+            isLoading={slicedFilesLoading}
+            onDownload={(slicedFile: SlicedFile) => handleFileDownload({ ...slicedFile, type: "slicedFile" })}
+            onUpload={() => {
+              setSelectedThreeMFFileId(undefined); // No pre-selection from grid header
+              setIsUploadDialogOpen(true);
+            }}
+            gridCols={4}
+          />
         </div>
-      )}
+      </div>
+
+      {/* Add Sliced Files Dialog */}
+      <AddSlicedFileDialog
+        isOpen={isUploadDialogOpen}
+        onOpenChange={(open) => {
+          setIsUploadDialogOpen(open);
+          if (!open) {
+            setSelectedThreeMFFileId(undefined); // Reset selection when dialog closes
+          }
+        }}
+        modelId={parseInt(modelId)}
+        preSelectedThreeMFFileId={selectedThreeMFFileId}
+        onSuccess={() => {
+          refetchSlicedFiles();
+        }}
+      />
 
       {/* Image Gallery */}
       {imageFiles.length > 0 && (
@@ -392,6 +375,19 @@ function ModelDetailPage() {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
+                    {/* Upload sliced file button for model files */}
+                    {(file.type === "modelFile" || file.type === "threeMFFile") && (
+                      <button
+                        onClick={() => {
+                          setSelectedThreeMFFileId(file.id);
+                          setIsUploadDialogOpen(true);
+                        }}
+                        className="text-muted-foreground hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 inline-flex items-center rounded-md p-2 transition-colors"
+                        title="Upload sliced file for this model"
+                      >
+                        <ArrowUpTrayIcon className="h-4 w-4" />
+                      </button>
+                    )}
                     <button
                       onClick={() => handleFileDownload(file)}
                       className="text-muted-foreground hover:text-primary hover:bg-muted inline-flex items-center rounded-md p-2 transition-colors"

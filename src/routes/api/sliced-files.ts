@@ -2,7 +2,7 @@ import { createServerFileRoute } from "@tanstack/react-start/server";
 import { PrismaClient, Prisma } from "@prisma/client";
 import { parse3MFMetadata, type Parsed3MFMetadata } from "@/lib/3mf-parser";
 import { logger } from "@/lib/logger";
-import { upload3MFFile } from "@/lib/s3-service";
+import { uploadSlicedFile } from "@/lib/s3-service";
 import { z } from "zod";
 
 const prisma = new PrismaClient();
@@ -11,6 +11,7 @@ const prisma = new PrismaClient();
 const uploadSchema = z.object({
   name: z.string().min(1, "Name is required"),
   modelId: z.number().int().positive("Valid model ID is required"),
+  threeMFFileId: z.number().int().positive("Valid ThreeMF file ID is required"),
   size: z.number().int().positive("Valid file size is required"),
 });
 
@@ -24,7 +25,15 @@ export const ServerRoute = createServerFileRoute("/api/sliced-files").methods({
               filamentIndex: "asc"
             }
           },
-          ModelFile: true
+          ThreeMFFile: {
+            include: {
+              Model: {
+                include: {
+                  Category: true,
+                },
+              },
+            },
+          },
         },
         orderBy: {
           name: "asc",
@@ -47,11 +56,13 @@ export const ServerRoute = createServerFileRoute("/api/sliced-files").methods({
       const file = formData.get("file") as File;
       const name = formData.get("name") as string;
       const modelId = parseInt(formData.get("modelId") as string);
+      const threeMFFileId = parseInt(formData.get("threeMFFileId") as string);
       
       // Validate required fields
       const validation = uploadSchema.safeParse({
         name,
         modelId,
+        threeMFFileId,
         size: file?.size || 0
       });
 
@@ -69,21 +80,21 @@ export const ServerRoute = createServerFileRoute("/api/sliced-files").methods({
         );
       }
 
-      // Check if file is a 3MF file
-      if (!file.name.endsWith('.3mf') && !file.name.endsWith('.gcode.3mf')) {
+      // Check if file is a sliced file (.gcode or .gcode.3mf)
+      if (!file.name.endsWith('.gcode') && !file.name.endsWith('.gcode.3mf')) {
         return Response.json(
-          { error: "Only 3MF files are supported" },
+          { error: "Only sliced files are supported (.gcode or .gcode.3mf)" },
           { status: 400 }
         );
       }
 
-      logger.info("Processing 3MF file upload", { name, size: file.size, modelId });
+      logger.info("Processing sliced file upload", { name, size: file.size, modelId });
 
       // Upload file to S3 first with performance monitoring
       const uploadStartTime = Date.now();
       let s3UploadResult;
       try {
-        s3UploadResult = await upload3MFFile(file, validation.data.modelId, {
+        s3UploadResult = await uploadSlicedFile(file, validation.data.modelId, {
           onProgress: (progress) => {
             const now = Date.now();
             const elapsedTime = now - uploadStartTime;
@@ -140,7 +151,7 @@ export const ServerRoute = createServerFileRoute("/api/sliced-files").methods({
         const slicedFile = await tx.slicedFile.create({
           data: {
             name: validation.data.name,
-            modelId: validation.data.modelId,
+            threeMFFileId: validation.data.threeMFFileId,
             url: s3UploadResult.s3Url,
             size: s3UploadResult.size,
             s3Key: s3UploadResult.s3Key,
@@ -220,7 +231,15 @@ export const ServerRoute = createServerFileRoute("/api/sliced-files").methods({
             SlicedFileFilaments: {
               orderBy: { filamentIndex: "asc" }
             },
-            ModelFile: true
+            ThreeMFFile: {
+              include: {
+                Model: {
+                  include: {
+                    Category: true,
+                  },
+                },
+              },
+            },
           }
         });
       });

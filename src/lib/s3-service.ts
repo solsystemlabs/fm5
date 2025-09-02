@@ -752,6 +752,42 @@ export async function uploadModelImage(
 }
 
 /**
+ * Upload sliced file (.gcode or .gcode.3mf) with automatic content type detection and key generation
+ * These go to the slicedFiles folder, not threeMFFiles
+ */
+export async function uploadSlicedFile(
+  file: File,
+  modelId: number,
+  options: StreamingUploadOptions = {},
+): Promise<UploadResult> {
+  // Validate file type
+  if (!file.name.endsWith(".gcode") && !file.name.endsWith(".gcode.3mf")) {
+    throw new Error("Only sliced files are supported (.gcode or .gcode.3mf)");
+  }
+
+  // Generate S3 key for sliced files folder
+  const s3Key = generateS3Key(modelId, file.name);
+
+  // Set appropriate content type
+  let contentType = "text/plain"; // default for .gcode
+  if (file.name.endsWith(".gcode.3mf")) {
+    contentType = "application/vnd.ms-3mfdocument";
+  }
+
+  logger.info("Starting sliced file upload", {
+    filename: file.name,
+    size: file.size,
+    modelId,
+    s3Key,
+    contentType,
+    useMultipart: file.size > (options.partSize || 5 * 1024 * 1024),
+  });
+
+  // Use smart upload that chooses method based on file size
+  return await uploadWithProgress(file, s3Key, contentType, options);
+}
+
+/**
  * Upload multiple model files and images
  * Returns separate results for each file type
  */

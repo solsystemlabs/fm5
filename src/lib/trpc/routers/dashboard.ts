@@ -68,12 +68,23 @@ export const dashboardRouter = router({
       const materialDistribution = await ctx.prisma.filament.groupBy({
         by: ["materialTypeId"],
         _count: true,
-        include: {
-          Material: {
-            select: { name: true },
+      });
+
+      // Get material type names separately
+      const materialTypes = await ctx.prisma.materialType.findMany({
+        where: {
+          id: {
+            in: materialDistribution.map(d => d.materialTypeId),
           },
         },
+        select: { id: true, name: true },
       });
+
+      // Combine the results
+      const materialDistributionWithNames = materialDistribution.map(dist => ({
+        ...dist,
+        Material: materialTypes.find(mt => mt.id === dist.materialTypeId),
+      }));
 
       // Get brand distribution
       const brandDistribution = await ctx.prisma.filament.groupBy({
@@ -152,7 +163,7 @@ export const dashboardRouter = router({
           totalPrintsWithFilament: filamentUsageStats._count.weightUsed,
         },
         distributions: {
-          materialTypes: materialDistribution,
+          materialTypes: materialDistributionWithNames,
           brands: brandDistribution,
         },
         recentModels: recentModelsWithImages,

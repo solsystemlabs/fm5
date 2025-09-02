@@ -8,6 +8,7 @@ import {
   CurrencyDollarIcon,
   ScaleIcon
 } from "@heroicons/react/24/outline";
+import { useNavigate } from "@tanstack/react-router";
 import { ColorLabel } from "@/components/color/ColorLabel";
 
 interface OverviewData {
@@ -44,7 +45,7 @@ interface RecentModel {
   id: number;
   name: string;
   Category: { name: string };
-  ModelImage: Array<{ url: string; name: string }>;
+  images: Array<{ url: string; name: string }>;
 }
 
 interface DashboardOverviewProps {
@@ -55,6 +56,7 @@ interface DashboardOverviewProps {
 }
 
 export function DashboardOverview({ overview, inventory, printStats, recentModels }: DashboardOverviewProps) {
+  const navigate = useNavigate();
   const formatTime = (minutes: number | null) => {
     if (!minutes) return "—";
     const hours = Math.floor(minutes / 60);
@@ -206,11 +208,15 @@ export function DashboardOverview({ overview, inventory, printStats, recentModel
         <h3 className="text-lg font-semibold mb-4 text-card-foreground">Recent Models</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {recentModels.map((model) => (
-            <div key={model.id} className="group cursor-pointer">
+            <div 
+              key={model.id} 
+              className="group cursor-pointer"
+              onClick={() => navigate({ to: '/models/$modelId', params: { modelId: model.id.toString() } })}
+            >
               <div className="aspect-square bg-surface-1 rounded-lg border border-border overflow-hidden mb-2">
-                {model.ModelImage[0] ? (
+                {model.images[0] ? (
                   <img 
-                    src={model.ModelImage[0].url} 
+                    src={model.images[0].url} 
                     alt={model.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                   />

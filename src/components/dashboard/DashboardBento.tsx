@@ -9,6 +9,7 @@ import {
   FireIcon,
   ArrowTrendingUpIcon
 } from "@heroicons/react/24/outline";
+import { useNavigate } from "@tanstack/react-router";
 import { ColorLabel } from "@/components/color/ColorLabel";
 
 interface BentoData {
@@ -40,7 +41,7 @@ interface BentoData {
     id: number;
     name: string;
     Category: { name: string };
-    ModelImage: Array<{ url: string; name: string }>;
+    images: Array<{ url: string; name: string }>;
   }>;
   distributions: {
     brands: Array<{ brandName: string; _count: number }>;
@@ -52,6 +53,7 @@ interface DashboardBentoProps {
 }
 
 export function DashboardBento({ data }: DashboardBentoProps) {
+  const navigate = useNavigate();
   const formatTime = (minutes: number | null) => {
     if (!minutes) return "—";
     const hours = Math.floor(minutes / 60);
@@ -106,11 +108,15 @@ export function DashboardBento({ data }: DashboardBentoProps) {
         </h3>
         <div className="grid grid-cols-3 gap-3 h-full">
           {data.recentModels.slice(0, 6).map((model) => (
-            <div key={model.id} className="group cursor-pointer">
+            <div 
+              key={model.id} 
+              className="group cursor-pointer"
+              onClick={() => navigate({ to: '/models/$modelId', params: { modelId: model.id.toString() } })}
+            >
               <div className="aspect-square bg-surface-1 rounded-xl border border-border overflow-hidden mb-2">
-                {model.ModelImage[0] ? (
+                {model.images[0] ? (
                   <img 
-                    src={model.ModelImage[0].url} 
+                    src={model.images[0].url} 
                     alt={model.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />

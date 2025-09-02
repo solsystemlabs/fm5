@@ -20,6 +20,7 @@ import { Route as ModelsIndexRouteImport } from './routes/models/index'
 import { Route as InventoryIndexRouteImport } from './routes/inventory/index'
 import { Route as FilamentsIndexRouteImport } from './routes/filaments/index'
 import { Route as ModelsModelIdRouteImport } from './routes/models/$modelId'
+import { ServerRoute as ApiTestServerRouteImport } from './routes/api/test'
 import { ServerRoute as ApiSlicedFilesServerRouteImport } from './routes/api/sliced-files'
 import { ServerRoute as ApiProductsServerRouteImport } from './routes/api/products'
 import { ServerRoute as ApiModelsServerRouteImport } from './routes/api/models'
@@ -31,6 +32,7 @@ import { ServerRoute as ApiHealthServerRouteImport } from './routes/api/health'
 import { ServerRoute as ApiFilamentsGroupedServerRouteImport } from './routes/api/filaments-grouped'
 import { ServerRoute as ApiFilamentsServerRouteImport } from './routes/api/filaments'
 import { ServerRoute as ApiFilamentTypesServerRouteImport } from './routes/api/filament-types'
+import { ServerRoute as ApiDebugServerRouteImport } from './routes/api/debug'
 import { ServerRoute as ApiDashboardAnalyticsServerRouteImport } from './routes/api/dashboard-analytics'
 import { ServerRoute as ApiBrandsServerRouteImport } from './routes/api/brands'
 import { ServerRoute as ApiTrpcSplatServerRouteImport } from './routes/api/trpc/$'
@@ -94,6 +96,11 @@ const ModelsModelIdRoute = ModelsModelIdRouteImport.update({
   path: '/models/$modelId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTestServerRoute = ApiTestServerRouteImport.update({
+  id: '/api/test',
+  path: '/api/test',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
 const ApiSlicedFilesServerRoute = ApiSlicedFilesServerRouteImport.update({
   id: '/api/sliced-files',
   path: '/api/sliced-files',
@@ -149,6 +156,11 @@ const ApiFilamentsServerRoute = ApiFilamentsServerRouteImport.update({
 const ApiFilamentTypesServerRoute = ApiFilamentTypesServerRouteImport.update({
   id: '/api/filament-types',
   path: '/api/filament-types',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiDebugServerRoute = ApiDebugServerRouteImport.update({
+  id: '/api/debug',
+  path: '/api/debug',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiDashboardAnalyticsServerRoute =
@@ -318,6 +330,7 @@ export interface RootRouteChildren {
 export interface FileServerRoutesByFullPath {
   '/api/brands': typeof ApiBrandsServerRoute
   '/api/dashboard-analytics': typeof ApiDashboardAnalyticsServerRoute
+  '/api/debug': typeof ApiDebugServerRoute
   '/api/filament-types': typeof ApiFilamentTypesServerRoute
   '/api/filaments': typeof ApiFilamentsServerRouteWithChildren
   '/api/filaments-grouped': typeof ApiFilamentsGroupedServerRoute
@@ -329,6 +342,7 @@ export interface FileServerRoutesByFullPath {
   '/api/models': typeof ApiModelsServerRouteWithChildren
   '/api/products': typeof ApiProductsServerRouteWithChildren
   '/api/sliced-files': typeof ApiSlicedFilesServerRouteWithChildren
+  '/api/test': typeof ApiTestServerRoute
   '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRouteWithChildren
   '/api/filaments/$id': typeof ApiFilamentsIdServerRoute
   '/api/models/$id': typeof ApiModelsIdServerRouteWithChildren
@@ -346,6 +360,7 @@ export interface FileServerRoutesByFullPath {
 export interface FileServerRoutesByTo {
   '/api/brands': typeof ApiBrandsServerRoute
   '/api/dashboard-analytics': typeof ApiDashboardAnalyticsServerRoute
+  '/api/debug': typeof ApiDebugServerRoute
   '/api/filament-types': typeof ApiFilamentTypesServerRoute
   '/api/filaments': typeof ApiFilamentsServerRouteWithChildren
   '/api/filaments-grouped': typeof ApiFilamentsGroupedServerRoute
@@ -357,6 +372,7 @@ export interface FileServerRoutesByTo {
   '/api/models': typeof ApiModelsServerRouteWithChildren
   '/api/products': typeof ApiProductsServerRouteWithChildren
   '/api/sliced-files': typeof ApiSlicedFilesServerRouteWithChildren
+  '/api/test': typeof ApiTestServerRoute
   '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRouteWithChildren
   '/api/filaments/$id': typeof ApiFilamentsIdServerRoute
   '/api/models/$id': typeof ApiModelsIdServerRouteWithChildren
@@ -375,6 +391,7 @@ export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
   '/api/brands': typeof ApiBrandsServerRoute
   '/api/dashboard-analytics': typeof ApiDashboardAnalyticsServerRoute
+  '/api/debug': typeof ApiDebugServerRoute
   '/api/filament-types': typeof ApiFilamentTypesServerRoute
   '/api/filaments': typeof ApiFilamentsServerRouteWithChildren
   '/api/filaments-grouped': typeof ApiFilamentsGroupedServerRoute
@@ -386,6 +403,7 @@ export interface FileServerRoutesById {
   '/api/models': typeof ApiModelsServerRouteWithChildren
   '/api/products': typeof ApiProductsServerRouteWithChildren
   '/api/sliced-files': typeof ApiSlicedFilesServerRouteWithChildren
+  '/api/test': typeof ApiTestServerRoute
   '/api/filaments/$filamentId': typeof ApiFilamentsFilamentIdServerRouteWithChildren
   '/api/filaments/$id': typeof ApiFilamentsIdServerRoute
   '/api/models/$id': typeof ApiModelsIdServerRouteWithChildren
@@ -405,6 +423,7 @@ export interface FileServerRouteTypes {
   fullPaths:
     | '/api/brands'
     | '/api/dashboard-analytics'
+    | '/api/debug'
     | '/api/filament-types'
     | '/api/filaments'
     | '/api/filaments-grouped'
@@ -416,6 +435,7 @@ export interface FileServerRouteTypes {
     | '/api/models'
     | '/api/products'
     | '/api/sliced-files'
+    | '/api/test'
     | '/api/filaments/$filamentId'
     | '/api/filaments/$id'
     | '/api/models/$id'
@@ -433,6 +453,7 @@ export interface FileServerRouteTypes {
   to:
     | '/api/brands'
     | '/api/dashboard-analytics'
+    | '/api/debug'
     | '/api/filament-types'
     | '/api/filaments'
     | '/api/filaments-grouped'
@@ -444,6 +465,7 @@ export interface FileServerRouteTypes {
     | '/api/models'
     | '/api/products'
     | '/api/sliced-files'
+    | '/api/test'
     | '/api/filaments/$filamentId'
     | '/api/filaments/$id'
     | '/api/models/$id'
@@ -461,6 +483,7 @@ export interface FileServerRouteTypes {
     | '__root__'
     | '/api/brands'
     | '/api/dashboard-analytics'
+    | '/api/debug'
     | '/api/filament-types'
     | '/api/filaments'
     | '/api/filaments-grouped'
@@ -472,6 +495,7 @@ export interface FileServerRouteTypes {
     | '/api/models'
     | '/api/products'
     | '/api/sliced-files'
+    | '/api/test'
     | '/api/filaments/$filamentId'
     | '/api/filaments/$id'
     | '/api/models/$id'
@@ -490,6 +514,7 @@ export interface FileServerRouteTypes {
 export interface RootServerRouteChildren {
   ApiBrandsServerRoute: typeof ApiBrandsServerRoute
   ApiDashboardAnalyticsServerRoute: typeof ApiDashboardAnalyticsServerRoute
+  ApiDebugServerRoute: typeof ApiDebugServerRoute
   ApiFilamentTypesServerRoute: typeof ApiFilamentTypesServerRoute
   ApiFilamentsServerRoute: typeof ApiFilamentsServerRouteWithChildren
   ApiFilamentsGroupedServerRoute: typeof ApiFilamentsGroupedServerRoute
@@ -501,6 +526,7 @@ export interface RootServerRouteChildren {
   ApiModelsServerRoute: typeof ApiModelsServerRouteWithChildren
   ApiProductsServerRoute: typeof ApiProductsServerRouteWithChildren
   ApiSlicedFilesServerRoute: typeof ApiSlicedFilesServerRouteWithChildren
+  ApiTestServerRoute: typeof ApiTestServerRoute
   ApiProxyImageServerRoute: typeof ApiProxyImageServerRoute
   ApiTrpcSplatServerRoute: typeof ApiTrpcSplatServerRoute
   ApiDownloadModelFileFileIdServerRoute: typeof ApiDownloadModelFileFileIdServerRoute
@@ -577,6 +603,13 @@ declare module '@tanstack/react-router' {
 }
 declare module '@tanstack/react-start/server' {
   interface ServerFileRoutesByPath {
+    '/api/test': {
+      id: '/api/test'
+      path: '/api/test'
+      fullPath: '/api/test'
+      preLoaderRoute: typeof ApiTestServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/sliced-files': {
       id: '/api/sliced-files'
       path: '/api/sliced-files'
@@ -652,6 +685,13 @@ declare module '@tanstack/react-start/server' {
       path: '/api/filament-types'
       fullPath: '/api/filament-types'
       preLoaderRoute: typeof ApiFilamentTypesServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/debug': {
+      id: '/api/debug'
+      path: '/api/debug'
+      fullPath: '/api/debug'
+      preLoaderRoute: typeof ApiDebugServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/dashboard-analytics': {
@@ -867,6 +907,7 @@ export const routeTree = rootRouteImport
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiBrandsServerRoute: ApiBrandsServerRoute,
   ApiDashboardAnalyticsServerRoute: ApiDashboardAnalyticsServerRoute,
+  ApiDebugServerRoute: ApiDebugServerRoute,
   ApiFilamentTypesServerRoute: ApiFilamentTypesServerRoute,
   ApiFilamentsServerRoute: ApiFilamentsServerRouteWithChildren,
   ApiFilamentsGroupedServerRoute: ApiFilamentsGroupedServerRoute,
@@ -878,6 +919,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiModelsServerRoute: ApiModelsServerRouteWithChildren,
   ApiProductsServerRoute: ApiProductsServerRouteWithChildren,
   ApiSlicedFilesServerRoute: ApiSlicedFilesServerRouteWithChildren,
+  ApiTestServerRoute: ApiTestServerRoute,
   ApiProxyImageServerRoute: ApiProxyImageServerRoute,
   ApiTrpcSplatServerRoute: ApiTrpcSplatServerRoute,
   ApiDownloadModelFileFileIdServerRoute: ApiDownloadModelFileFileIdServerRoute,

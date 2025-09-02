@@ -1,8 +1,7 @@
 import { createServerFileRoute } from "@tanstack/react-start/server";
 
-export const Route = createServerFileRoute("/api/test")
-  .methods({
-    async GET() {
+export const ServerRoute = createServerFileRoute("/api/test").methods({
+  GET: async ({ request }) => {
       console.log("=== SIMPLE TEST ENDPOINT ===");
       console.log("NODE_ENV:", process.env.NODE_ENV);
       console.log("Timestamp:", new Date().toISOString());
@@ -13,5 +12,5 @@ export const Route = createServerFileRoute("/api/test")
         message: "Basic API routing works!",
         env: process.env.NODE_ENV || "unknown"
       });
-    },
-  });
+  },
+});

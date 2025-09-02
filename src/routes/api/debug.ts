@@ -1,8 +1,7 @@
 import { createServerFileRoute } from "@tanstack/react-start/server";
 
-export const Route = createServerFileRoute("/api/debug")
-  .methods({
-    async GET() {
+export const ServerRoute = createServerFileRoute("/api/debug").methods({
+  GET: async ({ request }) => {
       try {
         console.log("=== DEBUG ENDPOINT CALLED ===");
         
@@ -62,5 +61,5 @@ export const Route = createServerFileRoute("/api/debug")
           { status: 500 }
         );
       }
-    },
-  });
+  },
+});

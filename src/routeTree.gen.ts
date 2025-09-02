@@ -23,6 +23,7 @@ import { Route as ModelsModelIdRouteImport } from './routes/models/$modelId'
 import { ServerRoute as ApiTestServerRouteImport } from './routes/api/test'
 import { ServerRoute as ApiSlicedFilesServerRouteImport } from './routes/api/sliced-files'
 import { ServerRoute as ApiProductsServerRouteImport } from './routes/api/products'
+import { ServerRoute as ApiPingServerRouteImport } from './routes/api/ping'
 import { ServerRoute as ApiModelsServerRouteImport } from './routes/api/models'
 import { ServerRoute as ApiModelFilesServerRouteImport } from './routes/api/model-files'
 import { ServerRoute as ApiModelCategoriesServerRouteImport } from './routes/api/model-categories'
@@ -109,6 +110,11 @@ const ApiSlicedFilesServerRoute = ApiSlicedFilesServerRouteImport.update({
 const ApiProductsServerRoute = ApiProductsServerRouteImport.update({
   id: '/api/products',
   path: '/api/products',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiPingServerRoute = ApiPingServerRouteImport.update({
+  id: '/api/ping',
+  path: '/api/ping',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiModelsServerRoute = ApiModelsServerRouteImport.update({
@@ -340,6 +346,7 @@ export interface FileServerRoutesByFullPath {
   '/api/model-categories': typeof ApiModelCategoriesServerRoute
   '/api/model-files': typeof ApiModelFilesServerRoute
   '/api/models': typeof ApiModelsServerRouteWithChildren
+  '/api/ping': typeof ApiPingServerRoute
   '/api/products': typeof ApiProductsServerRouteWithChildren
   '/api/sliced-files': typeof ApiSlicedFilesServerRouteWithChildren
   '/api/test': typeof ApiTestServerRoute
@@ -370,6 +377,7 @@ export interface FileServerRoutesByTo {
   '/api/model-categories': typeof ApiModelCategoriesServerRoute
   '/api/model-files': typeof ApiModelFilesServerRoute
   '/api/models': typeof ApiModelsServerRouteWithChildren
+  '/api/ping': typeof ApiPingServerRoute
   '/api/products': typeof ApiProductsServerRouteWithChildren
   '/api/sliced-files': typeof ApiSlicedFilesServerRouteWithChildren
   '/api/test': typeof ApiTestServerRoute
@@ -401,6 +409,7 @@ export interface FileServerRoutesById {
   '/api/model-categories': typeof ApiModelCategoriesServerRoute
   '/api/model-files': typeof ApiModelFilesServerRoute
   '/api/models': typeof ApiModelsServerRouteWithChildren
+  '/api/ping': typeof ApiPingServerRoute
   '/api/products': typeof ApiProductsServerRouteWithChildren
   '/api/sliced-files': typeof ApiSlicedFilesServerRouteWithChildren
   '/api/test': typeof ApiTestServerRoute
@@ -433,6 +442,7 @@ export interface FileServerRouteTypes {
     | '/api/model-categories'
     | '/api/model-files'
     | '/api/models'
+    | '/api/ping'
     | '/api/products'
     | '/api/sliced-files'
     | '/api/test'
@@ -463,6 +473,7 @@ export interface FileServerRouteTypes {
     | '/api/model-categories'
     | '/api/model-files'
     | '/api/models'
+    | '/api/ping'
     | '/api/products'
     | '/api/sliced-files'
     | '/api/test'
@@ -493,6 +504,7 @@ export interface FileServerRouteTypes {
     | '/api/model-categories'
     | '/api/model-files'
     | '/api/models'
+    | '/api/ping'
     | '/api/products'
     | '/api/sliced-files'
     | '/api/test'
@@ -524,6 +536,7 @@ export interface RootServerRouteChildren {
   ApiModelCategoriesServerRoute: typeof ApiModelCategoriesServerRoute
   ApiModelFilesServerRoute: typeof ApiModelFilesServerRoute
   ApiModelsServerRoute: typeof ApiModelsServerRouteWithChildren
+  ApiPingServerRoute: typeof ApiPingServerRoute
   ApiProductsServerRoute: typeof ApiProductsServerRouteWithChildren
   ApiSlicedFilesServerRoute: typeof ApiSlicedFilesServerRouteWithChildren
   ApiTestServerRoute: typeof ApiTestServerRoute
@@ -622,6 +635,13 @@ declare module '@tanstack/react-start/server' {
       path: '/api/products'
       fullPath: '/api/products'
       preLoaderRoute: typeof ApiProductsServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/ping': {
+      id: '/api/ping'
+      path: '/api/ping'
+      fullPath: '/api/ping'
+      preLoaderRoute: typeof ApiPingServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/models': {
@@ -917,6 +937,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiModelCategoriesServerRoute: ApiModelCategoriesServerRoute,
   ApiModelFilesServerRoute: ApiModelFilesServerRoute,
   ApiModelsServerRoute: ApiModelsServerRouteWithChildren,
+  ApiPingServerRoute: ApiPingServerRoute,
   ApiProductsServerRoute: ApiProductsServerRouteWithChildren,
   ApiSlicedFilesServerRoute: ApiSlicedFilesServerRouteWithChildren,
   ApiTestServerRoute: ApiTestServerRoute,

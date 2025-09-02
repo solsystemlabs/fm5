@@ -1,9 +1,9 @@
 # Cloudflare Pages configuration for FM5 Manager
 name = "fm5"
-compatibility_date = "2025-08-15"
+compatibility_date = "2024-11-13"
 compatibility_flags = ["nodejs_compat"]
 
-# Pages-specific configuration
+# Pages-specific configuration  
 pages_build_output_dir = "./dist"
 
 # Environment-specific configuration for Pages

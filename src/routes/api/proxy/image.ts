@@ -16,7 +16,11 @@ export const ServerRoute = createServerFileRoute('/api/proxy/image')
       
       try {
         // Validate that it's an S3 URL we own
-        if (!imageUrl.includes('solsystemlabs.s3.us-east-2.amazonaws.com')) {
+        const bucketName = process.env.AWS_S3_BUCKET_NAME || '';
+        const region = process.env.AWS_REGION || 'us-east-2';
+        const expectedS3Url = `${bucketName}.s3.${region}.amazonaws.com`;
+        
+        if (!imageUrl.includes(expectedS3Url)) {
           return new Response('Invalid image source', { status: 400 });
         }
         

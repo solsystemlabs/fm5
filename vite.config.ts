@@ -10,7 +10,13 @@ export default defineConfig({
   },
   plugins: [
     tsConfigPaths(),
-    tanstackStart({ customViteReactPlugin: true }),
+    tanstackStart({ 
+      target: 'netlify',
+      customViteReactPlugin: true,
+      spa: {
+        enabled: true,
+      }
+    }),
     viteReact(),
     tailwindcss(),
   ],

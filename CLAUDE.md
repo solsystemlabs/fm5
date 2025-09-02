@@ -82,10 +82,11 @@ npm run docker:logs      # View PostgreSQL container logs
 
 ### Environment Configuration
 - **Local Development**: Docker PostgreSQL (`npm run dev`)
-- **Staging**: Supabase PostgreSQL (for Netlify deployment)
-- **Production**: TBD (configurable via environment files)
+- **Staging**: Supabase PostgreSQL (staging branch → staging database)
+- **Production**: Supabase PostgreSQL (master branch → production database)
 - **Environment Files**: `.env.local`, `.env.staging`, `.env.production`
 - **Switch Environments**: Use `npm run env:local|staging|production`
+- **Deployment**: Netlify with branch-based deployments
 
 ### Component Structure
 - **Layout Components**: `src/components/layout/` - Header and navigation
@@ -178,3 +179,174 @@ Core entities managed by the application:
 - Always use `npm run dev` which handles database startup automatically
 - Use environment switching commands (`npm run env:*`) for different deployment contexts
 - Monitor Docker logs with `npm run docker:logs` if database issues occur
+
+## Deployment
+
+### Netlify Production Setup
+
+The application is configured for deployment on Netlify with branch-based environments:
+- **Production**: `master` branch → production Supabase database
+- **Staging**: `staging` branch → staging Supabase database
+
+#### Prerequisites
+1. Netlify account with GitHub integration
+2. Supabase projects for production and staging environments
+3. Environment variables configured in both `.env.production` and `.env.staging`
+
+#### Netlify Site Configuration
+
+##### Step 1: Create Two Netlify Sites
+
+**Production Site:**
+1. Go to Netlify dashboard → "Add new site" → "Import an existing project"
+2. Connect your GitHub repository
+3. Configure build settings:
+   - **Build command**: `npm run build`
+   - **Publish directory**: `dist`
+   - **Production branch**: `master`
+4. Deploy site
+
+**Staging Site (Optional - Alternative to branch deploys):**
+1. Create another site following the same steps
+2. Set **Production branch** to `staging`
+3. Configure different custom domain (e.g., `staging.yourdomain.com`)
+
+##### Step 2: Configure Environment Variables
+
+**Important**: In Netlify, environment variables are set directly in the dashboard, not via `.env` files. The build process uses these Netlify environment variables directly.
+
+**For Production Site:**
+In Netlify Dashboard → Site Settings → Build & Deploy → Environment Variables, add these variables with values from your local `.env.production` file:
+
+```bash
+# Database Configuration (from your .env.production)
+DATABASE_URL="postgresql://postgres.YOUR_PROJECT_ID:YOUR_PASSWORD@YOUR_HOST.supabase.com:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.YOUR_PROJECT_ID:YOUR_PASSWORD@YOUR_HOST.supabase.com:5432/postgres"
+
+# Authentication
+BETTER_AUTH_URL="https://yourdomain.com"
+BETTER_AUTH_SECRET="your-secure-production-secret"
+
+# AWS S3 Configuration  
+AWS_ACCESS_KEY_ID="AKIA..."
+AWS_SECRET_ACCESS_KEY="your-aws-secret"
+AWS_REGION="us-east-2"
+AWS_S3_BUCKET_NAME="your-prod-bucket-name"
+AWS_S3_BASE_URL="https://your-cdn-domain.com"
+
+# Project Configuration
+PROJECT_NAME="fm5-manager"
+NODE_ENV="production"
+```
+
+**For Staging Site/Context:**
+In Netlify Dashboard → Site Settings → Build & Deploy → Environment Variables, add these variables with values from your local `.env.staging` file:
+
+```bash
+# Database Configuration (from your .env.staging)
+DATABASE_URL="postgresql://postgres.YOUR_STAGING_ID:YOUR_STAGING_PASSWORD@YOUR_STAGING_HOST.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+DIRECT_URL="postgresql://postgres.YOUR_STAGING_ID:YOUR_STAGING_PASSWORD@YOUR_STAGING_HOST.supabase.com:5432/postgres"
+
+# Authentication
+BETTER_AUTH_URL="https://staging.yourdomain.com"
+BETTER_AUTH_SECRET="your-secure-staging-secret"
+
+# AWS S3 Configuration
+AWS_ACCESS_KEY_ID="AKIA..."
+AWS_SECRET_ACCESS_KEY="your-staging-aws-secret"
+AWS_REGION="us-east-2"  
+AWS_S3_BUCKET_NAME="your-staging-bucket-name"
+AWS_S3_BASE_URL="https://your-staging-cdn-domain.com"
+
+# Project Configuration
+PROJECT_NAME="fm5-manager"
+NODE_ENV="staging"
+```
+
+##### Step 3: Branch Deploy Configuration (Alternative to separate staging site)
+
+For a single site with branch deploys:
+
+1. In Netlify Dashboard → Site Settings → Build & Deploy → Branches
+2. Enable branch deploys for `staging` branch
+3. Configure branch-specific environment variables:
+   - Go to Build & Deploy → Environment Variables
+   - Click "Advanced" and select deploy contexts
+   - Set variables with context `branch:staging`
+
+##### Step 4: Custom Domains (Optional)
+
+**Production:**
+1. Site Settings → Domain management → Add custom domain
+2. Configure your domain's DNS to point to Netlify
+3. Enable HTTPS (automatic with Let's Encrypt)
+
+**Staging:**
+1. Configure subdomain (e.g., `staging.yourdomain.com`)
+2. Point DNS to staging site or configure branch deploy subdomain
+
+#### Deployment Workflow
+
+**Production Deployment:**
+1. Push changes to `master` branch
+2. Netlify automatically builds and deploys to production
+3. Uses production environment variables and database
+
+**Staging Deployment:**
+1. Push changes to `staging` branch  
+2. Netlify automatically builds and deploys to staging
+3. Uses staging environment variables and database
+
+**Testing Deployment:**
+1. Create feature branch from `staging`
+2. Push changes trigger branch deploy
+3. Review deployment at temporary URL before merging
+
+#### Configuration Files
+
+The project includes:
+- **`netlify.toml`**: Netlify configuration with context-specific environment variables and headers
+- **`public/_redirects`**: Route configuration for TanStack Start API routes and SPA routing
+- **`vite.config.ts`**: Configured with `target: 'netlify'` and SPA mode enabled for Netlify deployment
+
+**Note**: The Netlify build process uses `npm ci && npm run build` (not the local `npm run env:*` scripts) because environment variables are provided by Netlify's environment configuration. The `npm ci` ensures all dependencies including devDependencies are properly installed.
+
+**SPA Mode**: The application is configured with SPA mode enabled for Netlify deployment to avoid server-side rendering issues. Server functions and API routes still work through the `/_serverFn/*` and `/api/*` paths.
+
+#### Database Migrations
+
+**Important**: Run database migrations manually when needed:
+
+```bash
+# For production (after deploying schema changes)
+npm run env:production
+npx prisma migrate deploy
+
+# For staging
+npm run env:staging  
+npx prisma migrate deploy
+```
+
+#### Monitoring & Troubleshooting
+
+**Common Issues:**
+1. **Build failures**: Check environment variables are set correctly in Netlify
+2. **Database connection errors**: Verify Supabase connection strings and IP allowlisting
+3. **API routes not working**: Ensure `_redirects` file is in `public/` directory
+4. **Environment variable not found**: Check context-specific configuration in Netlify
+5. **Secrets scanning errors**: The project includes `SECRETS_SCAN_OMIT_PATHS` in `netlify.toml` to exclude documentation files from secrets scanning
+
+**Useful Netlify CLI Commands:**
+```bash
+# Link local project to Netlify site
+netlify link
+
+# Test build locally with production context
+netlify build --context production
+
+# Deploy directly (bypass Git)
+netlify deploy --prod
+
+# Check environment variables
+netlify env:list --context production
+```

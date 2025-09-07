@@ -1,0 +1,80 @@
+{
+  "name": "fm5",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npm run dev:db && vite dev --port 3000",
+    "dev:db": "docker compose up -d postgres && npm run db:wait",
+    "db:wait": "until docker compose exec -T postgres pg_isready -U fm5_user -d fm5_dev >/dev/null 2>&1; do sleep 1; done && echo 'Database is ready!'",
+    "start": "node .output/server/index.mjs",
+    "build": "vite build",
+    "serve": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint",
+    "format": "prettier",
+    "check": "prettier --write . && eslint --fix",
+    "prepare": "husky",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:migrate:status": "prisma migrate status",
+    "db:reset": "prisma migrate reset",
+    "db:studio": "prisma studio",
+    "db:seed": "npx prisma db seed",
+    "deploy": "npm run build && wrangler deploy",
+    "cf-typegen": "wrangler types --env-interface Env"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.15.0",
+    "@sentry/tanstackstart-react": "^9.12.0",
+    "@tailwindcss/vite": "^4.0.6",
+    "@tanstack/react-devtools": "^0.2.2",
+    "@tanstack/react-form": "^1.0.0",
+    "@tanstack/react-query": "^5.66.5",
+    "@tanstack/react-query-devtools": "^5.84.2",
+    "@tanstack/react-router": "^1.130.2",
+    "@tanstack/react-router-devtools": "^1.131.5",
+    "@tanstack/react-router-ssr-query": "^1.131.7",
+    "@tanstack/react-start": "^1.131.7",
+    "@tanstack/router-plugin": "^1.121.2",
+    "@trpc/client": "^11.4.3",
+    "@trpc/server": "^11.4.3",
+    "@trpc/tanstack-react-query": "^11.4.3",
+    "prisma": "^6.15.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "superjson": "^2.2.2",
+    "tailwindcss": "^4.0.6",
+    "vite-tsconfig-paths": "^5.1.4",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@tanstack/eslint-config": "^0.3.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.2.0",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "husky": "^9.1.7",
+    "jsdom": "^26.0.0",
+    "lint-staged": "^16.1.6",
+    "prettier": "^3.5.3",
+    "typescript": "^5.7.2",
+    "vite": "^6.3.5",
+    "vitest": "^3.0.5",
+    "web-vitals": "^4.2.4"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
+  }
+}

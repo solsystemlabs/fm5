@@ -12,5 +12,25 @@
   },
   "vars": {
     "NODE_ENV": "production"
+  },
+  "env": {
+    "staging": {
+      "name": "fm5-staging",
+      "vars": {
+        "NODE_ENV": "staging"
+      },
+      "routes": [
+        "fm5-staging.solsystemlabs.com"
+      ]
+    },
+    "production": {
+      "name": "fm5-production",
+      "vars": {
+        "NODE_ENV": "production"
+      },
+      "routes": [
+        "fm5.solsystemlabs.com"
+      ]
+    }
   }
 }

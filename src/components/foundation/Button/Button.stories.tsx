@@ -1,16 +1,36 @@
-import type { Meta, StoryObj } from '@storybook/react'
 import { Button } from './Button'
+import type { Meta, StoryObj } from '@storybook/react'
 
 // Example icons for demonstration
 const PlusIcon = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M12 4v16m8-8H4"
+    />
   </svg>
 )
 
 const SaveIcon = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M5 13l4 4L19 7"
+    />
   </svg>
 )
 
@@ -21,7 +41,8 @@ const meta: Meta<typeof Button> = {
     layout: 'centered',
     docs: {
       description: {
-        component: 'A flexible button component built with React Aria for accessibility and consistent styling.',
+        component:
+          'A flexible button component built with React Aria for accessibility and consistent styling.',
       },
     },
   },
@@ -33,7 +54,7 @@ const meta: Meta<typeof Button> = {
       description: 'Visual style variant of the button',
     },
     size: {
-      control: 'select', 
+      control: 'select',
       options: ['sm', 'md', 'lg'],
       description: 'Size of the button',
     },
@@ -170,9 +191,15 @@ export const AllVariants: Story = {
         <Button variant="ghost">Ghost</Button>
       </div>
       <div className="flex gap-2">
-        <Button variant="primary" isLoading>Loading</Button>
-        <Button variant="primary" isDisabled>Disabled</Button>
-        <Button variant="primary" icon={PlusIcon}>With Icon</Button>
+        <Button variant="primary" isLoading>
+          Loading
+        </Button>
+        <Button variant="primary" isDisabled>
+          Disabled
+        </Button>
+        <Button variant="primary" icon={PlusIcon}>
+          With Icon
+        </Button>
       </div>
     </div>
   ),

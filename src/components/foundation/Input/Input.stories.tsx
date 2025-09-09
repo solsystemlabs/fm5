@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react'
 import { Input } from './Input'
+import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof Input> = {
   title: 'Foundation/Input',
@@ -8,7 +8,8 @@ const meta: Meta<typeof Input> = {
     layout: 'centered',
     docs: {
       description: {
-        component: 'A flexible input component built with React Aria for accessibility and form validation.',
+        component:
+          'A flexible input component built with React Aria for accessibility and form validation.',
       },
     },
   },
@@ -200,13 +201,9 @@ export const FormExample: Story = {
   render: () => (
     <form className="space-y-4 w-96 p-6 border border-gray-200 rounded-lg">
       <h3 className="text-lg font-semibold text-gray-900">User Information</h3>
-      
-      <Input
-        label="Full Name"
-        placeholder="John Doe"
-        isRequired
-      />
-      
+
+      <Input label="Full Name" placeholder="John Doe" isRequired />
+
       <Input
         label="Email Address"
         type="email"
@@ -214,14 +211,14 @@ export const FormExample: Story = {
         isRequired
         description="We'll never share your email with anyone else."
       />
-      
+
       <Input
         label="Phone Number"
         type="tel"
         placeholder="+1 (555) 000-0000"
         prefix="+1"
       />
-      
+
       <Input
         label="Website"
         type="url"
@@ -229,10 +226,10 @@ export const FormExample: Story = {
         prefix="https://"
         suffix=".com"
       />
-      
+
       <div className="pt-4">
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
         >
           Submit

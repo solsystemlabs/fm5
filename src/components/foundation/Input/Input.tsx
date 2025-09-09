@@ -1,16 +1,18 @@
 import {
-  TextField,
-  Label,
   Input as AriaInput,
+  
+  Label,
   Text,
-  type TextFieldProps as AriaTextFieldProps,
+  TextField
 } from 'react-aria-components'
 import { cn } from '../../utils/cn'
+import type {TextFieldProps as AriaTextFieldProps} from 'react-aria-components';
 
 export interface InputProps extends Omit<AriaTextFieldProps, 'className'> {
   variant?: 'default' | 'filled' | 'minimal'
   size?: 'sm' | 'md' | 'lg'
   label: string
+  placeholder?: string
   description?: string
   errorMessage?: string
   prefix?: React.ReactNode
@@ -22,6 +24,7 @@ export function Input({
   variant = 'default',
   size = 'md',
   label,
+  placeholder,
   description,
   errorMessage,
   prefix,
@@ -97,18 +100,31 @@ export function Input({
   return (
     <TextField className={cn(baseFieldClasses, className)} {...props}>
       <Label className={cn(labelClasses)}>{label}</Label>
-      
-      <div className={cn(controlClasses, variantClasses[variant].control, sizeClasses[size].control)}>
+
+      <div
+        className={cn(
+          controlClasses,
+          variantClasses[variant].control,
+          sizeClasses[size].control,
+        )}
+      >
         {prefix && (
-          <div className={cn('text-gray-500 shrink-0', sizeClasses[size].prefix)}>
+          <div
+            className={cn('text-gray-500 shrink-0', sizeClasses[size].prefix)}
+          >
             {prefix}
           </div>
         )}
-        
-        <AriaInput className={cn(inputClasses, sizeClasses[size].input)} />
-        
+
+        <AriaInput 
+          className={cn(inputClasses, sizeClasses[size].input)} 
+          placeholder={placeholder}
+        />
+
         {suffix && (
-          <div className={cn('text-gray-500 shrink-0', sizeClasses[size].suffix)}>
+          <div
+            className={cn('text-gray-500 shrink-0', sizeClasses[size].suffix)}
+          >
             {suffix}
           </div>
         )}

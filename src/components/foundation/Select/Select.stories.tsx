@@ -1,15 +1,16 @@
+import { Select  } from './Select'
+import type {SelectOption} from './Select';
 import type { Meta, StoryObj } from '@storybook/react'
-import { Select, type SelectOption } from './Select'
 
 // Sample data
-const basicOptions: SelectOption[] = [
+const basicOptions: Array<SelectOption> = [
   { key: 'option1', label: 'Option 1', value: 'value1' },
   { key: 'option2', label: 'Option 2', value: 'value2' },
   { key: 'option3', label: 'Option 3', value: 'value3' },
   { key: 'option4', label: 'Option 4', value: 'value4', disabled: true },
 ]
 
-const filamentTypes: SelectOption[] = [
+const filamentTypes: Array<SelectOption> = [
   { key: 'pla', label: 'PLA', value: 'pla' },
   { key: 'abs', label: 'ABS', value: 'abs' },
   { key: 'petg', label: 'PETG', value: 'petg' },
@@ -18,7 +19,7 @@ const filamentTypes: SelectOption[] = [
   { key: 'carbon', label: 'Carbon Fiber', value: 'carbon', disabled: true },
 ]
 
-const priorities: SelectOption[] = [
+const priorities: Array<SelectOption> = [
   { key: 'low', label: 'Low Priority', value: 'low' },
   { key: 'medium', label: 'Medium Priority', value: 'medium' },
   { key: 'high', label: 'High Priority', value: 'high' },
@@ -32,7 +33,8 @@ const meta: Meta<typeof Select> = {
     layout: 'centered',
     docs: {
       description: {
-        component: 'A flexible select component built with React Aria for accessibility and consistent styling.',
+        component:
+          'A flexible select component built with React Aria for accessibility and consistent styling.',
       },
     },
   },
@@ -202,14 +204,14 @@ export const FilamentSelector: Story = {
         ]}
         placeholder="Select brand..."
       />
-      
+
       <Select
         label="Material Type"
         items={filamentTypes}
         placeholder="Select material..."
         description="Choose the filament material for your project."
       />
-      
+
       <Select
         label="Color"
         items={[
@@ -227,7 +229,8 @@ export const FilamentSelector: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Example of select components used for filament selection in a 3D printing context.',
+        story:
+          'Example of select components used for filament selection in a 3D printing context.',
       },
     },
   },
@@ -238,7 +241,7 @@ export const FormExample: Story = {
   render: () => (
     <form className="space-y-4 w-96 p-6 border border-gray-200 rounded-lg">
       <h3 className="text-lg font-semibold text-gray-900">Project Settings</h3>
-      
+
       <Select
         label="Project Priority"
         items={priorities}
@@ -246,7 +249,7 @@ export const FormExample: Story = {
         isRequired
         description="This affects the order in your project queue."
       />
-      
+
       <Select
         label="Print Quality"
         items={[
@@ -258,7 +261,7 @@ export const FormExample: Story = {
         placeholder="Select quality..."
         defaultSelectedKey="standard"
       />
-      
+
       <Select
         label="Infill Percentage"
         items={[
@@ -270,10 +273,10 @@ export const FormExample: Story = {
         placeholder="Select infill..."
         defaultSelectedKey="20"
       />
-      
+
       <div className="pt-4">
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
         >
           Save Settings
@@ -284,7 +287,8 @@ export const FormExample: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Example of select components used in a 3D printing project configuration form.',
+        story:
+          'Example of select components used in a 3D printing project configuration form.',
       },
     },
   },

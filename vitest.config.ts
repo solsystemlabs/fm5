@@ -1,9 +1,9 @@
-/// <reference types="vitest/config" />
-import { defineConfig } from 'vitest/config'
-import tsconfigPaths from 'vite-tsconfig-paths'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { defineConfig } from 'vitest/config'
+import tsconfigPaths from 'vite-tsconfig-paths'
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
+
 const dirname =
   typeof __dirname !== 'undefined'
     ? __dirname

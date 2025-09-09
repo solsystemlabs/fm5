@@ -1,1 +1,6 @@
-export { Modal, ModalTrigger, type ModalProps, type ModalTriggerProps } from './Modal'
+export {
+  Modal,
+  ModalTrigger,
+  type ModalProps,
+  type ModalTriggerProps,
+} from './Modal'

@@ -1,4 +1,3 @@
-import type { ModalOverlayProps } from 'react-aria-components'
 import {
   Modal as AriaModal,
   Dialog,
@@ -8,6 +7,7 @@ import {
 } from 'react-aria-components'
 import { cn } from '../../utils/cn'
 import { Button } from '../Button'
+import type { ModalOverlayProps } from 'react-aria-components'
 import type { ButtonProps } from '../Button'
 
 export interface ModalProps extends Omit<ModalOverlayProps, 'className'> {
@@ -83,7 +83,9 @@ export function Modal({
             >
               {title}
             </Heading>
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               className={cn(
                 'p-1 rounded-md text-gray-400 hover:text-gray-600',
                 'focus:outline-none focus:ring-2 focus:ring-primary-500',
@@ -98,7 +100,7 @@ export function Modal({
                   clipRule="evenodd"
                 />
               </svg>
-            </button>
+            </Button>
           </div>
 
           <div className={cn(contentClasses)}>{children}</div>
@@ -141,4 +143,3 @@ export function ModalTrigger({ children, modal }: ModalTriggerProps) {
     </DialogTrigger>
   )
 }
-

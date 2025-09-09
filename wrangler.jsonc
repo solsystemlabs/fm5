@@ -5,32 +5,28 @@
   "compatibility_date": "2025-09-07",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
-    "directory": ".output/public"
+    "directory": ".output/public",
   },
   "observability": {
-    "enabled": true
+    "enabled": true,
   },
   "vars": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
   },
   "env": {
     "staging": {
       "name": "fm5-staging",
       "vars": {
-        "NODE_ENV": "staging"
+        "NODE_ENV": "staging",
       },
-      "routes": [
-        "fm5-staging.solsystemlabs.com"
-      ]
+      "routes": ["fm5-staging.solsystemlabs.com"],
     },
     "production": {
       "name": "fm5-production",
       "vars": {
-        "NODE_ENV": "production"
+        "NODE_ENV": "production",
       },
-      "routes": [
-        "fm5.solsystemlabs.com"
-      ]
-    }
-  }
+      "routes": ["fm5.solsystemlabs.com"],
+    },
+  },
 }

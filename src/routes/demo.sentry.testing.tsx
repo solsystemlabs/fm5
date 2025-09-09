@@ -98,7 +98,7 @@ function RouteComponent() {
           name: 'Client Error Flow Demo',
           op: 'demo.client-error-flow',
         },
-        async () => {
+        () => {
           Sentry.setContext('demo', {
             feature: 'client-error-demo',
             triggered_at: new Date().toISOString(),

@@ -1,9 +1,9 @@
-import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
-import { Modal, ModalTrigger } from './Modal'
 import { Button } from '../Button'
 import { Input } from '../Input'
 import { Select } from '../Select'
+import { Modal, ModalTrigger } from './Modal'
+import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof Modal> = {
   title: 'Foundation/Modal',
@@ -12,7 +12,8 @@ const meta: Meta<typeof Modal> = {
     layout: 'centered',
     docs: {
       description: {
-        component: 'A flexible modal dialog component built with React Aria for accessibility and consistent styling.',
+        component:
+          'A flexible modal dialog component built with React Aria for accessibility and consistent styling.',
       },
     },
   },
@@ -29,7 +30,8 @@ const meta: Meta<typeof Modal> = {
     },
     isDismissable: {
       control: 'boolean',
-      description: 'Whether the modal can be dismissed by clicking outside or pressing escape',
+      description:
+        'Whether the modal can be dismissed by clicking outside or pressing escape',
     },
   },
 }
@@ -38,7 +40,13 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 // Basic modal with controlled state
-const BasicModalExample = ({ size = 'md', title = 'Modal Title' }: { size?: 'sm' | 'md' | 'lg' | 'xl' | 'full', title?: string }) => {
+const BasicModalExample = ({
+  size = 'md',
+  title = 'Modal Title',
+}: {
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+  title?: string
+}) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -52,8 +60,9 @@ const BasicModalExample = ({ size = 'md', title = 'Modal Title' }: { size?: 'sm'
         isDismissable
       >
         <p className="text-gray-600">
-          This is a basic modal dialog. It contains some content and can be dismissed
-          by clicking outside, pressing escape, or using the close button.
+          This is a basic modal dialog. It contains some content and can be
+          dismissed by clicking outside, pressing escape, or using the close
+          button.
         </p>
       </Modal>
     </>
@@ -113,7 +122,8 @@ const ModalWithActionsExample = () => {
         }}
       >
         <p className="text-gray-600 mb-4">
-          Are you sure you want to save these changes? This action cannot be undone.
+          Are you sure you want to save these changes? This action cannot be
+          undone.
         </p>
         <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
           <p className="text-yellow-800 text-sm">
@@ -156,7 +166,7 @@ const FormModalExample = () => {
             placeholder="Enter filament name"
             isRequired
           />
-          
+
           <div className="grid grid-cols-2 gap-4">
             <Select
               label="Material Type"
@@ -169,7 +179,7 @@ const FormModalExample = () => {
               placeholder="Select material..."
               isRequired
             />
-            
+
             <Input
               label="Weight (g)"
               type="number"
@@ -177,20 +187,17 @@ const FormModalExample = () => {
               isRequired
             />
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <Input
               label="Color"
               placeholder="e.g., Red, Blue, Black"
               isRequired
             />
-            
-            <Input
-              label="Brand"
-              placeholder="e.g., Hatchbox, Overture"
-            />
+
+            <Input label="Brand" placeholder="e.g., Hatchbox, Overture" />
           </div>
-          
+
           <Input
             label="Cost per kg"
             type="number"
@@ -233,14 +240,23 @@ const DangerModalExample = () => {
       >
         <div className="space-y-4">
           <p className="text-gray-600">
-            Are you sure you want to delete this project? This action cannot be undone.
+            Are you sure you want to delete this project? This action cannot be
+            undone.
           </p>
-          
+
           <div className="bg-red-50 border border-red-200 rounded-md p-4">
             <div className="flex">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                <svg
+                  className="h-5 w-5 text-red-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
               <div className="ml-3">

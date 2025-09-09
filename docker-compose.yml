@@ -7,12 +7,12 @@ services:
       POSTGRES_USER: fm5_user
       POSTGRES_PASSWORD: fm5_password
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db/init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U fm5_user -d fm5_dev"]
+      test: ['CMD-SHELL', 'pg_isready -U fm5_user -d fm5_dev']
       interval: 5s
       timeout: 5s
       retries: 5

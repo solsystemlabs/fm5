@@ -1,16 +1,17 @@
 import {
   Select as AriaSelect,
-  SelectValue,
+  
   Button,
+  
   Label,
-  Popover,
   ListBox,
   ListBoxItem,
-  Text,
-  type SelectProps as AriaSelectProps,
-  type Key,
+  Popover,
+  SelectValue,
+  Text
 } from 'react-aria-components'
 import { cn } from '../../utils/cn'
+import type {SelectProps as AriaSelectProps} from 'react-aria-components';
 
 export interface SelectOption {
   key: string
@@ -19,18 +20,19 @@ export interface SelectOption {
   disabled?: boolean
 }
 
-export interface SelectProps<T = any> extends Omit<AriaSelectProps<SelectOption>, 'className' | 'children'> {
+export interface SelectProps<T = any>
+  extends Omit<AriaSelectProps<SelectOption>, 'className' | 'children'> {
   variant?: 'default' | 'filled' | 'minimal'
   size?: 'sm' | 'md' | 'lg'
   label: string
   placeholder?: string
   description?: string
   errorMessage?: string
-  items: SelectOption[]
+  items: Array<SelectOption>
   className?: string
 }
 
-export function Select<T = any>({
+export function Select({
   variant = 'default',
   size = 'md',
   label,
@@ -60,7 +62,10 @@ export function Select<T = any>({
     'data-[placeholder]:text-gray-400',
   ]
 
-  const iconClasses = ['w-4 h-4 text-gray-500 shrink-0 transition-transform', 'group-data-[open]:rotate-180']
+  const iconClasses = [
+    'w-4 h-4 text-gray-500 shrink-0 transition-transform',
+    'group-data-[open]:rotate-180',
+  ]
 
   const variantClasses = {
     default: {
@@ -105,8 +110,14 @@ export function Select<T = any>({
   return (
     <AriaSelect className={cn(baseFieldClasses, className)} {...props}>
       <Label className={cn(labelClasses)}>{label}</Label>
-      
-      <Button className={cn(triggerClasses, variantClasses[variant].trigger, sizeClasses[size].trigger)}>
+
+      <Button
+        className={cn(
+          triggerClasses,
+          variantClasses[variant].trigger,
+          sizeClasses[size].trigger,
+        )}
+      >
         <SelectValue className={cn(valueClasses, sizeClasses[size].value)} />
         <div className={cn(iconClasses)}>
           <svg viewBox="0 0 20 20" fill="currentColor">
@@ -130,7 +141,7 @@ export function Select<T = any>({
                 'flex items-center px-3 py-2 text-sm cursor-pointer',
                 'hover:bg-gray-100 focus:bg-primary-100 focus:text-primary-900 focus:outline-none',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
-                'data-[selected]:bg-primary-100 data-[selected]:text-primary-900'
+                'data-[selected]:bg-primary-100 data-[selected]:text-primary-900',
               )}
               isDisabled={item.disabled}
             >

@@ -14,6 +14,7 @@ FileMaker 5 (FM5) is a comprehensive 3D printing business management platform th
 ### User Personas
 
 **Sarah - Small Business Owner** (28-45 years old)
+
 - **Role:** 3D Printing Business Owner
 - **Context:** Runs a small business selling custom 3D printed items at maker fairs and online marketplaces
 - **Pain Points:** Files scattered across folders, difficulty tracking which models have been printed, manual inventory counting, poor expense tracking

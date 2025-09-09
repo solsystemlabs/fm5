@@ -8,6 +8,7 @@
 ### Features
 
 #### Design Language & Tokens
+
 - [ ] **Design System Specification** `S`
   - [ ] Brand identity and design principles
   - [ ] Color palette and semantic color system
@@ -22,6 +23,7 @@
   - [ ] Responsive breakpoint system
 
 #### Foundation Component Library
+
 - [ ] **React Aria Wrapper Components** `L`
   - [ ] Button component with all variants and states
   - [ ] Input components (text, number, email, password)
@@ -40,13 +42,14 @@
 
 - [ ] **Data Display Components** `M`
   - [ ] Card components with variants
-  - [ ] Badge and status indicators  
+  - [ ] Badge and status indicators
   - [ ] Data table with sorting/filtering
   - [ ] Pagination controls
   - [ ] Empty state components
   - [ ] Tooltip and popover components
 
 #### Development Infrastructure
+
 - [ ] **Component Documentation** `M`
   - [ ] Storybook setup and configuration
   - [ ] Component stories with all variants
@@ -74,6 +77,7 @@
 ### Features
 
 #### 1. Project Infrastructure & Core UI Foundation
+
 - [ ] Project initialization and development environment setup `S`
 - [ ] **UI Foundation Components** `M`
   - [ ] Base layout components (Header, Sidebar, Main content area)
@@ -85,6 +89,7 @@
   - [ ] Data table components for list views
 
 #### 2. Model File Management System
+
 - [ ] **Backend: Basic model file upload and storage to S3** `M`
 - [ ] **UI: File Upload Interface** `M`
   - [ ] Drag-and-drop file upload component
@@ -106,6 +111,7 @@
   - [ ] File information panel
 
 #### 3. Model Organization & Variations
+
 - [ ] **Backend: Model variations management (linking sliced files to base models)** `L`
 - [ ] **UI: Model Variations Interface** `L`
   - [ ] Model variations tree/hierarchy view
@@ -115,6 +121,7 @@
   - [ ] Model library/gallery view with search and filters
 
 #### 4. Product Management
+
 - [ ] **Backend: Basic product creation and editing tied to model variations** `M`
 - [ ] **UI: Product Management Interface** `M`
   - [ ] Product creation/edit forms
@@ -124,6 +131,7 @@
   - [ ] Pricing and description editors
 
 #### 5. Filament Management
+
 - [ ] **Backend: Simple filament type management** `S`
 - [ ] **UI: Filament Management Interface** `S`
   - [ ] Filament type creation forms
@@ -145,6 +153,7 @@
 ### Features
 
 #### 6. Physical Inventory Tracking System
+
 - [ ] **Backend: Physical product inventory tracking with stock levels** `L`
 - [ ] **UI: Inventory Management Dashboard** `L`
   - [ ] Inventory overview dashboard with stock level charts
@@ -162,6 +171,7 @@
   - [ ] Cost-per-gram calculations display
 
 #### 7. Alert and Notification System
+
 - [ ] **Backend: Low stock alerts and notifications** `M`
 - [ ] **UI: Notification & Alert Interface** `M`
   - [ ] Notification badge/bell components
@@ -171,6 +181,7 @@
   - [ ] Dashboard alert summary cards
 
 #### 8. Financial Tracking System
+
 - [ ] **Backend: Expense tracking for filament purchases and hardware** `L`
 - [ ] **UI: Expense Management Interface** `L`
   - [ ] Expense entry forms with categorization
@@ -188,6 +199,7 @@
   - [ ] Receipt search and filtering
 
 #### 9. Sales Event Planning
+
 - [ ] **Backend: Sales event management (scheduling, costs, locations)** `L`
 - [ ] **UI: Event Management Interface** `L`
   - [ ] Event calendar component
@@ -219,6 +231,7 @@
 ### Features
 
 #### 10. AI-Powered Event Discovery
+
 - [ ] **Backend: AI-powered local event discovery** `XL`
 - [ ] **UI: Event Discovery Interface** `L`
   - [ ] AI-suggested events feed
@@ -229,6 +242,7 @@
   - [ ] Integration with event management system
 
 #### 11. Advanced Search and Data Management
+
 - [ ] **Backend: Advanced search and filtering across all entities** `M`
 - [ ] **UI: Advanced Search Interface** `M`
   - [ ] Global search bar with autocomplete
@@ -255,6 +269,7 @@
   - [ ] Batch tagging interface
 
 #### 12. Business Intelligence and Analytics
+
 - [ ] **Backend: Business analytics and reporting dashboard** `L`
 - [ ] **UI: Analytics Dashboard Interface** `L`
   - [ ] Business performance overview charts
@@ -286,15 +301,18 @@
 ## UI Component Architecture
 
 ### Foundation Components (Built on React Aria)
+
 These components form the basis for all UI features and should be developed first:
 
 #### Layout & Navigation
+
 - **AppLayout**: Main application shell with header, sidebar, and content area
 - **Header**: Top navigation with user menu, notifications, and global search
 - **Sidebar**: Collapsible navigation menu with route highlighting
 - **Breadcrumbs**: Navigation trail for deep pages
 
 #### Form Components
+
 - **Input**: Text inputs with validation states and error messages
 - **Select**: Dropdown selectors with search and multi-select capabilities
 - **Button**: Various button styles (primary, secondary, danger, etc.)
@@ -304,6 +322,7 @@ These components form the basis for all UI features and should be developed firs
 - **FormField**: Wrapper component with label, validation, and help text
 
 #### Data Display
+
 - **DataTable**: Sortable, filterable table with pagination and bulk actions
 - **Card**: Content containers with consistent styling
 - **Badge**: Status indicators and labels
@@ -312,6 +331,7 @@ These components form the basis for all UI features and should be developed firs
 - **Tooltip**: Contextual information overlays
 
 #### Feedback & Interaction
+
 - **Modal**: Dialog overlays for forms and confirmations
 - **Toast**: Notification messages with auto-dismiss
 - **Alert**: Inline status messages and warnings
@@ -319,27 +339,32 @@ These components form the basis for all UI features and should be developed firs
 - **EmptyState**: Placeholder content for empty data sets
 
 #### Navigation & Structure
+
 - **Tabs**: Content organization and switching
 - **Accordion**: Collapsible content sections
 - **Pagination**: Data navigation controls
 - **SearchBox**: Global and contextual search inputs
 
 ### Feature-Specific Components
+
 These components are built using the foundation components:
 
 #### File Management
+
 - **FileExplorer**: Tree-view file browser
 - **FileCard**: Model file preview with metadata
 - **UploadZone**: Drag-and-drop file upload area
 - **FileProcessor**: Processing status and progress display
 
 #### Inventory Management
+
 - **StockIndicator**: Visual stock level displays
 - **InventoryCard**: Product inventory summary
 - **StockAdjuster**: Quick stock level modification
 - **LowStockAlert**: Inventory warning displays
 
 #### Business Management
+
 - **ExpenseForm**: Expense entry with categorization
 - **ReceiptViewer**: Receipt image display and management
 - **EventCalendar**: Calendar view for sales events

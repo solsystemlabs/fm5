@@ -1,12 +1,17 @@
-import { Button as AriaButton, type ButtonProps as AriaButtonProps } from 'react-aria-components'
+import {
+  Button as AriaButton
+  
+} from 'react-aria-components'
 import { cn } from '../../utils/cn'
+import type {ButtonProps as AriaButtonProps} from 'react-aria-components';
 
-export interface ButtonProps extends Omit<AriaButtonProps, 'className'> {
+export interface ButtonProps extends Omit<AriaButtonProps, 'className' | 'children'> {
   variant?: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost'
   size?: 'sm' | 'md' | 'lg'
   isLoading?: boolean
   icon?: React.ComponentType<{ className?: string }>
   iconPosition?: 'left' | 'right'
+  children?: React.ReactNode
   className?: string
 }
 
@@ -71,7 +76,7 @@ export function Button({
         variantClasses[variant],
         sizeClasses[size],
         isLoading && 'cursor-wait',
-        className
+        className,
       )}
       isDisabled={props.isDisabled || isLoading}
       {...props}
@@ -81,7 +86,7 @@ export function Button({
           <div
             className={cn(
               'animate-spin rounded-full border-2 border-current border-t-transparent',
-              iconSizeClasses[size]
+              iconSizeClasses[size],
             )}
           />
           {children && <span className="sr-only">{children}</span>}

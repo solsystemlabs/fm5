@@ -59,7 +59,8 @@ export default defineConfig({
           onUnhandledError: (error, type) => {
             if (
               error.message?.includes('Cannot read properties of null') &&
-              (error.message.includes('useState') || error.message.includes('useContext'))
+              (error.message.includes('useState') ||
+                error.message.includes('useContext'))
             ) {
               // Suppress these specific React cleanup errors
               return false

@@ -18,7 +18,7 @@ export interface SelectOption {
   disabled?: boolean
 }
 
-export interface SelectProps<T = any>
+export interface SelectProps
   extends Omit<AriaSelectProps<SelectOption>, 'className' | 'children'> {
   variant?: 'default' | 'filled' | 'minimal'
   size?: 'sm' | 'md' | 'lg'
@@ -40,7 +40,7 @@ export function Select({
   items,
   className,
   ...props
-}: SelectProps<T>) {
+}: SelectProps) {
   const baseFieldClasses = ['flex flex-col gap-1']
 
   const labelClasses = [

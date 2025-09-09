@@ -61,6 +61,7 @@ function Home() {
       <div className="w-full max-w-2xl p-8 rounded-xl backdrop-blur-md bg-black/50 shadow-xl border-8 border-black/10">
         <h1 className="text-2xl mb-4">Start Server Functions - Todo Example</h1>
         <ul className="mb-4 space-y-2">
+          {/* @ts-ignore gonna be removed*/}
           {todos?.map((t) => (
             <li
               key={t.id}

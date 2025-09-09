@@ -13,7 +13,7 @@ const dirname =
 export default defineConfig({
   plugins: [tsconfigPaths()],
   optimizeDeps: {
-    include: ['@storybook/addon-a11y/preview', 'storybook/test']
+    include: ['@storybook/addon-a11y/preview', 'storybook/test'],
   },
   test: {
     globals: true,

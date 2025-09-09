@@ -21,12 +21,16 @@ export const LoggedOut: Story = {}
 export const LoggedIn: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    const loginButton = canvas.getByRole('button', { name: /Log in/i })
+
+    // Wait for the component to be fully rendered
+    await new Promise((resolve) => setTimeout(resolve, 100))
+
+    const loginButton = await canvas.findByRole('button', { name: /Log in/i })
     await expect(loginButton).toBeInTheDocument()
     await userEvent.click(loginButton)
     await expect(loginButton).not.toBeInTheDocument()
 
-    const logoutButton = canvas.getByRole('button', { name: /Log out/i })
+    const logoutButton = await canvas.findByRole('button', { name: /Log out/i })
     await expect(logoutButton).toBeInTheDocument()
   },
 }

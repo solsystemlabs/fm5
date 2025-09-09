@@ -1,0 +1,30 @@
+
+> test
+> vitest run
+
+info Using tsconfig paths for react-docgen
+info Using tsconfig paths for react-docgen
+
+ RUN  v3.2.4 /home/taylor/projects/fm5
+
+info Using tsconfig paths for react-docgen
+ ✓ |storybook (chromium)| src/stories/Header.stories.ts (2 tests) 498ms
+   ✓ Logged In  409ms
+ ✓ |storybook (chromium)| src/stories/Button.stories.ts (4 tests) 589ms
+   ✓ Primary  420ms
+ ✓ |storybook (chromium)| src/stories/Page.stories.ts (2 tests) 606ms
+   ✓ Logged Out  454ms
+ ✓ |storybook (chromium)| src/components/foundation/Modal/Modal.stories.tsx (9 tests) 811ms
+   ✓ Default  375ms
+ ✓ |storybook (chromium)| src/components/foundation/Button/Button.stories.tsx (12 tests) 992ms
+   ✓ Primary  384ms
+ ✓ |storybook (chromium)| src/components/foundation/Input/Input.stories.tsx (14 tests) 1097ms
+   ✓ Default  418ms
+ ✓ |storybook (chromium)| src/components/foundation/Select/Select.stories.tsx (11 tests) 1136ms
+   ✓ Default  459ms
+
+ Test Files  7 passed (7)
+      Tests  54 passed (54)
+   Start at  14:12:09
+   Duration  7.46s (transform 0ms, setup 8.25s, collect 3.67s, tests 5.73s, environment 0ms, prepare 43.12s)
+

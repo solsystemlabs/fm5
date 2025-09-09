@@ -41,13 +41,24 @@ jobs:
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
-          path: ~/.cache/ms-playwright/
-          key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          path: |
+            ~/.cache/ms-playwright/
+            ~/AppData/Local/ms-playwright/
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('**/playwright.config.*') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+            playwright-${{ runner.os }}-
 
       - name: Setup environment
         run: |
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
           echo "NODE_ENV=test" >> $GITHUB_ENV
+
+      - name: Cache Prisma client
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.prisma
+          key: prisma-${{ runner.os }}-${{ hashFiles('prisma/schema.prisma') }}
 
       - name: Generate Prisma client
         run: npm run db:generate
@@ -56,10 +67,10 @@ jobs:
         run: npm run db:push
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install --with-deps chromium
 
       - name: Check formatting
-        run: npm run format
+        run: npm run format -- --check
 
       - name: Run linting
         run: npm run lint
@@ -67,8 +78,17 @@ jobs:
       - name: Run type checking
         run: npx tsc --noEmit
 
-      - name: Run tests
-        run: npm test
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      - name: Run Playwright tests (Storybook)
+        run: npm test -- --project=storybook
+
+      - name: Upload coverage to GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
 
       - name: Build application
         run: npm run build

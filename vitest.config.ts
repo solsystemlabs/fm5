@@ -12,6 +12,9 @@ const dirname =
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   plugins: [tsconfigPaths()],
+  optimizeDeps: {
+    include: ['@storybook/addon-a11y/preview', 'storybook/test']
+  },
   test: {
     globals: true,
     environment: 'jsdom',

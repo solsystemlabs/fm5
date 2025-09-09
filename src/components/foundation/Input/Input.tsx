@@ -1,12 +1,11 @@
 import {
   Input as AriaInput,
-  
   Label,
   Text,
-  TextField
+  TextField,
 } from 'react-aria-components'
 import { cn } from '../../utils/cn'
-import type {TextFieldProps as AriaTextFieldProps} from 'react-aria-components';
+import type { TextFieldProps as AriaTextFieldProps } from 'react-aria-components'
 
 export interface InputProps extends Omit<AriaTextFieldProps, 'className'> {
   variant?: 'default' | 'filled' | 'minimal'
@@ -116,8 +115,8 @@ export function Input({
           </div>
         )}
 
-        <AriaInput 
-          className={cn(inputClasses, sizeClasses[size].input)} 
+        <AriaInput
+          className={cn(inputClasses, sizeClasses[size].input)}
           placeholder={placeholder}
         />
 

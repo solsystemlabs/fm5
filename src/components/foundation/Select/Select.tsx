@@ -1,17 +1,15 @@
 import {
   Select as AriaSelect,
-  
   Button,
-  
   Label,
   ListBox,
   ListBoxItem,
   Popover,
   SelectValue,
-  Text
+  Text,
 } from 'react-aria-components'
 import { cn } from '../../utils/cn'
-import type {SelectProps as AriaSelectProps} from 'react-aria-components';
+import type { SelectProps as AriaSelectProps } from 'react-aria-components'
 
 export interface SelectOption {
   key: string

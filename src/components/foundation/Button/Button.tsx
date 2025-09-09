@@ -1,11 +1,9 @@
-import {
-  Button as AriaButton
-  
-} from 'react-aria-components'
+import { Button as AriaButton } from 'react-aria-components'
 import { cn } from '../../utils/cn'
-import type {ButtonProps as AriaButtonProps} from 'react-aria-components';
+import type { ButtonProps as AriaButtonProps } from 'react-aria-components'
 
-export interface ButtonProps extends Omit<AriaButtonProps, 'className' | 'children'> {
+export interface ButtonProps
+  extends Omit<AriaButtonProps, 'className' | 'children'> {
   variant?: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost'
   size?: 'sm' | 'md' | 'lg'
   isLoading?: boolean

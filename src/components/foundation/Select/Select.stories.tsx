@@ -1,5 +1,5 @@
-import { Select  } from './Select'
-import type {SelectOption} from './Select';
+import { Select } from './Select'
+import type { SelectOption } from './Select'
 import type { Meta, StoryObj } from '@storybook/react'
 
 // Sample data

@@ -24,7 +24,7 @@ jobs:
       - name: Setup environment
         run: |
           echo "DATABASE_URL=${{ secrets.STAGING_DATABASE_URL }}" >> $GITHUB_ENV
-          echo "NODE_ENV=staging" >> $GITHUB_ENV
+          echo "NODE_ENV=production" >> $GITHUB_ENV
           echo "APP_URL=${{ secrets.STAGING_APP_URL }}" >> $GITHUB_ENV
 
       - name: Generate Prisma client

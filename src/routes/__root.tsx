@@ -3,7 +3,8 @@ import {
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
-import React from 'react'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import Header from '../components/Header'
 
@@ -54,51 +55,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body>
         <Header />
         {children}
-        {import.meta.env.DEV && <DevTools />}
+        <TanStackRouterDevtools />
+        <ReactQueryDevtools />
         <Scripts />
       </body>
     </html>
-  )
-}
-
-function DevTools() {
-  const [devtools, setDevtools] = React.useState<{
-    TanstackDevtools: any
-    TanStackRouterDevtoolsPanel: any
-    TanStackQueryDevtools: any
-  } | null>(null)
-
-  React.useEffect(() => {
-    // Dynamically import devtools only in development
-    Promise.all([
-      import('@tanstack/react-devtools'),
-      import('@tanstack/react-router-devtools'),
-      import('../integrations/tanstack-query/devtools'),
-    ]).then(([reactDevtools, routerDevtools, queryDevtools]) => {
-      setDevtools({
-        TanstackDevtools: reactDevtools.TanstackDevtools,
-        TanStackRouterDevtoolsPanel: routerDevtools.TanStackRouterDevtoolsPanel,
-        TanStackQueryDevtools: queryDevtools.default,
-      })
-    })
-  }, [])
-
-  if (!devtools) return null
-
-  const { TanstackDevtools, TanStackRouterDevtoolsPanel, TanStackQueryDevtools } = devtools
-
-  return (
-    <TanstackDevtools
-      config={{
-        position: 'bottom-left',
-      }}
-      plugins={[
-        {
-          name: 'Tanstack Router',
-          render: <TanStackRouterDevtoolsPanel />,
-        },
-        TanStackQueryDevtools,
-      ]}
-    />
   )
 }

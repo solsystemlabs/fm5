@@ -4,7 +4,7 @@ import { afterEach, beforeAll, vi } from 'vitest'
 
 // Mock environment variables for tests (only in Node.js environment)
 beforeAll(() => {
-  if (typeof process !== 'undefined' && process.env) {
+  if (typeof process !== 'undefined') {
     vi.stubEnv(
       'DATABASE_URL',
       'postgresql://test_user:test_pass@localhost:5432/test_db',

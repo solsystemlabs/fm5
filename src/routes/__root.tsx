@@ -3,12 +3,9 @@ import {
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanstackDevtools } from '@tanstack/react-devtools'
+import React from 'react'
 
 import Header from '../components/Header'
-
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
 import appCss from '../styles.css?url'
 
@@ -57,22 +54,51 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body>
         <Header />
         {children}
-{import.meta.env.DEV && (
-          <TanstackDevtools
-            config={{
-              position: 'bottom-left',
-            }}
-            plugins={[
-              {
-                name: 'Tanstack Router',
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-              TanStackQueryDevtools,
-            ]}
-          />
-        )}
+        {import.meta.env.DEV && <DevTools />}
         <Scripts />
       </body>
     </html>
+  )
+}
+
+function DevTools() {
+  const [devtools, setDevtools] = React.useState<{
+    TanstackDevtools: any
+    TanStackRouterDevtoolsPanel: any
+    TanStackQueryDevtools: any
+  } | null>(null)
+
+  React.useEffect(() => {
+    // Dynamically import devtools only in development
+    Promise.all([
+      import('@tanstack/react-devtools'),
+      import('@tanstack/react-router-devtools'),
+      import('../integrations/tanstack-query/devtools'),
+    ]).then(([reactDevtools, routerDevtools, queryDevtools]) => {
+      setDevtools({
+        TanstackDevtools: reactDevtools.TanstackDevtools,
+        TanStackRouterDevtoolsPanel: routerDevtools.TanStackRouterDevtoolsPanel,
+        TanStackQueryDevtools: queryDevtools.default,
+      })
+    })
+  }, [])
+
+  if (!devtools) return null
+
+  const { TanstackDevtools, TanStackRouterDevtoolsPanel, TanStackQueryDevtools } = devtools
+
+  return (
+    <TanstackDevtools
+      config={{
+        position: 'bottom-left',
+      }}
+      plugins={[
+        {
+          name: 'Tanstack Router',
+          render: <TanStackRouterDevtoolsPanel />,
+        },
+        TanStackQueryDevtools,
+      ]}
+    />
   )
 }

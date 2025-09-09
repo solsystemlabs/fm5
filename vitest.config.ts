@@ -55,19 +55,6 @@ export default defineConfig({
             ],
           },
           setupFiles: ['.storybook/vitest.setup.ts'],
-          // Silence unhandled errors from React component cleanup
-          onUnhandledError: (error, type) => {
-            if (
-              error.message?.includes('Cannot read properties of null') &&
-              (error.message.includes('useState') ||
-                error.message.includes('useContext'))
-            ) {
-              // Suppress these specific React cleanup errors
-              return false
-            }
-            // Re-throw other errors
-            return true
-          },
         },
       },
     ],

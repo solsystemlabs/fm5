@@ -4,14 +4,39 @@
 
 ```typescript
 import { initTRPC } from '@trpc/server';
-import { ModelSchema, ModelVariantSchema, FilamentSchema, FilamentInventorySchema } from '@/lib/schemas';
+import { UserSchema, ModelSchema, ModelVariantSchema, FilamentSchema, FilamentInventorySchema } from '@/lib/schemas';
+import { authenticateUser } from '@/lib/auth';
 
-const t = initTRPC.create();
+const t = initTRPC.context<{ user?: User }>().create();
+
+// Authentication middleware
+const requireAuth = t.middleware(async ({ next, ctx }) => {
+  if (!ctx.user) {
+    throw new Error('Authentication required');
+  }
+  return next({ ctx: { ...ctx, user: ctx.user } });
+});
+
+const protectedProcedure = t.procedure.use(requireAuth);
 
 export const appRouter = t.router({
-  // Models API
+  // Authentication API
+  auth: t.router({
+    me: protectedProcedure
+      .query(async ({ ctx }) => {
+        return UserSchema.parse(ctx.user);
+      }),
+
+    updateProfile: protectedProcedure
+      .input(UserSchema.omit('id', 'createdAt', 'updatedAt').partial())
+      .mutation(async ({ input, ctx }) => {
+        // Update user profile with validation
+      }),
+  }),
+
+  // Models API (Protected)
   models: t.router({
-    list: t.procedure
+    list: protectedProcedure
       .input(type({
         'search?': 'string',
         'category?': "'keychain'|'earring'|'decoration'|'functional'",
@@ -27,24 +52,26 @@ export const appRouter = t.router({
         // Implementation with full-text search and pagination
       }),
 
-    create: t.procedure
-      .input(ModelSchema.omit('id', 'createdAt', 'updatedAt'))
+    create: protectedProcedure
+      .input(ModelSchema.omit('id', 'userId', 'createdAt', 'updatedAt'))
       .output(ModelSchema)
-      .mutation(async ({ input }) => {
-        // Create new model with validation
+      .mutation(async ({ input, ctx }) => {
+        // Create new model with user isolation
+        const model = { ...input, userId: ctx.user.id };
+        // Implementation with user validation
       }),
 
-    byId: t.procedure
+    byId: protectedProcedure
       .input(type({ id: 'string' }))
       .output(ModelSchema.merge(type({ variants: ModelVariantSchema.array() })))
-      .query(async ({ input }) => {
-        // Get model with all variants
+      .query(async ({ input, ctx }) => {
+        // Get model with all variants (user-isolated via RLS)
       }),
   }),
 
-  // Model Variants API
+  // Model Variants API (Protected)
   variants: t.router({
-    create: t.procedure
+    create: protectedProcedure
       .input(type({
         modelId: 'string',
         variantData: ModelVariantSchema.omit('id', 'createdAt', 'updatedAt'),
@@ -71,7 +98,7 @@ export const appRouter = t.router({
         // Update variant (creates new version if needed)
       }),
 
-    checkFeasibility: t.procedure
+    checkFeasibility: protectedProcedure
       .input(type({ variantId: 'string' }))
       .output(type({
         feasible: 'boolean',
@@ -296,9 +323,32 @@ erDiagram
 ```typescript
 import { type } from 'arktype';
 
-// Core Model Types using ArkType
+// User Authentication Schema
+export const UserSchema = type({
+  id: 'string',
+  email: 'string', // format validated separately
+  name: 'string',
+  'businessName?': 'string',
+  'businessDescription?': 'string',
+  preferences: type({
+    'units?': "'metric'|'imperial'",
+    'defaultFilamentBrand?': 'string',
+    'notifications?': type({
+      email: 'boolean',
+      lowStock: 'boolean',
+      printComplete: 'boolean',
+      systemUpdates: 'boolean'
+    })
+  }),
+  createdAt: 'Date',
+  updatedAt: 'Date',
+  'lastLoginAt?': 'Date'
+});
+
+// Core Model Types using ArkType (now with user isolation)
 export const ModelSchema = type({
   id: 'string',
+  userId: 'string', // User isolation
   name: 'string',
   designer: 'string',
   'description?': 'string',
@@ -310,6 +360,7 @@ export const ModelSchema = type({
 
 export const ModelVariantSchema = type({
   id: 'string',
+  userId: 'string', // User isolation
   modelId: 'string',
   name: 'string',
   version: 'number',
@@ -332,9 +383,10 @@ export const ModelVariantSchema = type({
   updatedAt: 'Date'
 });
 
-// Filament specification (separate from inventory)
+// Filament specification (separate from inventory, user-isolated)
 export const FilamentSchema = type({
   id: 'string',
+  userId: 'string', // User isolation
   brand: 'string',
   materialType: "'PLA'|'PETG'|'ABS'|'TPU'",
   colorName: 'string',
@@ -346,9 +398,10 @@ export const FilamentSchema = type({
   updatedAt: 'Date'
 });
 
-// Physical filament inventory (spools in stock)
+// Physical filament inventory (spools in stock, user-isolated)
 export const FilamentInventorySchema = type({
   id: 'string',
+  userId: 'string', // User isolation
   filamentId: 'string', // reference to Filament
   'batchIdentifier?': 'string',
   quantityGrams: 'number',
@@ -374,6 +427,7 @@ export const FilamentRequirementSchema = type({
 
 export const PrintJobSchema = type({
   id: 'string',
+  userId: 'string', // User isolation
   variantId: 'string',
   status: "'queued'|'printing'|'completed'|'failed'",
   priority: 'number',
@@ -422,6 +476,7 @@ export const BambuMetadataSchema = type({
 });
 
 // Infer TypeScript types from ArkType schemas
+export type User = typeof UserSchema.infer;
 export type Model = typeof ModelSchema.infer;
 export type ModelVariant = typeof ModelVariantSchema.infer;
 export type Filament = typeof FilamentSchema.infer;
@@ -442,9 +497,23 @@ CREATE TYPE category_enum AS ENUM ('keychain', 'earring', 'decoration', 'functio
 CREATE TYPE material_type_enum AS ENUM ('PLA', 'PETG', 'ABS', 'TPU');
 CREATE TYPE job_status_enum AS ENUM ('queued', 'printing', 'completed', 'failed');
 
--- Models table
+-- Users table (authentication and profile)
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    business_name VARCHAR(255),
+    business_description TEXT,
+    preferences JSONB DEFAULT '{}',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    last_login_at TIMESTAMP WITH TIME ZONE
+);
+
+-- Models table (user-isolated)
 CREATE TABLE models (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     designer VARCHAR(255) NOT NULL,
     description TEXT,
@@ -454,9 +523,10 @@ CREATE TABLE models (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Model variants table with hybrid approach
+-- Model variants table with hybrid approach (user-isolated)
 CREATE TABLE model_variants (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     model_id UUID NOT NULL REFERENCES models(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     version INTEGER NOT NULL DEFAULT 1,
@@ -482,9 +552,10 @@ CREATE TABLE model_variants (
     UNIQUE(model_id, version)
 );
 
--- Filament specifications (separate from inventory)
+-- Filament specifications (separate from inventory, user-isolated)
 CREATE TABLE filaments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     brand VARCHAR(100) NOT NULL,
     material_type material_type_enum NOT NULL,
     color_name VARCHAR(100) NOT NULL,
@@ -495,13 +566,14 @@ CREATE TABLE filaments (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     
-    -- Ensure unique combination
-    UNIQUE(brand, material_type, color_hex)
+    -- Ensure unique combination per user
+    UNIQUE(user_id, brand, material_type, color_hex)
 );
 
--- Physical filament inventory (actual spools)
+-- Physical filament inventory (actual spools, user-isolated)
 CREATE TABLE filament_inventory (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     filament_id UUID NOT NULL REFERENCES filaments(id) ON DELETE CASCADE,
     batch_identifier VARCHAR(100),
     quantity_grams INTEGER NOT NULL DEFAULT 0,
@@ -528,9 +600,10 @@ CREATE TABLE filament_requirements (
     UNIQUE(variant_id, ams_slot)
 );
 
--- Print jobs/queue table
+-- Print jobs/queue table (user-isolated)
 CREATE TABLE print_jobs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     variant_id UUID NOT NULL REFERENCES model_variants(id) ON DELETE CASCADE,
     status job_status_enum NOT NULL DEFAULT 'queued',
     priority INTEGER NOT NULL DEFAULT 0,
@@ -543,11 +616,16 @@ CREATE TABLE print_jobs (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Performance indexes
+-- Performance indexes with user isolation
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_created_at ON users(created_at);
+
+CREATE INDEX idx_models_user_id ON models(user_id);
 CREATE INDEX idx_models_search ON models USING GIN (
     to_tsvector('english', name || ' ' || COALESCE(description, ''))
 );
 
+CREATE INDEX idx_variants_user_id ON model_variants(user_id);
 CREATE INDEX idx_variants_model_id ON model_variants(model_id);
 CREATE INDEX idx_variants_layer_height ON model_variants(layer_height);
 CREATE INDEX idx_variants_print_duration ON model_variants(print_duration_minutes);
@@ -555,9 +633,11 @@ CREATE INDEX idx_variants_print_duration ON model_variants(print_duration_minute
 -- JSONB indexes for metadata search
 CREATE INDEX idx_variants_bambu_metadata ON model_variants USING GIN (bambu_metadata);
 
--- Filament and inventory indexes
+-- Filament and inventory indexes with user isolation
+CREATE INDEX idx_filaments_user_id ON filaments(user_id);
 CREATE INDEX idx_filaments_material_color ON filaments(material_type, color_hex);
 CREATE INDEX idx_filaments_demand ON filaments(demand_count DESC);
+CREATE INDEX idx_inventory_user_id ON filament_inventory(user_id);
 CREATE INDEX idx_inventory_filament_id ON filament_inventory(filament_id);
 CREATE INDEX idx_inventory_quantity ON filament_inventory(quantity_grams, low_stock_threshold);
 
@@ -565,7 +645,8 @@ CREATE INDEX idx_inventory_quantity ON filament_inventory(quantity_grams, low_st
 CREATE INDEX idx_requirements_variant ON filament_requirements(variant_id);
 CREATE INDEX idx_requirements_filament ON filament_requirements(filament_id);
 
--- Print queue indexes
+-- Print queue indexes with user isolation
+CREATE INDEX idx_print_jobs_user_id ON print_jobs(user_id);
 CREATE INDEX idx_print_jobs_status ON print_jobs(status);
 CREATE INDEX idx_print_jobs_priority ON print_jobs(priority DESC);
 CREATE INDEX idx_print_jobs_queue_order ON print_jobs(status, priority DESC, created_at);
@@ -633,6 +714,52 @@ $ language 'plpgsql';
 CREATE TRIGGER update_filament_demand_count_trigger
     AFTER INSERT OR UPDATE OR DELETE ON filament_requirements
     FOR EACH ROW EXECUTE FUNCTION update_filament_demand_count();
+
+-- Row Level Security (RLS) for complete user data isolation
+ALTER TABLE models ENABLE ROW LEVEL SECURITY;
+ALTER TABLE model_variants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE filaments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE filament_inventory ENABLE ROW LEVEL SECURITY;
+ALTER TABLE filament_requirements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE print_jobs ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies (assuming current_user_id() function returns authenticated user ID)
+CREATE POLICY models_user_isolation ON models
+    FOR ALL TO authenticated_users
+    USING (user_id = current_user_id());
+
+CREATE POLICY variants_user_isolation ON model_variants
+    FOR ALL TO authenticated_users
+    USING (user_id = current_user_id());
+
+CREATE POLICY filaments_user_isolation ON filaments
+    FOR ALL TO authenticated_users
+    USING (user_id = current_user_id());
+
+CREATE POLICY inventory_user_isolation ON filament_inventory
+    FOR ALL TO authenticated_users
+    USING (user_id = current_user_id());
+
+CREATE POLICY requirements_user_isolation ON filament_requirements
+    FOR ALL TO authenticated_users
+    USING (variant_id IN (SELECT id FROM model_variants WHERE user_id = current_user_id()));
+
+CREATE POLICY print_jobs_user_isolation ON print_jobs
+    FOR ALL TO authenticated_users
+    USING (user_id = current_user_id());
+
+-- Function to get current authenticated user ID (implementation depends on auth provider)
+CREATE OR REPLACE FUNCTION current_user_id()
+RETURNS UUID AS $
+BEGIN
+    -- This would be implemented based on JWT claims or session data
+    -- For example, extracting user_id from JWT token or session
+    RETURN COALESCE(
+        current_setting('app.current_user_id', true)::UUID,
+        '00000000-0000-0000-0000-000000000000'::UUID
+    );
+END;
+$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
 ## API Specification
@@ -655,9 +782,9 @@ CREATE TRIGGER update_filament_demand_count_trigger
       }),
   }),
 
-  // Filament Management API
+  // Filament Management API (Protected)
   filaments: t.router({
-    list: t.procedure
+    list: protectedProcedure
       .input(type({
         'materialType?': "'PLA'|'PETG'|'ABS'|'TPU'",
         'brand?': 'string',
@@ -675,8 +802,8 @@ CREATE TRIGGER update_filament_demand_count_trigger
         // Get filaments with optional inventory data
       }),
 
-    create: t.procedure
-      .input(FilamentSchema.omit('id', 'demandCount', 'createdAt', 'updatedAt'))
+    create: protectedProcedure
+      .input(FilamentSchema.omit('id', 'userId', 'demandCount', 'createdAt', 'updatedAt'))
       .output(FilamentSchema)
       .mutation(async ({ input }) => {
         // Create new filament specification

@@ -105,9 +105,15 @@ Our target user operates a small 3D printing business with designer partnerships
 
 ### Epic 0: Foundation Setup
 
-**Epic Goal**: Establish development environment, core infrastructure, and foundational services required for all subsequent features based on the full-stack architecture specification.
+**Epic Goal**: Establish development environment, core infrastructure, authentication framework, deployment pipeline, and foundational services required for all subsequent features.
 
 **Prerequisites**: Must complete before any other epic can begin.
+
+**Key Additions from PO Review:**
+- Authentication framework setup and provider selection
+- CI/CD deployment pipeline configuration
+- External service planning (DNS, CDN, email)
+- Error handling patterns and user documentation strategy
 
 **Story 0.1: Project Scaffolding and Tanstack Start Setup**
 As a developer,
@@ -185,7 +191,87 @@ so that API procedures have runtime validation matching TypeScript interfaces.
 - Performance optimized validation as specified in architecture
 - Development server serves tRPC endpoints correctly
 
-**Story 0.5: Tanstack DB Collections and State Management**
+**Story 0.5: Authentication Framework Setup**
+As a developer,
+I want a complete authentication framework configured before any protected features,
+so that user management and security are established from the foundation.
+
+**Acceptance Criteria:**
+1. Authentication provider selected and configured (Clerk or Auth0 recommended)
+2. User model and session management integrated with database schema
+3. Route protection middleware configured for tRPC procedures
+4. Authentication UI components (login, signup, profile) implemented
+5. Role-based access control foundation established
+
+**Technical Requirements:**
+- JWT token validation middleware for tRPC
+- User table added to database schema with proper indexes
+- Session storage configured with Redis
+- Protected route wrapper components for frontend
+- Authentication state management with Tanstack Query
+- Logout and session expiry handling
+
+**Story 0.6: CI/CD Pipeline and Deployment Infrastructure**
+As a developer,
+I want automated deployment pipeline and infrastructure configuration,
+so that code can be deployed safely and consistently to production.
+
+**Acceptance Criteria:**
+1. GitHub Actions workflow configured for automated testing and deployment
+2. Environment-specific configuration (dev, staging, production)
+3. Database migration automation integrated with deployment
+4. Docker production build configuration optimized
+5. Infrastructure as Code (IaC) setup for cloud resources
+
+**Technical Requirements:**
+- Automated testing pipeline runs on pull requests
+- Production Docker image optimized for performance and security
+- Environment variable management for different deployment stages
+- Database backup and recovery procedures automated
+- Blue-green or rolling deployment strategy implemented
+- Health check endpoints for monitoring deployment status
+
+**Story 0.7: External Service Integration Planning**
+As a developer,
+I want external service dependencies configured and ready,
+so that features requiring third-party services work reliably.
+
+**Acceptance Criteria:**
+1. Cloudflare R2 account setup with API keys and bucket configuration
+2. DNS configuration planned and domain registration requirements documented
+3. Email service provider selected and configured (SendGrid or AWS SES)
+4. CDN configuration planned for static asset delivery
+5. Service monitoring and alerting configured
+
+**Technical Requirements:**
+- R2 bucket policies configured for secure file access
+- Email templates created for system notifications
+- CDN integration with R2 for optimized file delivery
+- Service health monitoring and automatic failover
+- API rate limiting and quota management
+- Cost monitoring and alerts for cloud services
+
+**Story 0.8: Error Handling and User Documentation Framework**
+As a developer,
+I want comprehensive error handling patterns and user documentation infrastructure,
+so that users have excellent experience with clear guidance.
+
+**Acceptance Criteria:**
+1. Global error boundary components implemented
+2. Loading states and error UI patterns standardized
+3. User help system infrastructure created
+4. Error logging and monitoring configured
+5. User onboarding flow framework established
+
+**Technical Requirements:**
+- React Error Boundary with user-friendly error pages
+- Loading skeleton components for all major features
+- Toast notification system for user feedback
+- Error tracking integration (Sentry or similar)
+- In-app help system with contextual guidance
+- User onboarding checklist and progress tracking
+
+**Story 0.9: Tanstack DB Collections and State Management**
 As a developer,
 I want Tanstack DB collections configured with live queries,
 so that reactive client-side data management works as specified in the architecture.
@@ -204,16 +290,82 @@ so that reactive client-side data management works as specified in the architect
 - QueryClient configured with architecture cache settings (staleTime, gcTime)
 - State management replaces traditional useQuery patterns per specification
 
-### Epic 1: Digital Asset Management Foundation
+### Epic 1: User Management & Authentication
+
+**Epic Goal**: Establish complete user authentication, profile management, and user-specific data isolation before any business features.
+
+**Dependencies**: Must complete Epic 0 Stories 0.5-0.8 before beginning.
+
+**Story 1.1: User Registration and Profile Management**
+As a 3D printing business owner,
+I want to create an account and manage my profile,
+so that I can access the platform securely and maintain my business information.
+
+**Acceptance Criteria:**
+1. User registration with email verification
+2. Profile management with business information (name, description, preferences)
+3. Password reset and account recovery functionality
+4. User preferences for units, default settings, and notifications
+5. Account deletion with proper data cleanup
+
+**Technical Requirements:**
+- Integration with authentication framework from Story 0.5
+- User profile stored in database with proper validation
+- Email verification workflow using external email service
+- GDPR-compliant data export and deletion
+- User session management with JWT tokens
+
+**Story 1.2: Dashboard and Navigation Framework**
+As a 3D printing business owner,
+I want a personalized dashboard and clear navigation,
+so that I can quickly access the features I need most.
+
+**Acceptance Criteria:**
+1. Personalized dashboard showing user-specific metrics and quick actions
+2. Navigation structure that adapts to user permissions and preferences
+3. Recent activity and quick access to frequently used features
+4. User-specific settings and configuration access
+5. Help system integration with contextual guidance
+
+**Technical Requirements:**
+- Dashboard components use authentication state
+- Navigation follows UI framework patterns from Epic 0
+- Real-time updates using Tanstack Query
+- Responsive design for mobile and desktop
+- Integration with help system from Story 0.8
+
+**Story 1.3: User Data Isolation and Permissions**
+As a 3D printing business owner,
+I want my data to be completely isolated from other users,
+so that my business information remains private and secure.
+
+**Acceptance Criteria:**
+1. All database queries automatically filter by user ID
+2. File storage organized by user with proper access controls
+3. API endpoints validate user ownership before operations
+4. Multi-tenant data architecture prevents cross-user data access
+5. Admin interface for user management (future-ready)
+
+**Technical Requirements:**
+- Row-level security implemented in database
+- tRPC middleware validates user ownership
+- File storage paths include user isolation
+- Database queries use user context filtering
+- Audit logging for all user data access
+
+### Epic 2: Digital Asset Management Foundation
 
 **Epic Goal**: Establish core file management capabilities that replace Windows folder chaos with systematic digital asset organization.
 
-**Dependencies**: Must complete Epic 0 entirely before beginning.
+**Dependencies**: Must complete Epic 0 and Epic 1 entirely before beginning, specifically:
+- Epic 1 (User Management) - Required for user-specific file organization and access control
+- Story 0.7 (External Service Integration) - Required for R2 bucket configuration
+- Story 0.8 (Error Handling Framework) - Required for file upload error states
 
-**Story 1.0: Cloudflare R2 Integration and File Storage Setup**
+**Story 2.1: Cloudflare R2 Integration and File Storage Setup**
 As a developer,
 I want secure file storage integration with Cloudflare R2,
-so that model and sliced files can be uploaded, stored, and accessed reliably.
+so that model and sliced files can be uploaded, stored, and accessed reliably with proper user isolation.
 
 **Acceptance Criteria:**
 1. Cloudflare R2 SDK integrated with proper authentication
@@ -221,15 +373,20 @@ so that model and sliced files can be uploaded, stored, and accessed reliably.
 3. File upload API endpoints accept .3mf, .gcode, and .stl files with size validation
 4. File integrity verification after upload completion
 5. Error handling for upload failures with retry mechanisms
+6. User-specific file isolation and access control implemented
 
 **Technical Requirements:**
 - File size limits enforced (100MB max per architecture spec)
 - Upload progress tracking implemented
 - Secure credential management for R2 access keys
-- File path organization follows logical structure (/models/{modelId}/variants/{variantId}/)
+- File path organization follows logical structure (/users/{userId}/models/{modelId}/variants/{variantId}/)
 - Local development uses MinIO, production uses Cloudflare R2
+- JWT token validation for all file operations
+- User quota and rate limiting per authentication framework
 
-**Story 1.1: Core Metadata Extraction Library**
+**Dependencies**: Requires Epic 1 (User Management) and Story 0.7 (External Services)
+
+**Story 2.2: Core Metadata Extraction Library**
 As a developer,
 I want a robust library for extracting metadata from 3D printing files,
 so that slicer settings can be automatically captured without manual entry.
@@ -248,19 +405,22 @@ so that slicer settings can be automatically captured without manual entry.
 - Memory efficient for large file handling
 - Uses security validation from FileSecurityValidator class
 
-**Story 1.2a: Basic File Upload Infrastructure**
+**Story 2.3a: Basic File Upload Infrastructure**
 As a 3D printing business owner,
 I want to upload model and sliced files through a simple interface,
 so that I can begin organizing my digital assets systematically.
 
 **Acceptance Criteria:**
-1. Drag-and-drop interface accepts multiple files simultaneously
-2. File type validation restricts to .3mf, .gcode, and .stl files per security spec
+1. User authentication required before accessing upload interface
+2. Drag-and-drop interface accepts multiple files simultaneously
+3. File type validation restricts to .3mf, .gcode, and .stl files per security spec
+4. User-specific upload quotas enforced
+5. Progress indicators and error states follow framework patterns
 3. Upload progress bars show individual file progress
 4. Batch upload handles up to 20 files efficiently
 5. Clear error messages for unsupported files or upload failures
 
-**Dependencies**: Requires Stories 1.0 and 1.1 completion.
+**Dependencies**: Requires Stories 2.1 and 2.2 completion.
 
 **Technical Requirements:**
 - File validation before upload attempt using FileSecurityValidator
@@ -269,7 +429,7 @@ so that I can begin organizing my digital assets systematically.
 - Resume failed uploads where possible
 - UI follows design system from frontend specification
 
-**Story 1.2b: Model and Variant Storage System**
+**Story 2.3b: Model and Variant Storage System**
 As a 3D printing business owner,
 I want to organize uploaded files into logical model-variant hierarchies,
 so that I can find specific variants quickly without folder navigation chaos.
@@ -281,7 +441,7 @@ so that I can find specific variants quickly without folder navigation chaos.
 4. Model-variant relationships clearly displayed in UI per frontend specification
 5. Bulk organization tools for multiple files
 
-**Dependencies**: Requires Story 1.2a completion.
+**Dependencies**: Requires Story 2.3a completion.
 
 **Technical Requirements:**
 - Database operations use proper transactions
@@ -289,7 +449,7 @@ so that I can find specific variants quickly without folder navigation chaos.
 - Parent-child relationships properly maintained in UI
 - Uses Tanstack DB collections for reactive updates
 
-**Story 1.2c: Advanced Metadata Extraction and Display**
+**Story 2.3c: Advanced Metadata Extraction and Display**
 As a 3D printing business owner,
 I want detailed slicer settings automatically extracted and displayed,
 so that I never lose track of parameters used for successful prints.
@@ -301,7 +461,7 @@ so that I never lose track of parameters used for successful prints.
 4. Manual metadata editing available for corrections or custom parameters
 5. Metadata validation prevents invalid or dangerous values per security spec
 
-**Dependencies**: Requires Story 1.2b completion.
+**Dependencies**: Requires Story 2.3b completion.
 
 **Technical Requirements:**
 - Metadata stored in JSONB format as per architecture
@@ -309,7 +469,7 @@ so that I never lose track of parameters used for successful prints.
 - Security validation for all extracted content using sanitization
 - Uses ArkType schemas for validation
 
-**Story 1.3: Advanced Search and Discovery**
+**Story 2.4: Advanced Search and Discovery**
 As a 3D printing business owner,
 I want to search for specific model variants using multiple criteria,
 so that I can quickly find the exact variant I need for production.
@@ -321,7 +481,7 @@ so that I can quickly find the exact variant I need for production.
 4. Search results include relevance ranking and sorting options
 5. Recent searches and favorites enable quick access to commonly used variants
 
-**Dependencies**: Requires Stories 1.2a, 1.2b, and 1.2c completion.
+**Dependencies**: Requires Stories 2.3a, 2.3b, and 2.3c completion.
 
 **Technical Requirements:**
 - PostgreSQL full-text search with GIN indexes per architecture
@@ -329,13 +489,13 @@ so that I can quickly find the exact variant I need for production.
 - Faceted search with multiple filter combinations
 - Uses materialized view for complex aggregations if needed
 
-### Epic 2: Inventory Intelligence System
+### Epic 3: Inventory Intelligence System
 
 **Epic Goal**: Create comprehensive inventory tracking that automates consumption calculations and purchasing decisions.
 
-**Dependencies**: Requires Epic 1 Stories 1.2c completion (filament extraction from metadata) before beginning.
+**Dependencies**: Requires Epic 2 Stories 2.3c completion (filament extraction from metadata) before beginning.
 
-**Story 2.1: Filament Inventory with Precise Matching**
+**Story 3.1: Filament Inventory with Precise Matching**
 As a 3D printing business owner,
 I want to track my filament inventory with precise color and material matching,
 so that I can accurately plan production and avoid stockouts.
@@ -347,7 +507,7 @@ so that I can accurately plan production and avoid stockouts.
 4. Low stock alerts trigger before complete depletion
 5. Multiple spool tracking handles partial spools and multiple locations
 
-**Dependencies**: Requires filament metadata extraction from Epic 1 Story 1.2c.
+**Dependencies**: Requires filament metadata extraction from Epic 2 Story 2.3c.
 
 **Technical Requirements:**
 - Uses FilamentSchema and FilamentInventorySchema from architecture
@@ -356,7 +516,7 @@ so that I can accurately plan production and avoid stockouts.
 - Uses Tanstack DB filamentInventoryCollection for reactive updates
 - Low stock thresholds configurable per filament type
 
-**Story 2.2: Automated Consumption Tracking**
+**Story 3.2: Automated Consumption Tracking**
 As a 3D printing business owner,
 I want the system to automatically calculate filament usage based on completed prints,
 so that inventory levels stay accurate without manual tracking.
@@ -368,7 +528,7 @@ so that inventory levels stay accurate without manual tracking.
 4. Waste factor adjustments improve accuracy over time
 5. Batch consumption updates handle multiple prints efficiently
 
-**Dependencies**: Requires Story 2.1 completion and Epic 3 print queue integration.
+**Dependencies**: Requires Story 3.1 completion and Epic 4 print queue integration.
 
 **Technical Requirements:**
 - Integrates with print queue status updates from Epic 3
@@ -377,7 +537,7 @@ so that inventory levels stay accurate without manual tracking.
 - Audit trail stored for inventory reconciliation
 - Optimistic updates with rollback on calculation errors
 
-**Story 2.3: Intelligent Shopping List Generation**
+**Story 3.3: Intelligent Shopping List Generation**
 As a 3D printing business owner,
 I want automated shopping lists generated based on inventory levels and planned production,
 so that I can restock efficiently without manual calculation.
@@ -389,7 +549,7 @@ so that I can restock efficiently without manual calculation.
 4. Event-based restocking considers seasonal demand spikes
 5. Cost calculations help optimize bulk purchasing decisions
 
-**Dependencies**: Requires Stories 2.1 and 2.2 completion.
+**Dependencies**: Requires Stories 3.1 and 3.2 completion.
 
 **Technical Requirements:**
 - Uses demand counting from filament requirements relationships
@@ -397,13 +557,13 @@ so that I can restock efficiently without manual calculation.
 - Historical usage pattern analysis for recommendations
 - Integration with market events from Epic 3 for seasonal planning
 
-### Epic 3: Production Optimization Engine
+### Epic 4: Production Optimization Engine
 
 **Epic Goal**: Enable intelligent production planning through queue management, feasibility checking, and performance analytics.
 
-**Dependencies**: Requires Epic 2 Stories 2.1 completion (inventory tracking) for feasibility checking functionality.
+**Dependencies**: Requires Epic 3 Stories 3.1 completion (inventory tracking) for feasibility checking functionality.
 
-**Story 3.1: Smart Print Queue Management**
+**Story 4.1: Smart Print Queue Management**
 As a 3D printing business owner,
 I want a print queue that helps me optimize printer utilization and batch efficiency,
 so that I can maximize productive printing time.
@@ -415,7 +575,7 @@ so that I can maximize productive printing time.
 4. Print feasibility warnings prevent queue items that exceed inventory
 5. Status updates (queued, printing, completed, failed) track progress accurately
 
-**Dependencies**: Requires Epic 1 Story 1.3 (search) and Epic 2 Story 2.1 (inventory) completion.
+**Dependencies**: Requires Epic 2 Story 2.4 (search) and Epic 3 Story 3.1 (inventory) completion.
 
 **Technical Requirements:**
 - Uses PrintJobSchema and queue API from architecture specification
@@ -424,7 +584,7 @@ so that I can maximize productive printing time.
 - Queue optimization uses print duration and material grouping algorithms
 - Status updates trigger inventory consumption via Epic 2 Story 2.2
 
-**Story 3.2: Sales Velocity Analytics and Restocking Intelligence**
+**Story 4.2: Sales Velocity Analytics and Restocking Intelligence**
 As a 3D printing business owner,
 I want to see which variants sell fastest and receive automatic restock recommendations,
 so that I can focus production on profitable items and avoid stockouts.
@@ -436,7 +596,7 @@ so that I can focus production on profitable items and avoid stockouts.
 4. Slow-moving inventory alerts help optimize product mix
 5. Performance dashboards enable quick decision-making
 
-**Dependencies**: Requires Story 3.1 completion and Epic 2 Story 2.3 (shopping lists).
+**Dependencies**: Requires Story 4.1 completion and Epic 3 Story 3.3 (shopping lists).
 
 **Technical Requirements:**
 - Analytics dashboard follows frontend design system specifications
@@ -445,7 +605,7 @@ so that I can focus production on profitable items and avoid stockouts.
 - Integration with shopping list generation from Epic 2
 - Dashboard follows responsive design strategy from frontend spec
 
-**Story 3.3: Market Event Planning and Themed Inventory**
+**Story 4.3: Market Event Planning and Themed Inventory**
 As a 3D printing business owner,
 I want to plan production for specific market events with themed inventory recommendations,
 so that I can optimize my product mix for each sales opportunity.
@@ -457,22 +617,26 @@ so that I can optimize my product mix for each sales opportunity.
 4. Production scheduling coordinates printing timeline with event dates
 5. Event performance tracking informs future planning decisions
 
-**Dependencies**: Requires Stories 3.1 and 3.2 completion.
+**Dependencies**: Requires Stories 4.1 and 4.2 completion.
 
 **Technical Requirements:**
 - Uses MarketEvents entity from database schema
 - Event planning interface follows frontend workflow specifications
-- Historical performance analysis uses analytics from Story 3.2
-- Production scheduling integrates with print queue from Story 3.1
-- Inventory checking uses Epic 2 inventory intelligence
+- Historical performance analysis uses analytics from Story 4.2
+- Production scheduling integrates with print queue from Story 4.1
+- Inventory checking uses Epic 3 inventory intelligence
 
-### Epic 4: Advanced Intelligence and Optimization
+## Post-MVP Features (Deferred)
+
+### Epic 5: Advanced Intelligence and Optimization
 
 **Epic Goal**: Establish foundation for learning algorithms that optimize printing success through version tracking and failure analysis.
 
-**Dependencies**: Requires Epic 3 completion for production data and analytics foundation.
+**Status**: POST-MVP - Deferred until after core business value delivery
 
-**Story 4.1: ModelVariant Versioning System**
+**Dependencies**: Requires Epic 4 completion for production data and analytics foundation.
+
+**Story 5.1: ModelVariant Versioning System**
 As a 3D printing business owner,
 I want to track different versions of my model variants with success/failure rates,
 so that I can identify optimal slicer settings over time.
@@ -484,7 +648,7 @@ so that I can identify optimal slicer settings over time.
 4. Performance trends guide future slicer parameter decisions
 5. Best practice recommendations emerge from successful version patterns
 
-**Dependencies**: Requires Epic 1 metadata extraction and Epic 3 print tracking completion.
+**Dependencies**: Requires Epic 2 metadata extraction and Epic 4 print tracking completion.
 
 **Technical Requirements:**
 - Version tracking extends ModelVariant schema with version field
@@ -493,7 +657,7 @@ so that I can identify optimal slicer settings over time.
 - Statistical analysis uses PostgreSQL analytics functions
 - Performance recommendations generated from success pattern analysis
 
-**Story 4.2: Manufacturing Cost Analysis**
+**Story 5.2: Manufacturing Cost Analysis**
 As a 3D printing business owner,
 I want accurate manufacturing cost calculations for each variant,
 so that I can price products appropriately and identify profit opportunities.
@@ -505,7 +669,7 @@ so that I can price products appropriately and identify profit opportunities.
 4. Cost tracking over time identifies efficiency improvements
 5. Competitive cost analysis supports market positioning
 
-**Dependencies**: Requires Epic 2 inventory cost tracking and Epic 3 production analytics.
+**Dependencies**: Requires Epic 3 inventory cost tracking and Epic 4 production analytics.
 
 **Technical Requirements:**
 - Cost calculations use filament usage from BambuMetadata and inventory costs
@@ -516,42 +680,52 @@ so that I can price products appropriately and identify profit opportunities.
 
 ## Cross-Epic Dependencies Summary
 
-**Epic Sequencing Requirements:**
-1. **Epic 0** → Must complete entirely before any other epic
-2. **Epic 1** → Can begin after Epic 0, must complete Stories 1.2c before Epic 2
-3. **Epic 2** → Requires Epic 1 Story 1.2c, must complete Story 2.1 before Epic 3
-4. **Epic 3** → Requires Epic 1 Story 1.3 and Epic 2 Story 2.1, must complete before Epic 4
-5. **Epic 4** → Requires Epic 3 completion for data foundation
+**Updated Epic Sequencing Requirements (Post-PO Review):**
+1. **Epic 0** → Foundation (Infrastructure, Auth, CI/CD, External Services) - Must complete entirely
+2. **Epic 1** → User Management & Authentication - Must complete before any business features
+3. **Epic 2** → Digital Asset Management - Requires Epic 1 completion, must complete Story 2.3c before Epic 3
+4. **Epic 3** → Inventory Intelligence - Requires Epic 2 Story 2.3c completion, must complete Story 3.1 before Epic 4
+5. **Epic 4** → Production Optimization - Requires Epic 2 Story 2.4 and Epic 3 Story 3.1 completion
+6. **Epic 5** → POST-MVP (Advanced Intelligence) - Deferred until after core business value delivery
 
 **Critical Path Dependencies:**
-- Epic 0 (Foundation) → Epic 1 Stories 1.0, 1.1 (Infrastructure)
-- Epic 1 Story 1.2c (Metadata) → Epic 2 Story 2.1 (Filament Inventory)
-- Epic 2 Story 2.1 (Inventory) → Epic 3 Story 3.1 (Queue Feasibility)
-- Epic 3 Stories 3.1, 3.2 (Production Data) → Epic 4 Stories 4.1, 4.2 (Analytics)
+- Epic 0 (Foundation + Auth + CI/CD) → Epic 1 (User Management)
+- Epic 1 (User Management) → Epic 2 (File Management with User Isolation)
+- Epic 2 Story 2.3c (Metadata) → Epic 3 Story 3.1 (Filament Inventory)
+- Epic 3 Story 3.1 (Inventory) → Epic 4 Story 4.1 (Queue Feasibility)
+- Epic 2 Story 2.4 (Search) + Epic 3 Story 3.1 (Inventory) → Epic 4 Production Features
 
 ## Technical Implementation
 
 ### Technology Stack
-- **Frontend Framework**: Tanstack Start (React-based full-stack framework)  
+- **Frontend Framework**: Tanstack Start (React-based full-stack framework)
 - **Styling**: TailwindCSS for responsive design
 - **Database**: PostgreSQL with PrismaORM and Tanstack DB
+- **Authentication**: JWT tokens with secure session management (Clerk or Auth0)
 - **State Management**: Tanstack Query for server state, Tanstack Form for form handling
 - **UI Components**: React Aria for accessible component primitives
 - **Database Hosting**: Xata (staging/production), Docker PostgreSQL (local development)
-- **File Storage**: Cloudflare R2 for model and sliced files
+- **File Storage**: Cloudflare R2 for model and sliced files with user isolation
+- **Email Service**: SendGrid or AWS SES for transactional emails
+- **Monitoring**: Error tracking (Sentry) and performance monitoring
+- **CI/CD**: GitHub Actions for automated testing and deployment
 - **Development**: Docker for local environment consistency
 
 ### Database Schema Design
 
 **Core Entities:**
-- **Models**: Base 3D designs with designer attribution and categorization
-- **ModelVariants**: Specific configurations with slicer settings and file references  
-- **FilamentInventory**: Stock tracking with precise material/color specifications
-- **ProductInventory**: Finished goods and accessories inventory
-- **PrintJobs**: Queue management and production tracking
-- **MarketEvents**: Event planning and themed inventory management
+- **Users**: User accounts with authentication and business profile information
+- **Models**: Base 3D designs with designer attribution and categorization (user-isolated)
+- **ModelVariants**: Specific configurations with slicer settings and file references (user-isolated)
+- **FilamentInventory**: Stock tracking with precise material/color specifications (user-isolated)
+- **ProductInventory**: Finished goods and accessories inventory (user-isolated)
+- **PrintJobs**: Queue management and production tracking (user-isolated)
+- **MarketEvents**: Event planning and themed inventory management (user-isolated)
 
 **Key Relationships:**
+- User (1:N) Models - user owns multiple models
+- User (1:N) FilamentInventory - user-specific inventory tracking
+- User (1:N) PrintJobs - user-specific print queue
 - Model (1:N) ModelVariant - hierarchical organization
 - ModelVariant (1:1) SlicedFile - direct file association
 - ModelVariant (M:N) FilamentInventory - material requirements mapping
@@ -564,9 +738,12 @@ so that I can price products appropriately and identify profit opportunities.
 - **Backup Strategy**: Automated versioning and disaster recovery
 
 ### Security and Compliance
-- **Data Protection**: Industry-standard encryption for sensitive business data
-- **Access Control**: User authentication with role-based permissions  
-- **Audit Logging**: Complete activity tracking for business operations
-- **Privacy Compliance**: GDPR-compliant data handling and retention policies
+- **Authentication**: JWT-based authentication with secure session management
+- **Data Protection**: Industry-standard encryption for sensitive business data with user isolation
+- **Access Control**: Row-level security ensuring complete user data isolation
+- **File Security**: User-specific file storage paths with signed URL access control
+- **Audit Logging**: Complete activity tracking for business operations with user context
+- **Privacy Compliance**: GDPR-compliant data handling and retention policies with user data export/deletion
+- **API Security**: Rate limiting and quota management per user with tRPC middleware validation
 
 This PRD provides the comprehensive foundation needed for the UX Expert to create detailed interface specifications and the Architect to design the complete technical implementation. The requirements balance immediate operational needs with future scalability and intelligence features.

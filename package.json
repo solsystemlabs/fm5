@@ -25,6 +25,7 @@
     "@tanstack/react-start": "^1.131.7",
     "@tanstack/router-plugin": "^1.121.2",
     "@trpc/client": "^11.5.1",
+    "@trpc/next": "^11.5.1",
     "@trpc/react-query": "^11.5.1",
     "@trpc/server": "^11.5.1",
     "arktype": "^2.1.22",
@@ -32,8 +33,10 @@
     "react": "^19.0.0",
     "react-aria-components": "^1.12.2",
     "react-dom": "^19.0.0",
+    "superjson": "^2.2.2",
     "tailwindcss": "^4.0.6",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "zod": "^4.1.11"
   },
   "devDependencies": {
     "@tanstack/eslint-config": "^0.3.0",

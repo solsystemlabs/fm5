@@ -172,15 +172,15 @@ so that all entities and relationships from the architecture are available for d
 - Migration scripts are idempotent and handle schema evolution
 - Database seeding capability for development data
 
-**Story 0.4: tRPC and ArkType Integration**
+**Story 0.4: tRPC and Zod Integration**
 As a developer,
-I want tRPC configured with ArkType schemas for end-to-end type safety,
+I want tRPC configured with Zod schemas for end-to-end type safety,
 so that API procedures have runtime validation matching TypeScript interfaces.
 
 **Acceptance Criteria:**
 1. tRPC server configured with router structure from architecture specification
-2. ArkType schemas defined for all entities: ModelSchema, FilamentSchema, etc.
-3. tRPC procedures use ArkType for input/output validation
+2. Zod schemas defined for all entities: ModelSchema, FilamentSchema, etc.
+3. tRPC procedures use Zod for input/output validation
 4. Client-side tRPC configured with proper error handling
 5. Type inference working from database to UI components
 
@@ -467,7 +467,7 @@ so that I never lose track of parameters used for successful prints.
 - Metadata stored in JSONB format as per architecture
 - Fast-access fields indexed for search performance
 - Security validation for all extracted content using sanitization
-- Uses ArkType schemas for validation
+- Uses Zod schemas for validation
 
 **Story 2.4: Advanced Search and Discovery**
 As a 3D printing business owner,

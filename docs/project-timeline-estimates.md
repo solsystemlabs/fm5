@@ -39,7 +39,7 @@
 | 0.1 | Project Scaffolding and Tanstack Start Setup | 2 | 0.5 | 2.5 |
 | 0.2 | Docker Development Environment Setup | 1.5 | 0.5 | 2 |
 | 0.3 | Database Schema and Prisma Setup | 3 | 1 | 4 |
-| 0.4 | tRPC and ArkType Integration | 2.5 | 0.5 | 3 |
+| 0.4 | tRPC and Zod Integration | 2.5 | 0.5 | 3 |
 | 0.5 | Authentication Framework Setup | 3 | 1 | 4 |
 | 0.6 | CI/CD Pipeline and Deployment Infrastructure | 4 | 1 | 5 |
 | 0.7 | External Service Integration Planning | 1.5 | 0.5 | 2 |

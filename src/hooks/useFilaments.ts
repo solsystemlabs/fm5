@@ -55,7 +55,7 @@ export function useFilamentInventory() {
 
       return { previousInventory }
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _variables, context) => {
       // Rollback on error
       if (context?.previousInventory) {
         utils.filaments.inventory.list.setData({}, context.previousInventory)

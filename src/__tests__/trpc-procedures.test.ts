@@ -1,7 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { TRPCError } from '@trpc/server'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { appRouter } from '../../lib/routers/_app'
-import { createTRPCContext } from '../../lib/trpc'
 
 // Mock database
 const mockDb = {
@@ -68,7 +66,7 @@ const mockUser = {
 }
 
 // Create test context
-function createTestContext(user = mockUser) {
+function createTestContext(user: typeof mockUser | null = mockUser) {
   return {
     db: mockDb,
     user,

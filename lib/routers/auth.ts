@@ -1,16 +1,12 @@
 import { z } from 'zod'
-import { createTRPCRouter, publicProcedure, protectedProcedure } from '../trpc'
 import { UserSchema } from '../schemas'
+import { createTRPCRouter, protectedProcedure } from '../trpc'
 
 export const authRouter = createTRPCRouter({
   // Get current user information
   me: protectedProcedure
     .output(UserSchema)
     .query(async ({ ctx }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const user = await ctx.db.user.findUnique({
         where: { id: ctx.user.id },
       })
@@ -43,10 +39,6 @@ export const authRouter = createTRPCRouter({
     )
     .output(UserSchema)
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const updatedUser = await ctx.db.user.update({
         where: { id: ctx.user.id },
         data: {

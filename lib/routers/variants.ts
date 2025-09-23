@@ -8,10 +8,6 @@ export const variantsRouter = createTRPCRouter({
     .input(z.string())
     .output(z.array(ModelVariantSchema))
     .query(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const variants = await ctx.db.modelVariant.findMany({
         where: {
           modelId: input,
@@ -28,10 +24,6 @@ export const variantsRouter = createTRPCRouter({
     .input(z.string())
     .output(ModelVariantSchema)
     .query(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const variant = await ctx.db.modelVariant.findFirst({
         where: {
           id: input,
@@ -65,10 +57,6 @@ export const variantsRouter = createTRPCRouter({
     )
     .output(ModelVariantSchema)
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       // Verify model belongs to user
       const model = await ctx.db.model.findFirst({
         where: {
@@ -112,10 +100,6 @@ export const variantsRouter = createTRPCRouter({
     )
     .output(ModelVariantSchema)
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const { id, ...updateData } = input
 
       const variant = await ctx.db.modelVariant.updateMany({
@@ -145,10 +129,6 @@ export const variantsRouter = createTRPCRouter({
     .input(z.string())
     .output(z.boolean())
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const result = await ctx.db.modelVariant.deleteMany({
         where: {
           id: input,

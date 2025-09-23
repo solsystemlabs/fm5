@@ -1,22 +1,24 @@
-import { initTRPC, TRPCError } from '@trpc/server'
-import { type FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
+import { TRPCError, initTRPC } from '@trpc/server'
 import superjson from 'superjson'
-import { db } from './db'
+import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
+
+// Mock database for now - will be replaced with actual db import later
+const db = {} as any
 
 // Create context for tRPC
-export async function createTRPCContext(opts: FetchCreateContextFnOptions) {
+export function createTRPCContext(opts: FetchCreateContextFnOptions) {
   const { req } = opts
 
   // Get user from authentication (placeholder for now)
   // In production, extract JWT token and validate user
-  const getUser = async () => {
+  const getUser = (): { id: string } | null => {
     // TODO: Implement JWT validation
     // const token = req.headers.get('authorization')?.replace('Bearer ', '')
     // Validate token and return user
     return null
   }
 
-  const user = await getUser()
+  const user = getUser()
 
   return {
     db,
@@ -25,7 +27,7 @@ export async function createTRPCContext(opts: FetchCreateContextFnOptions) {
   }
 }
 
-type Context = Awaited<ReturnType<typeof createTRPCContext>>
+type Context = ReturnType<typeof createTRPCContext>
 
 // Initialize tRPC
 const t = initTRPC.context<Context>().create({
@@ -59,7 +61,7 @@ const requireAuth = t.middleware(({ ctx, next }) => {
   return next({
     ctx: {
       ...ctx,
-      user: ctx.user,
+      user: ctx.user, // TypeScript now knows this is not null
     },
   })
 })

@@ -22,7 +22,7 @@ export function useModels(filters?: {
   // Optimistic create mutation with automatic rollback
   const createModel = api.models.create.useMutation({
     // Optimistic update with automatic rollback on error
-    onMutate: async (newModel) => {
+    onMutate: async () => {
       // Cancel any outgoing refetches
       await utils.models.list.cancel()
 
@@ -41,7 +41,7 @@ export function useModels(filters?: {
       return { previousModels }
     },
     // On error, rollback to previous state
-    onError: (err, newModel, context) => {
+    onError: (_err, _newModel, context) => {
       if (context?.previousModels) {
         utils.models.list.setData(
           { search: filters?.search, category: filters?.category, limit: 20 },
@@ -116,7 +116,7 @@ export function useModelsSuspense(filters?: {
   })
 
   return {
-    models: modelsQuery.data.models,
-    nextCursor: modelsQuery.data.nextCursor,
+    models: modelsQuery[0].models,
+    nextCursor: modelsQuery[0].nextCursor,
   }
 }

@@ -1,4 +1,3 @@
-import { json } from '@tanstack/react-start'
 import { createFileRoute } from '@tanstack/react-router'
 
 // For now, create a simple API endpoint that can be enhanced later

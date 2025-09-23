@@ -19,10 +19,6 @@ export const queueRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const { status, limit, cursor } = input
 
       const where = {
@@ -57,10 +53,6 @@ export const queueRouter = createTRPCRouter({
     .input(z.string())
     .output(PrintJobSchema)
     .query(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const job = await ctx.db.printJob.findFirst({
         where: {
           id: input,
@@ -87,10 +79,6 @@ export const queueRouter = createTRPCRouter({
     )
     .output(PrintJobSchema)
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       // Verify variant belongs to user
       const variant = await ctx.db.modelVariant.findFirst({
         where: {
@@ -128,10 +116,6 @@ export const queueRouter = createTRPCRouter({
     )
     .output(PrintJobSchema)
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const { id, ...updateData } = input
 
       // Set completion time automatically if status is completed
@@ -169,10 +153,6 @@ export const queueRouter = createTRPCRouter({
     )
     .output(PrintJobSchema)
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const { id, priority } = input
 
       const job = await ctx.db.printJob.updateMany({
@@ -199,10 +179,6 @@ export const queueRouter = createTRPCRouter({
     .input(z.string())
     .output(z.boolean())
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const result = await ctx.db.printJob.deleteMany({
         where: {
           id: input,
@@ -225,10 +201,6 @@ export const queueRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const [total, queued, printing, completed, failed] = await Promise.all([
         ctx.db.printJob.count({ where: { userId: ctx.user.id } }),
         ctx.db.printJob.count({ where: { userId: ctx.user.id, status: 'queued' } }),

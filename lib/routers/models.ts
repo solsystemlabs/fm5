@@ -20,10 +20,6 @@ export const modelsRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const { limit, cursor, search, category } = input
 
       const where = {
@@ -62,10 +58,6 @@ export const modelsRouter = createTRPCRouter({
     .input(z.string())
     .output(ModelSchema)
     .query(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const model = await ctx.db.model.findFirst({
         where: {
           id: input,
@@ -93,10 +85,6 @@ export const modelsRouter = createTRPCRouter({
     )
     .output(ModelSchema)
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const model = await ctx.db.model.create({
         data: {
           ...input,
@@ -123,10 +111,6 @@ export const modelsRouter = createTRPCRouter({
     )
     .output(ModelSchema)
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const { id, ...updateData } = input
 
       const model = await ctx.db.model.updateMany({
@@ -156,10 +140,6 @@ export const modelsRouter = createTRPCRouter({
     .input(z.string())
     .output(z.boolean())
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const result = await ctx.db.model.deleteMany({
         where: {
           id: input,

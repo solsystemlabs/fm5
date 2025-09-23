@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { z } from 'zod'
-import { UserSchema, ModelSchema, FilamentSchema, PrintJobSchema } from '../../lib/schemas'
+import { describe, expect, it } from 'vitest'
+import { FilamentSchema, ModelSchema, PrintJobSchema, UserSchema } from '../../lib/schemas'
+import type { z } from 'zod'
 
 describe('tRPC and Zod Schema Validation', () => {
   describe('Schema Type Safety', () => {
@@ -152,8 +152,6 @@ describe('tRPC and Zod Schema Validation', () => {
     it('should infer correct TypeScript types from Zod schemas', () => {
       type UserType = z.infer<typeof UserSchema>
       type ModelType = z.infer<typeof ModelSchema>
-      type FilamentType = z.infer<typeof FilamentSchema>
-      type PrintJobType = z.infer<typeof PrintJobSchema>
 
       // Type assertions to verify correct inference
       const user: UserType = {

@@ -1,7 +1,7 @@
 import { createTRPCReact } from '@trpc/react-query'
 import { httpBatchLink } from '@trpc/client'
-import type { AppRouter } from './routers/_app'
 import superjson from 'superjson'
+import type { AppRouter } from './routers/_app'
 
 // Create tRPC React client with enhanced 2025 integration
 export const api = createTRPCReact<AppRouter>()
@@ -23,10 +23,10 @@ function getBaseUrl() {
 // Enhanced tRPC client configuration with modern features
 export function createTRPCClient() {
   return api.createClient({
-    transformer: superjson,
     links: [
       httpBatchLink({
         url: `${getBaseUrl()}/api/trpc`,
+        transformer: superjson,
         // Add authentication headers
         headers() {
           return {
@@ -43,34 +43,5 @@ export function createTRPCClient() {
         },
       }),
     ],
-    // Enhanced query client defaults for optimal caching
-    defaultOptions: {
-      queries: {
-        // Optimize stale time for better UX
-        staleTime: 5 * 60 * 1000, // 5 minutes
-        // Enable background refetch
-        refetchOnWindowFocus: false,
-        refetchOnReconnect: true,
-        // Add retry configuration
-        retry: (failureCount, error: any) => {
-          // Don't retry for authentication errors
-          if (error?.data?.code === 'UNAUTHORIZED') return false
-          // Retry up to 3 times for other errors
-          return failureCount < 3
-        },
-        // Configure retry delay with exponential backoff
-        retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-      },
-      mutations: {
-        // Add retry for mutations
-        retry: (failureCount, error: any) => {
-          // Don't retry authentication errors or validation errors
-          if (error?.data?.code === 'UNAUTHORIZED' || error?.data?.code === 'BAD_REQUEST') {
-            return false
-          }
-          return failureCount < 2
-        },
-      },
-    },
   })
 }

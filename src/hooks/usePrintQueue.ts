@@ -28,7 +28,7 @@ export function usePrintQueue() {
 
   // Add job to queue with optimistic updates
   const addJob = api.queue.add.useMutation({
-    onMutate: async (newJob) => {
+    onMutate: async () => {
       await utils.queue.list.cancel()
 
       const previousQueue = utils.queue.list.getData()
@@ -41,7 +41,7 @@ export function usePrintQueue() {
 
       return { previousQueue }
     },
-    onError: (err, newJob, context) => {
+    onError: (_err, _newJob, context) => {
       if (context?.previousQueue) {
         utils.queue.list.setData({}, context.previousQueue)
       }
@@ -77,7 +77,7 @@ export function usePrintQueue() {
 
       return { previousQueue }
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _variables, context) => {
       if (context?.previousQueue) {
         utils.queue.list.setData({}, context.previousQueue)
       }

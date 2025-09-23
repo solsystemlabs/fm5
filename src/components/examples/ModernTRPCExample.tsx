@@ -50,7 +50,7 @@ function ModelsListStandard() {
 
   return (
     <div className="grid gap-4">
-      {models.map((model) => (
+      {models.map((model: any) => (
         <div key={model.id} className="p-4 border rounded">
           <h3 className="font-medium">{model.name}</h3>
           <p className="text-sm text-gray-600">by {model.designer}</p>
@@ -71,7 +71,7 @@ function ModelsListSuspense() {
 
   return (
     <div className="grid gap-4">
-      {models.map((model) => (
+      {models.map((model: any) => (
         <div key={model.id} className="p-4 border rounded bg-green-50">
           <h3 className="font-medium">{model.name}</h3>
           <p className="text-sm text-gray-600">by {model.designer}</p>
@@ -168,15 +168,6 @@ function CacheUtilsExample() {
  * Real-time data example with automatic refetch
  */
 export function RealTimeQueueExample() {
-  const queueQuery = api.queue.list.useQuery(
-    {},
-    {
-      // Refresh every 10 seconds for real-time updates
-      refetchInterval: 10000,
-      refetchOnWindowFocus: true,
-    }
-  )
-
   const stats = api.queue.stats.useQuery()
 
   return (

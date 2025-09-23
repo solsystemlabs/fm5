@@ -1,6 +1,6 @@
 import { z } from 'zod'
+import { FilamentInventorySchema, FilamentSchema } from '../schemas'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
-import { FilamentSchema, FilamentInventorySchema } from '../schemas'
 
 export const filamentsRouter = createTRPCRouter({
   // List filaments with filtering
@@ -14,10 +14,6 @@ export const filamentsRouter = createTRPCRouter({
     )
     .output(z.array(FilamentSchema))
     .query(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const { materialType, search, limit } = input
 
       const where = {
@@ -45,10 +41,6 @@ export const filamentsRouter = createTRPCRouter({
     .input(z.string())
     .output(FilamentSchema)
     .query(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const filament = await ctx.db.filament.findFirst({
         where: {
           id: input,
@@ -77,10 +69,6 @@ export const filamentsRouter = createTRPCRouter({
     )
     .output(FilamentSchema)
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const filament = await ctx.db.filament.create({
         data: {
           ...input,
@@ -109,10 +97,6 @@ export const filamentsRouter = createTRPCRouter({
     )
     .output(FilamentSchema)
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const { id, ...updateData } = input
 
       const filament = await ctx.db.filament.updateMany({
@@ -142,10 +126,6 @@ export const filamentsRouter = createTRPCRouter({
     .input(z.string())
     .output(z.boolean())
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new Error('User not found')
-      }
-
       const result = await ctx.db.filament.deleteMany({
         where: {
           id: input,
@@ -168,10 +148,6 @@ export const filamentsRouter = createTRPCRouter({
       )
       .output(z.array(FilamentInventorySchema))
       .query(async ({ ctx, input }) => {
-        if (!ctx.user) {
-          throw new Error('User not found')
-        }
-
         const { filamentId, lowStock } = input
 
         const where = {
@@ -205,10 +181,6 @@ export const filamentsRouter = createTRPCRouter({
       )
       .output(FilamentInventorySchema)
       .mutation(async ({ ctx, input }) => {
-        if (!ctx.user) {
-          throw new Error('User not found')
-        }
-
         // Verify filament belongs to user
         const filament = await ctx.db.filament.findFirst({
           where: {
@@ -243,10 +215,6 @@ export const filamentsRouter = createTRPCRouter({
       )
       .output(FilamentInventorySchema)
       .mutation(async ({ ctx, input }) => {
-        if (!ctx.user) {
-          throw new Error('User not found')
-        }
-
         const { id, quantityGrams } = input
 
         const inventory = await ctx.db.filamentInventory.updateMany({

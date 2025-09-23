@@ -1,6 +1,6 @@
-## tRPC API Specification with ArkType
+## tRPC API Specification with Zod
 
-### Router Definition with ArkType Validation
+### Router Definition with Zod Validation
 
 ```typescript
 import { initTRPC } from '@trpc/server';
@@ -179,7 +179,7 @@ This architecture focuses on creating a scalable, efficient system for small 3D 
 | **Form Handling** | Tanstack Form | Latest | Type-safe form validation and handling |
 | **UI Components** | React Aria | Latest | Accessibility-first component primitives |
 | **Styling** | TailwindCSS | 3.4+ | Utility-first CSS framework |
-| **Type Safety** | ArkType + tRPC | Latest | End-to-end type safety with runtime validation |
+| **Type Safety** | Zod + tRPC | Latest | End-to-end type safety with runtime validation |
 | **Client Database** | Tanstack DB | Latest | Reactive client-side database with live queries |
 | **File Storage** | Cloudflare R2 | - | S3-compatible object storage |
 | **Dev Database** | Docker PostgreSQL | 18 Beta | Local development environment |
@@ -200,9 +200,9 @@ This architecture focuses on creating a scalable, efficient system for small 3D 
 - **Sub-millisecond Performance**: Complex queries with joins across collections
 - **Eliminates Query Boilerplate**: Collections replace most useQuery patterns
 
-**ArkType + tRPC Strategy:**
-- **Runtime Validation**: ArkType schemas validate at compile time and runtime
-- **Type-Safe APIs**: tRPC procedures use ArkType for input/output validation
+**Zod + tRPC Strategy:**
+- **Runtime Validation**: Zod schemas validate at compile time and runtime
+- **Type-Safe APIs**: tRPC procedures use Zod for input/output validation
 - **1:1 Type Mapping**: Runtime types exactly match TypeScript interfaces
 - **Better Performance**: Optimized validation compared to alternatives
 
@@ -318,10 +318,10 @@ erDiagram
     }
 ```
 
-### ArkType Schema Definitions
+### Zod Schema Definitions
 
 ```typescript
-import { type } from 'arktype';
+import { type } from 'zod';
 
 // User Authentication Schema
 export const UserSchema = type({
@@ -345,7 +345,7 @@ export const UserSchema = type({
   'lastLoginAt?': 'Date'
 });
 
-// Core Model Types using ArkType (now with user isolation)
+// Core Model Types using Zod (now with user isolation)
 export const ModelSchema = type({
   id: 'string',
   userId: 'string', // User isolation
@@ -475,7 +475,7 @@ export const BambuMetadataSchema = type({
   rawMetadata: 'unknown'
 });
 
-// Infer TypeScript types from ArkType schemas
+// Infer TypeScript types from Zod schemas
 export type User = typeof UserSchema.infer;
 export type Model = typeof ModelSchema.infer;
 export type ModelVariant = typeof ModelVariantSchema.infer;
@@ -2240,7 +2240,7 @@ await migrationTool.migrateFolderStructure(migrationPlan);
 1. **Enhanced Retry Logic**: File uploads preserve metadata and allow easy retry without re-entering form data
 2. **PostgreSQL 18 Beta**: Updated to latest version with enhanced JSONB capabilities  
 3. **Filament/Inventory Separation**: Clean separation between filament specifications and physical inventory
-4. **ArkType + tRPC Integration**: Full end-to-end type safety with runtime validation
+4. **Zod + tRPC Integration**: Full end-to-end type safety with runtime validation
 5. **Tanstack DB Implementation**: Reactive collections with live queries and optimistic updates
 6. **Demand Tracking**: Automatic calculation of filament demand across variants
 7. **Migration Strategy**: Comprehensive migration from Windows folders with filament demand analysis
@@ -2249,7 +2249,7 @@ await migrationTool.migrateFolderStructure(migrationPlan);
 
 - **Better UX**: Retry uploads without losing extracted metadata
 - **Data Integrity**: Separate filament specs from inventory enables better demand tracking  
-- **Type Safety**: ArkType ensures runtime validation matches TypeScript types
+- **Type Safety**: Zod ensures runtime validation matches TypeScript types
 - **Performance**: Tanstack DB provides sub-millisecond queries with automatic reactivity
 - **Scalability**: Schema designed for 1000+ models with proper indexing
 - **Future-Proof**: Architecture easily extends to PrusaSlicer and OrcaSlicer
@@ -2260,7 +2260,7 @@ The architecture now provides:
 - Complete technical specifications for implementation
 - Proper error handling and retry mechanisms
 - Scalable database design with demand tracking
-- Modern tech stack integration (ArkType, tRPC, Tanstack DB)
+- Modern tech stack integration (Zod, tRPC, Tanstack DB)
 - Migration tools for existing Windows folder workflows
 - Performance monitoring and optimization strategies
 

@@ -1,6 +1,6 @@
-# tRPC API Specification with ArkType
+# tRPC API Specification with Zod
 
-## Router Definition with ArkType Validation
+## Router Definition with Zod Validation
 
 ```typescript
 import { initTRPC } from '@trpc/server';
@@ -179,7 +179,7 @@ This architecture focuses on creating a scalable, efficient system for small 3D 
 | **Form Handling** | Tanstack Form | Latest | Type-safe form validation and handling |
 | **UI Components** | React Aria | Latest | Accessibility-first component primitives |
 | **Styling** | TailwindCSS | 3.4+ | Utility-first CSS framework |
-| **Type Safety** | ArkType + tRPC | Latest | End-to-end type safety with runtime validation |
+| **Type Safety** | Zod + tRPC | Latest | End-to-end type safety with runtime validation |
 | **Client Database** | Tanstack DB | Latest | Reactive client-side database with live queries |
 | **File Storage** | Cloudflare R2 | - | S3-compatible object storage |
 | **Dev Database** | Docker PostgreSQL | 18 Beta | Local development environment |
@@ -200,9 +200,9 @@ This architecture focuses on creating a scalable, efficient system for small 3D 
 - **Sub-millisecond Performance**: Complex queries with joins across collections
 - **Eliminates Query Boilerplate**: Collections replace most useQuery patterns
 
-**ArkType + tRPC Strategy:**
-- **Runtime Validation**: ArkType schemas validate at compile time and runtime
-- **Type-Safe APIs**: tRPC procedures use ArkType for input/output validation
+**Zod + tRPC Strategy:**
+- **Runtime Validation**: Zod schemas validate at compile time and runtime
+- **Type-Safe APIs**: tRPC procedures use Zod for input/output validation
 - **1:1 Type Mapping**: Runtime types exactly match TypeScript interfaces
 - **Better Performance**: Optimized validation compared to alternatives
 
@@ -318,10 +318,10 @@ erDiagram
     }
 ```
 
-## ArkType Schema Definitions
+## Zod Schema Definitions
 
 ```typescript
-import { type } from 'arktype';
+import { z } from 'zod';
 
 // User Authentication Schema
 export const UserSchema = type({
@@ -345,7 +345,7 @@ export const UserSchema = type({
   'lastLoginAt?': 'Date'
 });
 
-// Core Model Types using ArkType (now with user isolation)
+// Core Model Types using Zod (now with user isolation)
 export const ModelSchema = type({
   id: 'string',
   userId: 'string', // User isolation
@@ -475,7 +475,7 @@ export const BambuMetadataSchema = type({
   rawMetadata: 'unknown'
 });
 
-// Infer TypeScript types from ArkType schemas
+// Infer TypeScript types from Zod schemas
 export type User = typeof UserSchema.infer;
 export type Model = typeof ModelSchema.infer;
 export type ModelVariant = typeof ModelVariantSchema.infer;

@@ -14,7 +14,7 @@ export function useFilamentInventory() {
       refetchInterval: 5 * 60 * 1000,
       // Enable background updates
       refetchOnWindowFocus: true,
-    }
+    },
   )
 
   const inventoryQuery = api.filaments.inventory.list.useQuery({})
@@ -25,7 +25,7 @@ export function useFilamentInventory() {
     {
       // More frequent updates for low stock items
       refetchInterval: 2 * 60 * 1000,
-    }
+    },
   )
 
   // Create filament with inventory
@@ -47,10 +47,12 @@ export function useFilamentInventory() {
       const previousInventory = utils.filaments.inventory.list.getData()
 
       // Optimistically update
-      utils.filaments.inventory.list.setData({}, (old) =>
-        old?.map((item) =>
-          item.id === id ? { ...item, quantityGrams } : item
-        ) ?? []
+      utils.filaments.inventory.list.setData(
+        {},
+        (old) =>
+          old?.map((item) =>
+            item.id === id ? { ...item, quantityGrams } : item,
+          ) ?? [],
       )
 
       return { previousInventory }
@@ -113,10 +115,10 @@ export function useMaterialStats() {
             acc[filament.materialType] = (acc[filament.materialType] || 0) + 1
             return acc
           },
-          {} as Record<string, number>
+          {} as Record<string, number>,
         )
         return stats
       },
-    }
+    },
   )
 }

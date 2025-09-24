@@ -1,33 +1,37 @@
 import { TRPCError, initTRPC } from '@trpc/server'
 import superjson from 'superjson'
+import { auth } from './auth'
+import { prisma } from './db'
+import type { User } from './auth'
 import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 
-// Mock database for now - will be replaced with actual db import later
-const db = {} as any
-
 // Create context for tRPC
-export function createTRPCContext(opts: FetchCreateContextFnOptions) {
+export async function createTRPCContext(opts: FetchCreateContextFnOptions) {
   const { req } = opts
 
-  // Get user from authentication (placeholder for now)
-  // In production, extract JWT token and validate user
-  const getUser = (): { id: string } | null => {
-    // TODO: Implement JWT validation
-    // const token = req.headers.get('authorization')?.replace('Bearer ', '')
-    // Validate token and return user
-    return null
+  // Get user from BetterAuth session
+  const getUser = async (): Promise<User | null> => {
+    try {
+      const session = await auth.api.getSession({
+        headers: req.headers,
+      })
+      return session?.user ?? null
+    } catch (error) {
+      // Session validation failed or no session
+      return null
+    }
   }
 
-  const user = getUser()
+  const user = await getUser()
 
   return {
-    db,
+    db: prisma,
     user,
     req,
   }
 }
 
-type Context = ReturnType<typeof createTRPCContext>
+type Context = Awaited<ReturnType<typeof createTRPCContext>>
 
 // Initialize tRPC
 const t = initTRPC.context<Context>().create({
@@ -37,9 +41,10 @@ const t = initTRPC.context<Context>().create({
       ...shape,
       data: {
         ...shape.data,
-        zodError: error.cause instanceof Error && error.cause.name === 'ZodError'
-          ? error.cause
-          : null,
+        zodError:
+          error.cause instanceof Error && error.cause.name === 'ZodError'
+            ? error.cause
+            : null,
       },
     }
   },
@@ -54,7 +59,8 @@ const requireAuth = t.middleware(({ ctx, next }) => {
   if (!ctx.user) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
-      message: 'User must be authenticated',
+      message:
+        'Authentication required. Please sign in to access this resource.',
     })
   }
 
@@ -66,5 +72,35 @@ const requireAuth = t.middleware(({ ctx, next }) => {
   })
 })
 
-// Protected procedure (requires authentication)
+// Role-based authorization middleware
+const requireRole = (allowedRoles: Array<'owner' | 'operator' | 'viewer'>) =>
+  t.middleware(({ ctx, next }) => {
+    if (!ctx.user) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required.',
+      })
+    }
+
+    // @ts-ignore - User type might not have role yet, will be fixed after schema migration
+    if (!allowedRoles.includes(ctx.user.role)) {
+      throw new TRPCError({
+        code: 'FORBIDDEN',
+        message: `Access denied. Required role: ${allowedRoles.join(' or ')}.`,
+      })
+    }
+
+    return next({ ctx })
+  })
+
+// Protected procedures with different permission levels
 export const protectedProcedure = t.procedure.use(requireAuth)
+export const ownerOnlyProcedure = t.procedure
+  .use(requireAuth)
+  .use(requireRole(['owner']))
+export const operatorProcedure = t.procedure
+  .use(requireAuth)
+  .use(requireRole(['owner', 'operator']))
+export const viewerProcedure = t.procedure
+  .use(requireAuth)
+  .use(requireRole(['owner', 'operator', 'viewer']))

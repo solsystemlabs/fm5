@@ -2,7 +2,7 @@
 
 ## Collection Definitions
 
-```typescript
+````typescript
 import { createCollection } from '@tanstack/db';
 import { queryCollectionOptions } from '@tanstack/query-db-collection';
 import { ModelSchema, FilamentSchema, FilamentInventorySchema } from '@/lib/schemas';
@@ -72,17 +72,17 @@ import { eq, gt, and } from '@tanstack/db';
 export function useLowStockFilaments() {
   return useLiveQuery((query) =>
     query
-      .from({ 
+      .from({
         filaments: filamentsCollection,
-        inventory: filamentInventoryCollection 
+        inventory: filamentInventoryCollection
       })
-      .where(({ inventory }) => 
+      .where(({ inventory }) =>
         gt(inventory.lowStockThreshold, inventory.quantityGrams)
       )
       .select({
         filament: ({ filaments }) => filaments,
         inventory: ({ inventory }) => inventory,
-        shortage: ({ inventory }) => 
+        shortage: ({ inventory }) =>
           inventory.lowStockThreshold - inventory.quantityGrams
       })
       .orderBy(({ shortage }) => shortage, 'desc')
@@ -103,7 +103,7 @@ export function useHighDemandFilaments() {
 export function useQueueFeasibility() {
   return useLiveQuery((query) =>
     query
-      .from({ 
+      .from({
         queue: printQueueCollection,
         variants: modelVariantsCollection,
         requirements: filamentRequirementsCollection,
@@ -131,11 +131,11 @@ export function useAddToQueue() {
       priority,
       createdAt: new Date(),
     });
-    
+
     // tRPC mutation handles server sync and rollback on failure
   };
 }
-```
+````
 
 ## State Management with Collections
 
@@ -153,50 +153,51 @@ export function useModelBrowser() {
         imageUrls: ({ models }) => models.imageUrls,
         variantCount: ({ models }) => models.variants.length,
       })
-      .orderBy(({ models }) => models.updatedAt, 'desc')
-  );
+      .orderBy(({ models }) => models.updatedAt, 'desc'),
+  )
 
   // Search with live filtering
   const searchModels = (searchTerm: string) => {
     return useLiveQuery((query) =>
       query
         .from({ models: modelsCollection })
-        .where(({ models }) => 
-          models.name.includes(searchTerm) || 
-          models.designer.includes(searchTerm)
-        )
-    );
-  };
+        .where(
+          ({ models }) =>
+            models.name.includes(searchTerm) ||
+            models.designer.includes(searchTerm),
+        ),
+    )
+  }
 
-  return { models, searchModels };
+  return { models, searchModels }
 }
 
 // Inventory management with live updates
 export function useInventoryDashboard() {
-  const { data: lowStock } = useLowStockFilaments();
-  const { data: highDemand } = useHighDemandFilaments();
-  
+  const { data: lowStock } = useLowStockFilaments()
+  const { data: highDemand } = useHighDemandFilaments()
+
   const { data: inventoryStats } = useLiveQuery((query) =>
     query
-      .from({ 
+      .from({
         filaments: filamentsCollection,
-        inventory: filamentInventoryCollection 
+        inventory: filamentInventoryCollection,
       })
       .select({
         totalFilaments: ({ filaments }) => filaments.count(),
         totalSpools: ({ inventory }) => inventory.count(),
-        totalValue: ({ inventory }) => 
+        totalValue: ({ inventory }) =>
           inventory.sum(inventory.quantityGrams * inventory.actualCostPerGram),
-        averageAge: ({ inventory }) => 
-          inventory.avg(new Date() - inventory.purchaseDate)
-      })
-  );
+        averageAge: ({ inventory }) =>
+          inventory.avg(new Date() - inventory.purchaseDate),
+      }),
+  )
 
   return {
     lowStock,
     highDemand,
     inventoryStats,
-  };
+  }
 }
 ```
 
@@ -271,20 +272,20 @@ interface ModelCardProps {
 export function ModelCard({ variant, onEdit, className }: ModelCardProps) {
   const { addToQueue, checkFeasibility } = useQueue();
   const feasible = checkFeasibility(variant.id);
-  
+
   return (
     <div className={`bg-white rounded-lg shadow-sm border p-4 ${className}`}>
       <div className="aspect-square mb-3">
-        <img 
-          src={variant.model.imageUrls[0]} 
+        <img
+          src={variant.model.imageUrls[0]}
           alt={variant.name}
           className="w-full h-full object-cover rounded"
         />
       </div>
-      
+
       <h3 className="font-medium text-slate-900 mb-1">{variant.name}</h3>
       <p className="text-sm text-slate-600 mb-2">{variant.model.designer}</p>
-      
+
       <div className="flex items-center justify-between text-xs text-slate-500 mb-3">
         <span>{variant.printDurationMinutes}min</span>
         <span>{variant.layerHeight}mm</span>
@@ -292,7 +293,7 @@ export function ModelCard({ variant, onEdit, className }: ModelCardProps) {
           {feasible ? 'Ready' : 'Need Materials'}
         </span>
       </div>
-      
+
       <div className="flex gap-2">
         <Button
           size="sm"
@@ -318,31 +319,31 @@ export function ModelCard({ variant, onEdit, className }: ModelCardProps) {
 
 ```typescript
 // hooks/useModels.ts
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { apiClient } from '@/lib/api'
 
 export function useModels(searchParams: SearchParams = {}) {
   return useQuery({
     queryKey: ['models', searchParams],
     queryFn: () => apiClient.searchModels(searchParams),
     staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000,   // 10 minutes
-  });
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  })
 }
 
 export function useCreateModel() {
-  const queryClient = useQueryClient();
-  
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: apiClient.createModel,
     onSuccess: (newModel) => {
       // Invalidate and refetch models list
-      queryClient.invalidateQueries({ queryKey: ['models'] });
-      
+      queryClient.invalidateQueries({ queryKey: ['models'] })
+
       // Optimistically add to cache
-      queryClient.setQueryData(['models', newModel.id], newModel);
+      queryClient.setQueryData(['models', newModel.id], newModel)
     },
-  });
+  })
 }
 
 export function useModelDetails(modelId: string) {
@@ -350,25 +351,25 @@ export function useModelDetails(modelId: string) {
     queryKey: ['models', modelId],
     queryFn: () => apiClient.getModel(modelId),
     enabled: !!modelId,
-  });
+  })
 }
 
 // Prefetch related data strategy
 export function useModelWithVariants(modelId: string) {
-  const queryClient = useQueryClient();
-  
-  const modelQuery = useModelDetails(modelId);
-  
+  const queryClient = useQueryClient()
+
+  const modelQuery = useModelDetails(modelId)
+
   // Prefetch variants when model loads
   useEffect(() => {
     if (modelQuery.data?.variants) {
-      modelQuery.data.variants.forEach(variant => {
-        queryClient.setQueryData(['variants', variant.id], variant);
-      });
+      modelQuery.data.variants.forEach((variant) => {
+        queryClient.setQueryData(['variants', variant.id], variant)
+      })
     }
-  }, [modelQuery.data, queryClient]);
-  
-  return modelQuery;
+  }, [modelQuery.data, queryClient])
+
+  return modelQuery
 }
 ```
 
@@ -380,117 +381,118 @@ export function useModelWithVariants(modelId: string) {
 // lib/metadata-extractor.ts
 interface ExtractedMetadata {
   filaments: Array<{
-    type: string;
-    brand: string;
-    color: string;
-    colorHex: string;
-    amsSlot: number;
-    usageModel: number;
-    usageWaste: number;
-    usagePurge: number;
-  }>;
-  nozzleSize: number;
-  layerHeight: number;
-  brimWidth: number;
-  brimType: string;
+    type: string
+    brand: string
+    color: string
+    colorHex: string
+    amsSlot: number
+    usageModel: number
+    usageWaste: number
+    usagePurge: number
+  }>
+  nozzleSize: number
+  layerHeight: number
+  brimWidth: number
+  brimType: string
   printTime: {
-    totalMinutes: number;
-    modelTime: number;
-    supportTime: number;
-    purgeTime: number;
-  };
-  rawMetadata: Record<string, any>;
+    totalMinutes: number
+    modelTime: number
+    supportTime: number
+    purgeTime: number
+  }
+  rawMetadata: Record<string, any>
 }
 
 export class BambuStudioExtractor {
   static async extractFromFile(file: File): Promise<ExtractedMetadata> {
     // Only process .3mf and .gcode files
     if (!file.name.endsWith('.3mf') && !file.name.endsWith('.gcode')) {
-      throw new Error('Unsupported file format');
+      throw new Error('Unsupported file format')
     }
-    
+
     try {
-      let metadataContent: string;
-      
+      let metadataContent: string
+
       if (file.name.endsWith('.3mf')) {
-        metadataContent = await this.extractFrom3MF(file);
+        metadataContent = await this.extractFrom3MF(file)
       } else {
-        metadataContent = await this.extractFromGCode(file);
+        metadataContent = await this.extractFromGCode(file)
       }
-      
-      const rawMetadata = this.parseMetadataContent(metadataContent);
-      return this.transformToStructured(rawMetadata);
-      
+
+      const rawMetadata = this.parseMetadataContent(metadataContent)
+      return this.transformToStructured(rawMetadata)
     } catch (error) {
-      console.error('Metadata extraction failed:', error);
-      throw new Error('Failed to extract metadata from file');
+      console.error('Metadata extraction failed:', error)
+      throw new Error('Failed to extract metadata from file')
     }
   }
-  
+
   private static async extractFrom3MF(file: File): Promise<string> {
-    const JSZip = await import('jszip');
-    const zip = new JSZip.default();
-    
-    const contents = await zip.loadAsync(file);
-    const metadataFile = contents.file('metadata/slic3r_pe.config');
-    
+    const JSZip = await import('jszip')
+    const zip = new JSZip.default()
+
+    const contents = await zip.loadAsync(file)
+    const metadataFile = contents.file('metadata/slic3r_pe.config')
+
     if (!metadataFile) {
-      throw new Error('No Bambu Studio metadata found in .3mf file');
+      throw new Error('No Bambu Studio metadata found in .3mf file')
     }
-    
-    return await metadataFile.async('text');
+
+    return await metadataFile.async('text')
   }
-  
+
   private static async extractFromGCode(file: File): Promise<string> {
-    const text = await file.text();
-    const lines = text.split('\n');
-    
+    const text = await file.text()
+    const lines = text.split('\n')
+
     // Find metadata section in G-code comments
     const metadataLines = lines
-      .filter(line => line.startsWith('; '))
-      .map(line => line.substring(2));
-    
-    return metadataLines.join('\n');
+      .filter((line) => line.startsWith('; '))
+      .map((line) => line.substring(2))
+
+    return metadataLines.join('\n')
   }
-  
+
   private static parseMetadataContent(content: string): Record<string, any> {
-    const metadata: Record<string, any> = {};
-    const lines = content.split('\n');
-    
+    const metadata: Record<string, any> = {}
+    const lines = content.split('\n')
+
     for (const line of lines) {
-      const [key, ...valueParts] = line.split('=');
+      const [key, ...valueParts] = line.split('=')
       if (key && valueParts.length > 0) {
-        const value = valueParts.join('=').trim();
-        metadata[key.trim()] = this.parseValue(value);
+        const value = valueParts.join('=').trim()
+        metadata[key.trim()] = this.parseValue(value)
       }
     }
-    
-    return metadata;
+
+    return metadata
   }
-  
+
   private static parseValue(value: string): any {
     // Parse different value types
     if (value === 'true' || value === 'false') {
-      return value === 'true';
+      return value === 'true'
     }
-    
+
     if (!isNaN(Number(value))) {
-      return Number(value);
+      return Number(value)
     }
-    
+
     // Check for arrays
     if (value.startsWith('[') && value.endsWith(']')) {
       try {
-        return JSON.parse(value);
+        return JSON.parse(value)
       } catch {
-        return value;
+        return value
       }
     }
-    
-    return value;
+
+    return value
   }
-  
-  private static transformToStructured(raw: Record<string, any>): ExtractedMetadata {
+
+  private static transformToStructured(
+    raw: Record<string, any>,
+  ): ExtractedMetadata {
     // Transform raw metadata into structured format
     // This is where we extract the specific fields we need
     return {
@@ -501,15 +503,15 @@ export class BambuStudioExtractor {
       brimType: raw.brim_type || 'no_brim',
       printTime: this.extractPrintTime(raw),
       rawMetadata: raw,
-    };
+    }
   }
-  
+
   private static extractFilamentInfo(raw: Record<string, any>) {
     // Extract filament information from raw metadata
     // Bambu Studio stores this in specific fields
-    const filaments = [];
-    const filamentCount = raw.filament_count || 1;
-    
+    const filaments = []
+    const filamentCount = raw.filament_count || 1
+
     for (let i = 0; i < filamentCount; i++) {
       filaments.push({
         type: raw[`filament_type_${i}`] || 'PLA',
@@ -520,53 +522,56 @@ export class BambuStudioExtractor {
         usageModel: raw[`filament_used_model_${i}`] || 0,
         usageWaste: raw[`filament_used_waste_${i}`] || 0,
         usagePurge: raw[`filament_used_purge_${i}`] || 0,
-      });
+      })
     }
-    
-    return filaments;
+
+    return filaments
   }
-  
+
   private static extractPrintTime(raw: Record<string, any>) {
     return {
       totalMinutes: Math.round((raw.estimated_printing_time || 0) / 60),
       modelTime: Math.round((raw.model_printing_time || 0) / 60),
       supportTime: Math.round((raw.support_printing_time || 0) / 60),
       purgeTime: Math.round((raw.purge_printing_time || 0) / 60),
-    };
+    }
   }
-  
+
   // Validation and sanitization
   static validateAndSanitize(metadata: ExtractedMetadata): ExtractedMetadata {
     // Basic validation and sanitization
-    const sanitized = { ...metadata };
-    
+    const sanitized = { ...metadata }
+
     // Ensure filaments array is valid
-    sanitized.filaments = metadata.filaments.filter(f => 
-      f.type && f.brand && f.color
-    );
-    
+    sanitized.filaments = metadata.filaments.filter(
+      (f) => f.type && f.brand && f.color,
+    )
+
     // Validate numeric values
-    sanitized.nozzleSize = Math.max(0.1, Math.min(2.0, metadata.nozzleSize));
-    sanitized.layerHeight = Math.max(0.05, Math.min(1.0, metadata.layerHeight));
-    sanitized.brimWidth = Math.max(0, Math.min(50, metadata.brimWidth));
-    
+    sanitized.nozzleSize = Math.max(0.1, Math.min(2.0, metadata.nozzleSize))
+    sanitized.layerHeight = Math.max(0.05, Math.min(1.0, metadata.layerHeight))
+    sanitized.brimWidth = Math.max(0, Math.min(50, metadata.brimWidth))
+
     // Sanitize print time values
     sanitized.printTime = {
       totalMinutes: Math.max(0, metadata.printTime.totalMinutes),
       modelTime: Math.max(0, metadata.printTime.modelTime),
       supportTime: Math.max(0, metadata.printTime.supportTime),
       purgeTime: Math.max(0, metadata.printTime.purgeTime),
-    };
-    
+    }
+
     // Sanitize raw metadata (remove potentially dangerous keys)
-    const dangerousKeys = ['eval', 'function', 'script', 'onclick'];
+    const dangerousKeys = ['eval', 'function', 'script', 'onclick']
     sanitized.rawMetadata = Object.fromEntries(
-      Object.entries(metadata.rawMetadata).filter(([key]) => 
-        !dangerousKeys.some(dangerous => key.toLowerCase().includes(dangerous))
-      )
-    );
-    
-    return sanitized;
+      Object.entries(metadata.rawMetadata).filter(
+        ([key]) =>
+          !dangerousKeys.some((dangerous) =>
+            key.toLowerCase().includes(dangerous),
+          ),
+      ),
+    )
+
+    return sanitized
   }
 }
 ```
@@ -598,14 +603,14 @@ export function useFileUpload() {
   const queryClient = useQueryClient();
   const [uploadProgress, setUploadProgress] = useState<Map<string, UploadProgress>>(new Map());
   const [uploadStates, setUploadStates] = useState<Map<string, UploadState>>(new Map());
-  
+
   const uploadFiles = useMutation({
     mutationFn: async (files: FileList) => {
       const results = [];
-      
+
       for (const file of Array.from(files)) {
         const fileId = crypto.randomUUID();
-        
+
         try {
           // Step 1: Extract metadata on client
           setUploadProgress(prev => new Map(prev.set(fileId, {
@@ -614,17 +619,17 @@ export function useFileUpload() {
             progress: 10,
             status: 'extracting'
           })));
-          
+
           const extractedData = await BambuStudioExtractor.extractFromFile(file);
           const sanitizedData = BambuStudioExtractor.validateAndSanitize(extractedData);
-          
+
           // Store state for potential retry
           setUploadStates(prev => new Map(prev.set(fileId, {
             originalFile: file,
             extractedMetadata: extractedData,
             sanitizedMetadata: sanitizedData
           })));
-          
+
           // Step 2: Upload file to Cloudflare R2
           setUploadProgress(prev => new Map(prev.set(fileId, {
             fileId,
@@ -633,13 +638,13 @@ export function useFileUpload() {
             status: 'uploading',
             extractedData: sanitizedData
           })));
-          
+
           const uploadResponse = await trpc.files.upload.mutate({
             fileName: file.name,
             fileSize: file.size,
             contentType: file.type
           });
-          
+
           // Upload to R2 using signed URL
           await uploadToR2(uploadResponse.uploadUrl, file, {
             onProgress: (progress) => {
@@ -649,14 +654,14 @@ export function useFileUpload() {
               })));
             }
           });
-          
+
           // Step 3: Submit to server with extracted metadata
           setUploadProgress(prev => new Map(prev.set(fileId, {
             ...prev.get(fileId)!,
             progress: 80,
             status: 'processing'
           })));
-          
+
           const result = await trpc.variants.create.mutate({
             modelId: '', // Will be set by user in form
             variantData: {
@@ -676,15 +681,15 @@ export function useFileUpload() {
               usagePurge: f.usagePurge,
             }))
           });
-          
+
           setUploadProgress(prev => new Map(prev.set(fileId, {
             ...prev.get(fileId)!,
             progress: 100,
             status: 'completed'
           })));
-          
+
           results.push({ fileId, result });
-          
+
         } catch (error) {
           setUploadProgress(prev => new Map(prev.set(fileId, {
             fileId,
@@ -695,11 +700,11 @@ export function useFileUpload() {
             retryable: true, // Most errors are retryable
             extractedData: uploadStates.get(fileId)?.sanitizedMetadata
           })));
-          
+
           results.push({ fileId, error });
         }
       }
-      
+
       return results;
     },
     onSuccess: () => {
@@ -708,17 +713,17 @@ export function useFileUpload() {
       filamentsCollection.invalidate();
     }
   });
-  
+
   // Retry upload with preserved metadata
   const retryUpload = useMutation({
     mutationFn: async (fileId: string) => {
       const state = uploadStates.get(fileId);
       const progress = uploadProgress.get(fileId);
-      
+
       if (!state || !progress) {
         throw new Error('Upload state not found');
       }
-      
+
       try {
         // Reset progress but keep extracted data
         setUploadProgress(prev => new Map(prev.set(fileId, {
@@ -727,13 +732,13 @@ export function useFileUpload() {
           status: 'uploading',
           error: undefined
         })));
-        
+
         // Use preserved metadata and file
         const uploadResponse = await trpc.files.retry.mutate({
           jobId: fileId, // Reuse original job ID
           preserveMetadata: true
         });
-        
+
         if (state.originalFile) {
           await uploadToR2(uploadResponse.uploadUrl, state.originalFile, {
             onProgress: (progress) => {
@@ -744,16 +749,16 @@ export function useFileUpload() {
             }
           });
         }
-        
+
         setUploadProgress(prev => new Map(prev.set(fileId, {
           ...prev.get(fileId)!,
           progress: 100,
           status: 'completed',
           error: undefined
         })));
-        
+
         return { fileId, success: true };
-        
+
       } catch (error) {
         setUploadProgress(prev => new Map(prev.set(fileId, {
           ...prev.get(fileId)!,
@@ -761,12 +766,12 @@ export function useFileUpload() {
           error: error.message,
           retryable: true
         })));
-        
+
         throw error;
       }
     }
   });
-  
+
   const clearUpload = (fileId: string) => {
     setUploadProgress(prev => {
       const newMap = new Map(prev);
@@ -779,7 +784,7 @@ export function useFileUpload() {
       return newMap;
     });
   };
-  
+
   return {
     uploadFiles: uploadFiles.mutate,
     retryUpload: retryUpload.mutate,
@@ -802,8 +807,8 @@ export function FileUploadProgress({ uploads, onRetry, onClear }) {
           <div className="flex items-center justify-between mb-2">
             <span className="font-medium">{upload.fileName}</span>
             {upload.status === 'error' && upload.retryable && (
-              <Button 
-                size="sm" 
+              <Button
+                size="sm"
                 variant="outline"
                 onClick={() => onRetry(upload.fileId)}
               >
@@ -811,37 +816,37 @@ export function FileUploadProgress({ uploads, onRetry, onClear }) {
               </Button>
             )}
           </div>
-          
+
           <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-            <div 
+            <div
               className={`h-2 rounded-full transition-all duration-300 ${
-                upload.status === 'error' ? 'bg-red-500' : 
+                upload.status === 'error' ? 'bg-red-500' :
                 upload.status === 'completed' ? 'bg-green-500' : 'bg-blue-500'
               }`}
               style={{ width: `${upload.progress}%` }}
             />
           </div>
-          
+
           <div className="flex items-center justify-between text-sm">
             <span className={`capitalize ${
-              upload.status === 'error' ? 'text-red-600' : 
+              upload.status === 'error' ? 'text-red-600' :
               upload.status === 'completed' ? 'text-green-600' : 'text-blue-600'
             }`}>
               {upload.status === 'error' ? upload.error : upload.status}
             </span>
-            
+
             {upload.extractedData && (
               <span className="text-gray-600">
-                Metadata: {upload.extractedData.filaments.length} filaments, 
+                Metadata: {upload.extractedData.filaments.length} filaments,
                 {upload.extractedData.printTime.totalMinutes}min
               </span>
             )}
           </div>
-          
+
           {upload.status === 'completed' && (
-            <Button 
-              size="sm" 
-              variant="ghost" 
+            <Button
+              size="sm"
+              variant="ghost"
               onClick={() => onClear(upload.fileId)}
               className="mt-2"
             >
@@ -858,3 +863,5 @@ export function FileUploadProgress({ uploads, onRetry, onClear }) {
 ## Updated Docker Configuration
 
 ```yaml
+
+```

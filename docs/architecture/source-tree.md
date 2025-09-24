@@ -155,26 +155,31 @@ docs/
 ## Configuration Files
 
 ### Package Management
+
 - **`package.json`**: Dependencies including TanStack ecosystem, tRPC, Prisma, React 19
 - **Development**: Vite, Vitest, ESLint, Prettier, TypeScript
 
 ### Build and Development
+
 - **`eslint.config.js`**: ESLint configuration using TanStack config
 - **Vite**: Build system with TypeScript paths and React plugin
 
 ## Key Integration Points
 
 ### Authentication Integration Points
+
 - **`lib/trpc.ts`**: Authentication middleware (placeholder for JWT)
 - **`src/routes/__root.tsx`**: Authentication provider wrapper needed
 - **`lib/routers/auth.ts`**: Authentication procedures (placeholder)
 
 ### Database Integration
+
 - **`lib/db.ts`**: Global Prisma client for development
 - **`lib/schemas.ts`**: Zod schemas matching Prisma models exactly
 - **User Isolation**: All main tables include `userId` for multi-tenant architecture
 
 ### Frontend Integration
+
 - **`src/components/providers/TRPCProvider.tsx`**: React Query + tRPC integration
 - **`src/hooks/`**: Custom hooks for tRPC procedure calls
 - **`src/routes/api/trpc/$trpc.ts`**: TanStack Router tRPC handler
@@ -182,12 +187,14 @@ docs/
 ## Development Patterns
 
 ### File Naming Conventions
+
 - **React Components**: PascalCase (e.g., `Header.tsx`, `TRPCProvider.tsx`)
 - **Hooks**: camelCase starting with 'use' (e.g., `useFilaments.ts`)
 - **Utilities**: camelCase (e.g., `utils.ts`, `api.ts`)
 - **Constants**: SCREAMING_SNAKE_CASE or camelCase depending on context
 
 ### Directory Organization
+
 - **Components**: Organized by type (`ui/`, `layout/`, `providers/`, `examples/`)
 - **Routes**: File-based routing following TanStack Router conventions
 - **Tests**: Co-located with source files or in `__tests__/` directories
@@ -196,6 +203,7 @@ docs/
 ## Build and Deployment
 
 ### Development Commands
+
 ```bash
 npm run dev       # Start development server on port 3000
 npm run build     # Production build
@@ -206,18 +214,21 @@ npm run check     # Format + lint fix
 ```
 
 ### Build Output
+
 - **`.output/`**: Nitro build output for production deployment
 - **`.nitro/`**: Nitro build system types and configuration
 
 ## Testing Structure
 
 ### Test Organization
+
 - **`src/__tests__/setup.ts`**: Test environment configuration
 - **Validation Tests**: Setup, build, and tRPC procedure validation
 - **Component Tests**: React Testing Library with smoke tests
 - **Framework**: Vitest with jsdom for React component testing
 
 ### Test Patterns
+
 - Component smoke tests for UI validation
 - tRPC procedure testing with mock data
 - Build verification testing

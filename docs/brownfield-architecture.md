@@ -42,6 +42,7 @@ Based on current development priorities, these files are central to authenticati
 FM5 is a modern full-stack TypeScript application built for 3D printing business management. The architecture emphasizes type safety, user data isolation, and developer experience through the TanStack ecosystem.
 
 **Core Principles**:
+
 - End-to-end type safety from database to frontend
 - User data isolation through multi-tenant database design
 - Modern React patterns with server-side rendering capabilities
@@ -50,22 +51,22 @@ FM5 is a modern full-stack TypeScript application built for 3D printing business
 
 ### Actual Tech Stack (from package.json analysis)
 
-| Category        | Technology                 | Version  | Notes                                  |
-| --------------- | -------------------------- | -------- | -------------------------------------- |
-| Runtime         | Node.js                    | ES Modules | Native ES module support             |
-| Frontend        | React                      | 19.0.0   | Latest with server components          |
-| Framework       | TanStack Start             | 1.131.7  | Full-stack React framework             |
-| API             | tRPC                       | 11.5.1   | End-to-end type-safe API               |
-| Database        | PostgreSQL + Prisma       | 6.16.2   | ORM with type-safe client              |
-| Validation      | Zod                        | 4.1.11   | Runtime schema validation              |
-| Routing         | TanStack Router            | 1.130.2  | File-based type-safe routing           |
-| State           | TanStack Query             | 5.89.0   | Server state management                |
-| Forms           | TanStack Form              | 1.23.0   | Type-safe form handling                |
-| UI Components   | React Aria Components      | 1.12.2   | Accessible component foundation        |
-| Styling         | Tailwind CSS               | 4.0.6    | Utility-first CSS framework            |
-| Build Tool      | Vite                       | 6.3.5    | Fast build and development             |
-| Testing         | Vitest                     | 3.0.5    | Fast unit and integration testing      |
-| TypeScript      | TypeScript                 | 5.7.2    | Strict mode enabled                    |
+| Category      | Technology            | Version    | Notes                             |
+| ------------- | --------------------- | ---------- | --------------------------------- |
+| Runtime       | Node.js               | ES Modules | Native ES module support          |
+| Frontend      | React                 | 19.0.0     | Latest with server components     |
+| Framework     | TanStack Start        | 1.131.7    | Full-stack React framework        |
+| API           | tRPC                  | 11.5.1     | End-to-end type-safe API          |
+| Database      | PostgreSQL + Prisma   | 6.16.2     | ORM with type-safe client         |
+| Validation    | Zod                   | 4.1.11     | Runtime schema validation         |
+| Routing       | TanStack Router       | 1.130.2    | File-based type-safe routing      |
+| State         | TanStack Query        | 5.89.0     | Server state management           |
+| Forms         | TanStack Form         | 1.23.0     | Type-safe form handling           |
+| UI Components | React Aria Components | 1.12.2     | Accessible component foundation   |
+| Styling       | Tailwind CSS          | 4.0.6      | Utility-first CSS framework       |
+| Build Tool    | Vite                  | 6.3.5      | Fast build and development        |
+| Testing       | Vitest                | 3.0.5      | Fast unit and integration testing |
+| TypeScript    | TypeScript            | 5.7.2      | Strict mode enabled               |
 
 ### Repository Structure Reality Check
 
@@ -121,12 +122,14 @@ fm5/
 The database implements strict user isolation with comprehensive indexing:
 
 **Key Design Patterns**:
+
 - All main tables include `userId` foreign key for multi-tenant isolation
 - JSONB fields for flexible metadata (e.g., `bambuMetadata` in variants)
 - Comprehensive indexing for performance (user-based, status-based, time-based)
 - Row Level Security architecture ready for implementation
 
 **Core Tables**:
+
 - **users**: Authentication and profile with JSONB preferences
 - **models**: 3D model metadata with category classification
 - **model_variants**: Sliced files with complete Bambu Studio metadata
@@ -136,6 +139,7 @@ The database implements strict user isolation with comprehensive indexing:
 - **print_jobs**: Queue management with status tracking and estimates
 
 **Reference Schema Files**:
+
 - **Complete Schema**: `prisma/schema.prisma` (211 lines with enums, indexes, relationships)
 - **Zod Validation**: `lib/schemas.ts` (185 lines with runtime validation)
 
@@ -144,6 +148,7 @@ The database implements strict user isolation with comprehensive indexing:
 **Current State**: tRPC infrastructure is established with authentication middleware placeholders ready for JWT integration.
 
 **Router Structure** (in `lib/routers/`):
+
 - **`_app.ts`**: Main router aggregation
 - **`auth.ts`**: Authentication procedures (placeholder - needs JWT implementation)
 - **`filaments.ts`**: Filament management with user isolation
@@ -152,6 +157,7 @@ The database implements strict user isolation with comprehensive indexing:
 - **`queue.ts`**: Print job queue management
 
 **Authentication Middleware** (in `lib/trpc.ts`):
+
 ```typescript
 // CURRENT STATE: Placeholder ready for JWT implementation
 const requireAuth = t.middleware(({ ctx, next }) => {
@@ -198,11 +204,11 @@ const requireAuth = t.middleware(({ ctx, next }) => {
 
 ### External Services (Planned)
 
-| Service         | Purpose                    | Integration Status     | Key Files                      |
-| --------------- | -------------------------- | ---------------------- | ------------------------------ |
-| Auth Provider   | JWT authentication         | To Be Implemented      | `lib/trpc.ts`, `lib/routers/auth.ts` |
-| File Storage    | STL/3MF file storage       | Future Implementation  | TBD                            |
-| Print Service   | 3D printer communication   | Future Implementation  | TBD                            |
+| Service       | Purpose                  | Integration Status    | Key Files                            |
+| ------------- | ------------------------ | --------------------- | ------------------------------------ |
+| Auth Provider | JWT authentication       | To Be Implemented     | `lib/trpc.ts`, `lib/routers/auth.ts` |
+| File Storage  | STL/3MF file storage     | Future Implementation | TBD                                  |
+| Print Service | 3D printer communication | Future Implementation | TBD                                  |
 
 ### Internal Integration Points
 
@@ -232,6 +238,7 @@ const requireAuth = t.middleware(({ ctx, next }) => {
 ### Environment Configuration
 
 **Required Variables**:
+
 ```env
 DATABASE_URL=postgresql://...
 NODE_ENV=development|production|test
@@ -258,6 +265,7 @@ npm test                    # Run all tests with Vitest
 ```
 
 ### Testing Patterns
+
 - **Setup**: `src/__tests__/setup.ts` - Test environment configuration
 - **Utilities**: React Testing Library for component testing
 - **Mocking**: Built-in Vitest mocking capabilities
@@ -268,12 +276,14 @@ npm test                    # Run all tests with Vitest
 ### Current Authentication State
 
 **Infrastructure Ready**:
+
 - tRPC authentication middleware structure exists (`requireAuth` pattern)
 - Protected procedure pattern established (`protectedProcedure`)
 - User context type definitions in place
 - Database users table ready with proper fields
 
 **Missing Implementation**:
+
 - JWT validation logic in `lib/trpc.ts`
 - Authentication provider integration (Clerk/Auth0)
 - Authentication UI components
@@ -285,17 +295,20 @@ npm test                    # Run all tests with Vitest
 Based on Story 0.5 requirements and current analysis:
 
 **Core Authentication Files**:
+
 - **`lib/trpc.ts`**: Implement JWT validation in `requireAuth` middleware
 - **`lib/routers/auth.ts`**: Implement authentication procedures (`me`, `updateProfile`)
 - **`lib/db.ts`**: May need session management integration
 
 **Frontend Integration**:
+
 - **`src/routes/__root.tsx`**: Add authentication provider wrapper
 - **`src/components/providers/`**: New authentication context provider
 - **`src/components/auth/`**: New directory for login/signup components
 - **`src/hooks/useAuth.ts`**: New authentication state management hook
 
 **Configuration**:
+
 - **Environment variables**: JWT secrets and provider configuration
 - **Prisma schema**: May need authentication provider field additions
 

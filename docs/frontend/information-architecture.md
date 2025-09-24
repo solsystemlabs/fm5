@@ -3,13 +3,14 @@
 ## Primary Navigation Structure
 
 **Dashboard-Centered Hub Model:**
+
 ```
 Dashboard (Home)
 ├── Models & Variants
 │   ├── Search & Browse
 │   ├── Upload New
 │   └── Manage Variants
-├── Inventory Management  
+├── Inventory Management
 │   ├── Filament Tracking
 │   ├── Product Inventory
 │   └── Shopping Lists
@@ -30,11 +31,13 @@ Dashboard (Home)
 ## Content Organization Strategy
 
 **Context-Aware Sections:**
+
 - **Active Work Area** (prominent): Current queue, immediate actions, alerts
-- **Resource Management** (secondary): Inventory, models, planning tools  
+- **Resource Management** (secondary): Inventory, models, planning tools
 - **Analysis & Planning** (tertiary): Reports, trends, strategic planning
 
 **Search-First Architecture:**
+
 - Global search accessible from all pages
 - Scoped search within sections (models only, inventory only)
 - Recent searches and favorites for quick access

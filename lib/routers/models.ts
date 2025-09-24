@@ -10,14 +10,16 @@ export const modelsRouter = createTRPCRouter({
         limit: z.number().min(1).max(100).default(10),
         cursor: z.string().optional(),
         search: z.string().optional(),
-        category: z.enum(['keychain', 'earring', 'decoration', 'functional']).optional(),
-      })
+        category: z
+          .enum(['keychain', 'earring', 'decoration', 'functional'])
+          .optional(),
+      }),
     )
     .output(
       z.object({
         models: z.array(ModelSchema),
         nextCursor: z.string().optional(),
-      })
+      }),
     )
     .query(async ({ ctx, input }) => {
       const { limit, cursor, search, category } = input
@@ -48,7 +50,10 @@ export const modelsRouter = createTRPCRouter({
       }
 
       return {
-        models,
+        models: models.map(model => ({
+          ...model,
+          description: model.description ?? undefined,
+        })),
         nextCursor,
       }
     }),
@@ -69,7 +74,11 @@ export const modelsRouter = createTRPCRouter({
         throw new Error('Model not found')
       }
 
-      return model
+      // Transform Prisma model to match Zod schema (null -> undefined)
+      return {
+        ...model,
+        description: model.description ?? undefined,
+      }
     }),
 
   // Create new model
@@ -81,7 +90,7 @@ export const modelsRouter = createTRPCRouter({
         description: z.string().optional(),
         imageUrls: z.array(z.string()),
         category: z.enum(['keychain', 'earring', 'decoration', 'functional']),
-      })
+      }),
     )
     .output(ModelSchema)
     .mutation(async ({ ctx, input }) => {
@@ -94,7 +103,11 @@ export const modelsRouter = createTRPCRouter({
         },
       })
 
-      return model
+      // Transform Prisma model to match Zod schema (null -> undefined)
+      return {
+        ...model,
+        description: model.description ?? undefined,
+      }
     }),
 
   // Update existing model
@@ -106,8 +119,10 @@ export const modelsRouter = createTRPCRouter({
         designer: z.string().optional(),
         description: z.string().optional(),
         imageUrls: z.array(z.string()).optional(),
-        category: z.enum(['keychain', 'earring', 'decoration', 'functional']).optional(),
-      })
+        category: z
+          .enum(['keychain', 'earring', 'decoration', 'functional'])
+          .optional(),
+      }),
     )
     .output(ModelSchema)
     .mutation(async ({ ctx, input }) => {
@@ -132,7 +147,11 @@ export const modelsRouter = createTRPCRouter({
         where: { id },
       })
 
-      return updatedModel
+      // Transform Prisma model to match Zod schema (null -> undefined)
+      return {
+        ...updatedModel,
+        description: updatedModel.description ?? undefined,
+      }
     }),
 
   // Delete model

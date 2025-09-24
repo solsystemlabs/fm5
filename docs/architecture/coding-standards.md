@@ -9,6 +9,7 @@ This document outlines the coding standards, patterns, and conventions used in t
 ### TypeScript Standards
 
 #### Type Definitions
+
 ```typescript
 // ✅ GOOD: Use Zod schema inference for types
 export type User = z.infer<typeof UserSchema>
@@ -27,6 +28,7 @@ interface UserManual {
 ```
 
 #### Strict TypeScript Configuration
+
 - Enable strict mode: `"strict": true`
 - No implicit any: `"noImplicitAny": true`
 - Use `unknown` instead of `any` for truly unknown types
@@ -35,6 +37,7 @@ interface UserManual {
 ### React and JSX Standards
 
 #### Component Patterns
+
 ```typescript
 // ✅ GOOD: Function components with TypeScript
 interface HeaderProps {
@@ -57,6 +60,7 @@ function useFilaments() {
 ```
 
 #### Component Organization
+
 - **One component per file** (except for small, tightly coupled sub-components)
 - **Named exports** for components (not default exports)
 - **Props interfaces** co-located with component
@@ -67,17 +71,20 @@ function useFilaments() {
 ### tRPC Procedure Standards
 
 #### Router Organization
+
 ```typescript
 // lib/routers/filaments.ts
 export const filamentsRouter = createTRPCRouter({
   // ✅ GOOD: Descriptive procedure names
   list: protectedProcedure
-    .input(z.object({
-      search: z.string().optional(),
-      materialType: z.enum(['PLA', 'PETG', 'ABS', 'TPU']).optional(),
-      limit: z.number().min(1).max(100).default(20),
-      offset: z.number().min(0).default(0)
-    }))
+    .input(
+      z.object({
+        search: z.string().optional(),
+        materialType: z.enum(['PLA', 'PETG', 'ABS', 'TPU']).optional(),
+        limit: z.number().min(1).max(100).default(20),
+        offset: z.number().min(0).default(0),
+      }),
+    )
     .query(async ({ input, ctx }) => {
       // Implementation with user isolation
       return await ctx.db.filament.findMany({
@@ -86,14 +93,14 @@ export const filamentsRouter = createTRPCRouter({
           ...(input.search && {
             OR: [
               { brand: { contains: input.search, mode: 'insensitive' } },
-              { colorName: { contains: input.search, mode: 'insensitive' } }
-            ]
+              { colorName: { contains: input.search, mode: 'insensitive' } },
+            ],
           }),
-          ...(input.materialType && { materialType: input.materialType })
+          ...(input.materialType && { materialType: input.materialType }),
         },
         take: input.limit,
         skip: input.offset,
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: 'desc' },
       })
     }),
 
@@ -103,14 +110,15 @@ export const filamentsRouter = createTRPCRouter({
       return await ctx.db.filament.create({
         data: {
           ...input,
-          userId: ctx.user.id // ✅ User isolation enforced
-        }
+          userId: ctx.user.id, // ✅ User isolation enforced
+        },
       })
-    })
+    }),
 })
 ```
 
 #### Authentication and Authorization
+
 ```typescript
 // ✅ GOOD: Protected procedures for user data
 export const protectedProcedure = t.procedure.use(requireAuth)
@@ -130,6 +138,7 @@ const requireAuth = t.middleware(({ ctx, next }) => {
 ### Database Access Patterns
 
 #### User Isolation (Row Level Security)
+
 ```typescript
 // ✅ GOOD: Always include userId in queries
 async function getModelsForUser(userId: string) {
@@ -137,9 +146,9 @@ async function getModelsForUser(userId: string) {
     where: { userId }, // User isolation
     include: {
       variants: {
-        where: { userId } // Consistent isolation in relations
-      }
-    }
+        where: { userId }, // Consistent isolation in relations
+      },
+    },
   })
 }
 
@@ -150,16 +159,20 @@ async function getAllModels() {
 ```
 
 #### Database Transaction Patterns
+
 ```typescript
 // ✅ GOOD: Use transactions for multi-table operations
-async function createModelWithVariant(data: CreateModelWithVariantInput, userId: string) {
+async function createModelWithVariant(
+  data: CreateModelWithVariantInput,
+  userId: string,
+) {
   return prisma.$transaction(async (tx) => {
     const model = await tx.model.create({
-      data: { ...data.model, userId }
+      data: { ...data.model, userId },
     })
 
     const variant = await tx.modelVariant.create({
-      data: { ...data.variant, modelId: model.id, userId }
+      data: { ...data.variant, modelId: model.id, userId },
     })
 
     return { model, variant }
@@ -170,6 +183,7 @@ async function createModelWithVariant(data: CreateModelWithVariantInput, userId:
 ### Schema Validation Patterns
 
 #### Zod Schema Organization
+
 ```typescript
 // ✅ GOOD: Schemas match Prisma models exactly
 export const FilamentSchema = z.object({
@@ -186,7 +200,7 @@ export const CreateFilamentInput = FilamentSchema.omit({
   id: true,
   userId: true,
   createdAt: true,
-  updatedAt: true
+  updatedAt: true,
 })
 ```
 
@@ -195,6 +209,7 @@ export const CreateFilamentInput = FilamentSchema.omit({
 ### Naming Conventions
 
 #### Files and Directories
+
 ```
 ✅ GOOD:
 components/
@@ -219,6 +234,7 @@ lib/SCHEMAS.ts                  # UPPERCASE
 ```
 
 #### Variable and Function Names
+
 ```typescript
 // ✅ GOOD: Descriptive, camelCase
 const filamentInventory = await getFilamentInventory(userId)
@@ -235,6 +251,7 @@ const jobs = await getJobs('printing')
 ```
 
 ### Import Organization
+
 ```typescript
 // ✅ GOOD: Import order
 // 1. External libraries
@@ -254,6 +271,7 @@ import { useFilaments } from '../hooks/useFilaments'
 ## Testing Standards
 
 ### Test Organization
+
 ```typescript
 // src/__tests__/filaments.test.ts
 import { describe, it, expect, beforeEach } from 'vitest'
@@ -267,13 +285,16 @@ describe('Filament Management', () => {
   it('should create filament with user isolation', async () => {
     const user = await createTestUser()
 
-    const filament = await trpc.filaments.create.mutate({
-      brand: 'Test Brand',
-      materialType: 'PLA',
-      colorName: 'Red',
-      colorHex: '#FF0000',
-      costPerGramBase: 0.025
-    }, { context: { user } })
+    const filament = await trpc.filaments.create.mutate(
+      {
+        brand: 'Test Brand',
+        materialType: 'PLA',
+        colorName: 'Red',
+        colorHex: '#FF0000',
+        costPerGramBase: 0.025,
+      },
+      { context: { user } },
+    )
 
     expect(filament.userId).toBe(user.id)
   })
@@ -281,6 +302,7 @@ describe('Filament Management', () => {
 ```
 
 ### Test Naming
+
 ```typescript
 // ✅ GOOD: Descriptive test names
 it('should return only user-owned filaments when listing')
@@ -296,34 +318,37 @@ it('returns data')
 ## Error Handling Standards
 
 ### tRPC Error Patterns
+
 ```typescript
 // ✅ GOOD: Specific error codes and messages
 if (!userCanAccessModel(ctx.user.id, modelId)) {
   throw new TRPCError({
     code: 'FORBIDDEN',
-    message: 'You do not have access to this model'
+    message: 'You do not have access to this model',
   })
 }
 
 if (!input.email || !isValidEmail(input.email)) {
   throw new TRPCError({
     code: 'BAD_REQUEST',
-    message: 'Valid email address is required'
+    message: 'Valid email address is required',
   })
 }
 ```
 
 ### Database Error Handling
+
 ```typescript
 // ✅ GOOD: Handle Prisma errors appropriately
 try {
   return await prisma.filament.create({ data: filamentData })
 } catch (error) {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    if (error.code === 'P2002') { // Unique constraint violation
+    if (error.code === 'P2002') {
+      // Unique constraint violation
       throw new TRPCError({
         code: 'CONFLICT',
-        message: 'A filament with these specifications already exists'
+        message: 'A filament with these specifications already exists',
       })
     }
   }
@@ -334,6 +359,7 @@ try {
 ## Security Standards
 
 ### Authentication Requirements
+
 ```typescript
 // ✅ GOOD: All user data operations require authentication
 export const filamentsRouter = createTRPCRouter({
@@ -350,36 +376,44 @@ export const filamentsRouter = createTRPCRouter({
 ```
 
 ### Input Validation
+
 ```typescript
 // ✅ GOOD: Validate all inputs with Zod
 const updateFilament = protectedProcedure
-  .input(z.object({
-    id: z.string().uuid(),
-    updates: FilamentSchema.partial().omit({ id: true, userId: true })
-  }))
+  .input(
+    z.object({
+      id: z.string().uuid(),
+      updates: FilamentSchema.partial().omit({ id: true, userId: true }),
+    }),
+  )
   .mutation(async ({ input, ctx }) => {
     // Input is validated by Zod before reaching this point
   })
 ```
 
 ### User Data Isolation
+
 ```typescript
 // ✅ GOOD: Verify ownership before operations
-async function updateFilament(filamentId: string, updates: Partial<Filament>, userId: string) {
+async function updateFilament(
+  filamentId: string,
+  updates: Partial<Filament>,
+  userId: string,
+) {
   const existingFilament = await prisma.filament.findFirst({
-    where: { id: filamentId, userId } // ✅ Verify ownership
+    where: { id: filamentId, userId }, // ✅ Verify ownership
   })
 
   if (!existingFilament) {
     throw new TRPCError({
       code: 'NOT_FOUND',
-      message: 'Filament not found or you do not have access to it'
+      message: 'Filament not found or you do not have access to it',
     })
   }
 
   return prisma.filament.update({
     where: { id: filamentId },
-    data: updates
+    data: updates,
   })
 }
 ```
@@ -387,26 +421,29 @@ async function updateFilament(filamentId: string, updates: Partial<Filament>, us
 ## Performance Standards
 
 ### Database Query Optimization
+
 ```typescript
 // ✅ GOOD: Use appropriate indexes and select only needed fields
 const filaments = await prisma.filament.findMany({
   where: {
     userId, // ✅ Indexed field
-    materialType: 'PLA' // ✅ Indexed field
+    materialType: 'PLA', // ✅ Indexed field
   },
-  select: { // ✅ Select only needed fields
+  select: {
+    // ✅ Select only needed fields
     id: true,
     brand: true,
     colorName: true,
     colorHex: true,
-    quantityGrams: true
+    quantityGrams: true,
   },
   take: 20, // ✅ Limit results
-  orderBy: { createdAt: 'desc' } // ✅ Use indexed field for ordering
+  orderBy: { createdAt: 'desc' }, // ✅ Use indexed field for ordering
 })
 ```
 
 ### React Performance
+
 ```typescript
 // ✅ GOOD: Memoize expensive computations
 const expensiveData = useMemo(() => {
@@ -422,6 +459,7 @@ const FilamentCard = React.memo<FilamentCardProps>(({ filament }) => {
 ## Documentation Standards
 
 ### Code Comments
+
 ```typescript
 /**
  * Calculates the total cost to produce a print job including material and waste.
@@ -432,13 +470,14 @@ const FilamentCard = React.memo<FilamentCardProps>(({ filament }) => {
  */
 function calculatePrintJobCost(
   variant: ModelVariant,
-  filamentInventory: FilamentInventory[]
+  filamentInventory: FilamentInventory[],
 ): number {
   // Implementation details...
 }
 ```
 
 ### API Documentation
+
 ```typescript
 // tRPC procedures are self-documenting through TypeScript types
 export const filamentsRouter = createTRPCRouter({
@@ -448,7 +487,7 @@ export const filamentsRouter = createTRPCRouter({
    */
   list: protectedProcedure
     .meta({
-      description: 'List user filaments with filtering and pagination'
+      description: 'List user filaments with filtering and pagination',
     })
     .input(/* ... */)
     .query(/* ... */),
@@ -458,6 +497,7 @@ export const filamentsRouter = createTRPCRouter({
 ## Linting and Formatting
 
 ### ESLint Configuration
+
 The project uses `@tanstack/eslint-config` with additional rules:
 
 ```javascript
@@ -467,20 +507,27 @@ export default [
   {
     rules: {
       // Enforce consistent imports
-      'import/order': ['error', {
-        groups: ['builtin', 'external', 'internal', 'parent', 'sibling'],
-        'newlines-between': 'always'
-      }],
+      'import/order': [
+        'error',
+        {
+          groups: ['builtin', 'external', 'internal', 'parent', 'sibling'],
+          'newlines-between': 'always',
+        },
+      ],
       // Require explicit return types for exported functions
-      '@typescript-eslint/explicit-function-return-type': ['error', {
-        allowExpressions: true
-      }]
-    }
-  }
+      '@typescript-eslint/explicit-function-return-type': [
+        'error',
+        {
+          allowExpressions: true,
+        },
+      ],
+    },
+  },
 ]
 ```
 
 ### Prettier Configuration
+
 ```json
 {
   "semi": false,
@@ -494,16 +541,20 @@ export default [
 ## Deployment and Build Standards
 
 ### Environment Configuration
+
 ```typescript
 // ✅ GOOD: Validate environment variables
-const config = z.object({
-  DATABASE_URL: z.string().url(),
-  JWT_SECRET: z.string().min(32),
-  NODE_ENV: z.enum(['development', 'production', 'test'])
-}).parse(process.env)
+const config = z
+  .object({
+    DATABASE_URL: z.string().url(),
+    JWT_SECRET: z.string().min(32),
+    NODE_ENV: z.enum(['development', 'production', 'test']),
+  })
+  .parse(process.env)
 ```
 
 ### Build Optimization
+
 ```typescript
 // vite.config.ts
 export default {
@@ -512,17 +563,18 @@ export default {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
-          trpc: ['@trpc/client', '@trpc/server', '@trpc/react-query']
-        }
-      }
-    }
-  }
+          trpc: ['@trpc/client', '@trpc/server', '@trpc/react-query'],
+        },
+      },
+    },
+  },
 }
 ```
 
 ## Migration and Deprecation Standards
 
 ### Database Migrations
+
 ```sql
 -- migrations/001_add_filament_demand_tracking.sql
 -- Add demand tracking to filaments table
@@ -538,12 +590,15 @@ UPDATE filaments SET demand_count = (
 ```
 
 ### Code Deprecation
+
 ```typescript
 /**
  * @deprecated Use `getFilamentInventory` instead. This function will be removed in v6.
  */
 function getFilamentStock(userId: string) {
-  console.warn('getFilamentStock is deprecated. Use getFilamentInventory instead.')
+  console.warn(
+    'getFilamentStock is deprecated. Use getFilamentInventory instead.',
+  )
   return getFilamentInventory(userId)
 }
 ```

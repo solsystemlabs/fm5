@@ -16,7 +16,13 @@ export const variantsRouter = createTRPCRouter({
         orderBy: { version: 'desc' },
       })
 
-      return variants
+      // Transform Prisma model to match Zod schema (Decimal -> number)
+      return variants.map(variant => ({
+        ...variant,
+        layerHeight: variant.layerHeight.toNumber(),
+        costToProduceUsd: variant.costToProduceUsd.toNumber(),
+        successRatePercentage: variant.successRatePercentage.toNumber(),
+      }))
     }),
 
   // Get single variant by ID
@@ -35,7 +41,13 @@ export const variantsRouter = createTRPCRouter({
         throw new Error('Variant not found')
       }
 
-      return variant
+      // Transform Prisma model to match Zod schema (Decimal -> number)
+      return {
+        ...variant,
+        layerHeight: variant.layerHeight.toNumber(),
+        costToProduceUsd: variant.costToProduceUsd.toNumber(),
+        successRatePercentage: variant.successRatePercentage.toNumber(),
+      }
     }),
 
   // Create new variant
@@ -53,7 +65,7 @@ export const variantsRouter = createTRPCRouter({
         bambuMetadata: z.unknown(),
         costToProduceUsd: z.number(),
         successRatePercentage: z.number(),
-      })
+      }),
     )
     .output(ModelVariantSchema)
     .mutation(async ({ ctx, input }) => {
@@ -72,13 +84,20 @@ export const variantsRouter = createTRPCRouter({
       const variant = await ctx.db.modelVariant.create({
         data: {
           ...input,
+          bambuMetadata: input.bambuMetadata as any, // Cast unknown to JsonValue for Prisma
           userId: ctx.user.id,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
       })
 
-      return variant
+      // Transform Prisma model to match Zod schema (Decimal -> number)
+      return {
+        ...variant,
+        layerHeight: variant.layerHeight.toNumber(),
+        costToProduceUsd: variant.costToProduceUsd.toNumber(),
+        successRatePercentage: variant.successRatePercentage.toNumber(),
+      }
     }),
 
   // Update existing variant
@@ -96,7 +115,7 @@ export const variantsRouter = createTRPCRouter({
         bambuMetadata: z.unknown().optional(),
         costToProduceUsd: z.number().optional(),
         successRatePercentage: z.number().optional(),
-      })
+      }),
     )
     .output(ModelVariantSchema)
     .mutation(async ({ ctx, input }) => {
@@ -109,6 +128,7 @@ export const variantsRouter = createTRPCRouter({
         },
         data: {
           ...updateData,
+          bambuMetadata: updateData.bambuMetadata as any, // Cast unknown to JsonValue for Prisma
           updatedAt: new Date(),
         },
       })
@@ -121,7 +141,13 @@ export const variantsRouter = createTRPCRouter({
         where: { id },
       })
 
-      return updatedVariant
+      // Transform Prisma model to match Zod schema (Decimal -> number)
+      return {
+        ...updatedVariant,
+        layerHeight: updatedVariant.layerHeight.toNumber(),
+        costToProduceUsd: updatedVariant.costToProduceUsd.toNumber(),
+        successRatePercentage: updatedVariant.successRatePercentage.toNumber(),
+      }
     }),
 
   // Delete variant

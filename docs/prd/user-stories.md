@@ -7,6 +7,7 @@
 **Prerequisites**: Must complete before any other epic can begin.
 
 **Key Additions from PO Review:**
+
 - Authentication framework setup and provider selection
 - CI/CD deployment pipeline configuration
 - External service planning (DNS, CDN, email)
@@ -18,13 +19,15 @@ I want to initialize the Tanstack Start project with proper TypeScript configura
 so that development can proceed with the specified tech stack and folder structure.
 
 **Acceptance Criteria:**
+
 1. Tanstack Start project created with TypeScript 5.0+ configuration
 2. Folder structure follows frontend specification: app/routes/, components/, lib/, hooks/, types/
 3. Package.json configured with all dependencies from tech stack: Tanstack ecosystem, React Aria, TailwindCSS
 4. Node.js 20+ environment verified and documented
-5. Initial routing structure created with __root.tsx and index.tsx
+5. Initial routing structure created with \_\_root.tsx and index.tsx
 
 **Technical Requirements:**
+
 - Tanstack Start latest version installed
 - TypeScript strict mode enabled
 - ESLint and Prettier configured for consistency
@@ -37,6 +40,7 @@ I want the complete Docker development environment from the architecture specifi
 so that PostgreSQL, Redis, and MinIO services are available for local development.
 
 **Acceptance Criteria:**
+
 1. Docker Compose configuration creates PostgreSQL 18 Beta container with extensions
 2. Redis 7 Alpine container configured for session/cache storage during development
 3. MinIO container configured for local Cloudflare R2 simulation
@@ -44,6 +48,7 @@ so that PostgreSQL, Redis, and MinIO services are available for local developmen
 5. All services accessible on specified ports with health checks
 
 **Technical Requirements:**
+
 - PostgreSQL accessible on localhost:5432 with printmgmt_dev database
 - Redis accessible on localhost:6379 with append-only persistence
 - MinIO accessible on localhost:9000/9001 with development credentials
@@ -56,6 +61,7 @@ I want the complete database schema implemented with PrismaORM,
 so that all entities and relationships from the architecture are available for development.
 
 **Acceptance Criteria:**
+
 1. PrismaORM 5.0+ installed and configured with PostgreSQL connection
 2. All tables created per architecture: models, model_variants, filaments, filament_inventory, etc.
 3. Proper indexes implemented including GIN indexes for full-text search
@@ -63,6 +69,7 @@ so that all entities and relationships from the architecture are available for d
 5. Initial migration successfully creates all structures
 
 **Technical Requirements:**
+
 - Schema matches full-stack architecture specification exactly
 - All foreign key constraints and relationships properly configured
 - Indexes optimized for expected query patterns (search under 2 seconds)
@@ -75,6 +82,7 @@ I want tRPC configured with Zod schemas for end-to-end type safety,
 so that API procedures have runtime validation matching TypeScript interfaces.
 
 **Acceptance Criteria:**
+
 1. tRPC server configured with router structure from architecture specification
 2. Zod schemas defined for all entities: ModelSchema, FilamentSchema, etc.
 3. tRPC procedures use Zod for input/output validation
@@ -82,6 +90,7 @@ so that API procedures have runtime validation matching TypeScript interfaces.
 5. Type inference working from database to UI components
 
 **Technical Requirements:**
+
 - Runtime validation exactly matches TypeScript types (1:1 mapping)
 - API routes follow architecture router structure (models, variants, filaments, queue)
 - Error handling consistent across all procedures
@@ -94,6 +103,7 @@ I want a complete authentication framework configured before any protected featu
 so that user management and security are established from the foundation.
 
 **Acceptance Criteria:**
+
 1. Authentication provider selected and configured (Clerk or Auth0 recommended)
 2. User model and session management integrated with database schema
 3. Route protection middleware configured for tRPC procedures
@@ -101,6 +111,7 @@ so that user management and security are established from the foundation.
 5. Role-based access control foundation established
 
 **Technical Requirements:**
+
 - JWT token validation middleware for tRPC
 - User table added to database schema with proper indexes
 - Session storage configured with Redis
@@ -114,6 +125,7 @@ I want automated deployment pipeline and infrastructure configuration,
 so that code can be deployed safely and consistently to production.
 
 **Acceptance Criteria:**
+
 1. GitHub Actions workflow configured for automated testing and deployment
 2. Environment-specific configuration (dev, staging, production)
 3. Database migration automation integrated with deployment
@@ -121,6 +133,7 @@ so that code can be deployed safely and consistently to production.
 5. Infrastructure as Code (IaC) setup for cloud resources
 
 **Technical Requirements:**
+
 - Automated testing pipeline runs on pull requests
 - Production Docker image optimized for performance and security
 - Environment variable management for different deployment stages
@@ -134,6 +147,7 @@ I want external service dependencies configured and ready,
 so that features requiring third-party services work reliably.
 
 **Acceptance Criteria:**
+
 1. Cloudflare R2 account setup with API keys and bucket configuration
 2. DNS configuration planned and domain registration requirements documented
 3. Email service provider selected and configured (SendGrid or AWS SES)
@@ -141,6 +155,7 @@ so that features requiring third-party services work reliably.
 5. Service monitoring and alerting configured
 
 **Technical Requirements:**
+
 - R2 bucket policies configured for secure file access
 - Email templates created for system notifications
 - CDN integration with R2 for optimized file delivery
@@ -154,6 +169,7 @@ I want comprehensive error handling patterns and user documentation infrastructu
 so that users have excellent experience with clear guidance.
 
 **Acceptance Criteria:**
+
 1. Global error boundary components implemented
 2. Loading states and error UI patterns standardized
 3. User help system infrastructure created
@@ -161,6 +177,7 @@ so that users have excellent experience with clear guidance.
 5. User onboarding flow framework established
 
 **Technical Requirements:**
+
 - React Error Boundary with user-friendly error pages
 - Loading skeleton components for all major features
 - Toast notification system for user feedback
@@ -174,6 +191,7 @@ I want Tanstack DB collections configured with live queries,
 so that reactive client-side data management works as specified in the architecture.
 
 **Acceptance Criteria:**
+
 1. Tanstack Query v5 configured with cache settings from architecture
 2. Tanstack DB collections created for all major entities (models, filaments, inventory)
 3. Live query patterns implemented per architecture examples
@@ -181,6 +199,7 @@ so that reactive client-side data management works as specified in the architect
 5. Optimistic mutations working with automatic rollback on failure
 
 **Technical Requirements:**
+
 - Collections follow architecture examples exactly (modelsCollection, filamentsCollection, etc.)
 - Live queries provide sub-millisecond performance as specified
 - Optimistic updates integrate properly with tRPC mutations
@@ -199,6 +218,7 @@ I want to create an account and manage my profile,
 so that I can access the platform securely and maintain my business information.
 
 **Acceptance Criteria:**
+
 1. User registration with email verification
 2. Profile management with business information (name, description, preferences)
 3. Password reset and account recovery functionality
@@ -206,6 +226,7 @@ so that I can access the platform securely and maintain my business information.
 5. Account deletion with proper data cleanup
 
 **Technical Requirements:**
+
 - Integration with authentication framework from Story 0.5
 - User profile stored in database with proper validation
 - Email verification workflow using external email service
@@ -218,6 +239,7 @@ I want a personalized dashboard and clear navigation,
 so that I can quickly access the features I need most.
 
 **Acceptance Criteria:**
+
 1. Personalized dashboard showing user-specific metrics and quick actions
 2. Navigation structure that adapts to user permissions and preferences
 3. Recent activity and quick access to frequently used features
@@ -225,6 +247,7 @@ so that I can quickly access the features I need most.
 5. Help system integration with contextual guidance
 
 **Technical Requirements:**
+
 - Dashboard components use authentication state
 - Navigation follows UI framework patterns from Epic 0
 - Real-time updates using Tanstack Query
@@ -237,6 +260,7 @@ I want my data to be completely isolated from other users,
 so that my business information remains private and secure.
 
 **Acceptance Criteria:**
+
 1. All database queries automatically filter by user ID
 2. File storage organized by user with proper access controls
 3. API endpoints validate user ownership before operations
@@ -244,6 +268,7 @@ so that my business information remains private and secure.
 5. Admin interface for user management (future-ready)
 
 **Technical Requirements:**
+
 - Row-level security implemented in database
 - tRPC middleware validates user ownership
 - File storage paths include user isolation
@@ -255,6 +280,7 @@ so that my business information remains private and secure.
 **Epic Goal**: Establish core file management capabilities that replace Windows folder chaos with systematic digital asset organization.
 
 **Dependencies**: Must complete Epic 0 and Epic 1 entirely before beginning, specifically:
+
 - Epic 1 (User Management) - Required for user-specific file organization and access control
 - Story 0.7 (External Service Integration) - Required for R2 bucket configuration
 - Story 0.8 (Error Handling Framework) - Required for file upload error states
@@ -265,6 +291,7 @@ I want secure file storage integration with Cloudflare R2,
 so that model and sliced files can be uploaded, stored, and accessed reliably with proper user isolation.
 
 **Acceptance Criteria:**
+
 1. Cloudflare R2 SDK integrated with proper authentication
 2. Signed URL generation for secure file uploads working with MinIO locally
 3. File upload API endpoints accept .3mf, .gcode, and .stl files with size validation
@@ -273,6 +300,7 @@ so that model and sliced files can be uploaded, stored, and accessed reliably wi
 6. User-specific file isolation and access control implemented
 
 **Technical Requirements:**
+
 - File size limits enforced (100MB max per architecture spec)
 - Upload progress tracking implemented
 - Secure credential management for R2 access keys
@@ -289,6 +317,7 @@ I want a robust library for extracting metadata from 3D printing files,
 so that slicer settings can be automatically captured without manual entry.
 
 **Acceptance Criteria:**
+
 1. Client-side JavaScript library extracts metadata from .3mf files using JSZip
 2. G-code comment parsing extracts Bambu Studio parameters
 3. Extracted data follows BambuMetadata schema from architecture
@@ -296,6 +325,7 @@ so that slicer settings can be automatically captured without manual entry.
 5. Error handling gracefully manages corrupted or unsupported files
 
 **Technical Requirements:**
+
 - Supports Bambu Studio .3mf and .gcode formats initially
 - Extracts 600+ parameters as specified in architecture
 - Performance: processes 50MB files within 30 seconds
@@ -308,18 +338,20 @@ I want to upload model and sliced files through a simple interface,
 so that I can begin organizing my digital assets systematically.
 
 **Acceptance Criteria:**
+
 1. User authentication required before accessing upload interface
 2. Drag-and-drop interface accepts multiple files simultaneously
 3. File type validation restricts to .3mf, .gcode, and .stl files per security spec
 4. User-specific upload quotas enforced
 5. Progress indicators and error states follow framework patterns
-3. Upload progress bars show individual file progress
-4. Batch upload handles up to 20 files efficiently
-5. Clear error messages for unsupported files or upload failures
+6. Upload progress bars show individual file progress
+7. Batch upload handles up to 20 files efficiently
+8. Clear error messages for unsupported files or upload failures
 
 **Dependencies**: Requires Stories 2.1 and 2.2 completion.
 
 **Technical Requirements:**
+
 - File validation before upload attempt using FileSecurityValidator
 - Chunked upload for large files
 - Cancel upload functionality
@@ -332,6 +364,7 @@ I want to organize uploaded files into logical model-variant hierarchies,
 so that I can find specific variants quickly without folder navigation chaos.
 
 **Acceptance Criteria:**
+
 1. Models creation with name, designer, category, and description
 2. Variants automatically linked to parent models with clear relationships
 3. File metadata automatically extracted and stored using metadata extraction library
@@ -341,6 +374,7 @@ so that I can find specific variants quickly without folder navigation chaos.
 **Dependencies**: Requires Story 2.3a completion.
 
 **Technical Requirements:**
+
 - Database operations use proper transactions
 - Variant naming follows consistent patterns
 - Parent-child relationships properly maintained in UI
@@ -352,6 +386,7 @@ I want detailed slicer settings automatically extracted and displayed,
 so that I never lose track of parameters used for successful prints.
 
 **Acceptance Criteria:**
+
 1. Critical parameters (layer height, nozzle temp, filament colors) prominently displayed
 2. Complete metadata (600+ parameters) accessible through expandable interface
 3. Filament information automatically creates or matches existing filament records
@@ -361,6 +396,7 @@ so that I never lose track of parameters used for successful prints.
 **Dependencies**: Requires Story 2.3b completion.
 
 **Technical Requirements:**
+
 - Metadata stored in JSONB format as per architecture
 - Fast-access fields indexed for search performance
 - Security validation for all extracted content using sanitization
@@ -372,6 +408,7 @@ I want to search for specific model variants using multiple criteria,
 so that I can quickly find the exact variant I need for production.
 
 **Acceptance Criteria:**
+
 1. Keyword search operates across model names, descriptions, and metadata
 2. Visual browsing displays thumbnail images for quick identification
 3. Filtering by parameters (material, color, size, print duration) narrows results effectively
@@ -381,6 +418,7 @@ so that I can quickly find the exact variant I need for production.
 **Dependencies**: Requires Stories 2.3a, 2.3b, and 2.3c completion.
 
 **Technical Requirements:**
+
 - PostgreSQL full-text search with GIN indexes per architecture
 - Search response time under 2 seconds for 1000+ variants
 - Faceted search with multiple filter combinations
@@ -398,6 +436,7 @@ I want to track my filament inventory with precise color and material matching,
 so that I can accurately plan production and avoid stockouts.
 
 **Acceptance Criteria:**
+
 1. Filament entries include hex color codes, brand names, and material types
 2. Inventory levels are tracked in grams with automatic conversion to print estimates
 3. Visual color representation matches physical spool colors accurately
@@ -407,6 +446,7 @@ so that I can accurately plan production and avoid stockouts.
 **Dependencies**: Requires filament metadata extraction from Epic 2 Story 2.3c.
 
 **Technical Requirements:**
+
 - Uses FilamentSchema and FilamentInventorySchema from architecture
 - Filament demand tracking automatically calculated via database triggers
 - Color accuracy validation per frontend specification (hex codes)
@@ -419,6 +459,7 @@ I want the system to automatically calculate filament usage based on completed p
 so that inventory levels stay accurate without manual tracking.
 
 **Acceptance Criteria:**
+
 1. Completed print jobs automatically deduct calculated filament usage from inventory
 2. Failed prints allow percentage completion entry for partial consumption calculation
 3. Consumption history provides audit trail for inventory reconciliation
@@ -428,6 +469,7 @@ so that inventory levels stay accurate without manual tracking.
 **Dependencies**: Requires Story 3.1 completion and Epic 4 print queue integration.
 
 **Technical Requirements:**
+
 - Integrates with print queue status updates from Epic 3
 - Uses filament usage data from BambuMetadata schema
 - Consumption calculations use database transactions for consistency
@@ -440,6 +482,7 @@ I want automated shopping lists generated based on inventory levels and planned 
 so that I can restock efficiently without manual calculation.
 
 **Acceptance Criteria:**
+
 1. Shopping lists automatically include items below defined thresholds
 2. Purchase URLs stored with inventory items enable one-click ordering
 3. Quantity recommendations based on historical usage patterns
@@ -449,6 +492,7 @@ so that I can restock efficiently without manual calculation.
 **Dependencies**: Requires Stories 3.1 and 3.2 completion.
 
 **Technical Requirements:**
+
 - Uses demand counting from filament requirements relationships
 - Shopping list generation follows tRPC API specification
 - Historical usage pattern analysis for recommendations
@@ -466,6 +510,7 @@ I want a print queue that helps me optimize printer utilization and batch effici
 so that I can maximize productive printing time.
 
 **Acceptance Criteria:**
+
 1. Queue displays estimated print times and material requirements
 2. Drag-and-drop reordering enables priority adjustment
 3. Batch optimization suggestions group similar materials and settings
@@ -475,6 +520,7 @@ so that I can maximize productive printing time.
 **Dependencies**: Requires Epic 2 Story 2.4 (search) and Epic 3 Story 3.1 (inventory) completion.
 
 **Technical Requirements:**
+
 - Uses PrintJobSchema and queue API from architecture specification
 - Feasibility checking integrates with FilamentInventory via live queries
 - Drag-and-drop follows frontend UI specification patterns
@@ -487,6 +533,7 @@ I want to see which variants sell fastest and receive automatic restock recommen
 so that I can focus production on profitable items and avoid stockouts.
 
 **Acceptance Criteria:**
+
 1. Sales velocity metrics track movement rates for each variant
 2. Trending analysis identifies seasonal patterns and market preferences
 3. Automated restock recommendations consider sales history and current inventory
@@ -496,6 +543,7 @@ so that I can focus production on profitable items and avoid stockouts.
 **Dependencies**: Requires Story 4.1 completion and Epic 3 Story 3.3 (shopping lists).
 
 **Technical Requirements:**
+
 - Analytics dashboard follows frontend design system specifications
 - Performance metrics stored using database performance monitoring patterns
 - Trending analysis uses PostgreSQL time series queries
@@ -508,6 +556,7 @@ I want to plan production for specific market events with themed inventory recom
 so that I can optimize my product mix for each sales opportunity.
 
 **Acceptance Criteria:**
+
 1. Event planning interface allows theme assignment (Christmas, Spring, etc.)
 2. Product recommendations based on historical performance for similar events
 3. Inventory preparation checklists ensure adequate stock levels
@@ -517,6 +566,7 @@ so that I can optimize my product mix for each sales opportunity.
 **Dependencies**: Requires Stories 4.1 and 4.2 completion.
 
 **Technical Requirements:**
+
 - Uses MarketEvents entity from database schema
 - Event planning interface follows frontend workflow specifications
 - Historical performance analysis uses analytics from Story 4.2

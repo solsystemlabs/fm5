@@ -53,6 +53,8 @@ const mockUser = {
   id: 'user-123',
   email: 'test@example.com',
   name: 'Test User',
+  emailVerified: true,
+  role: 'owner' as const,
   businessName: undefined,
   businessDescription: undefined,
   preferences: {
@@ -68,7 +70,7 @@ const mockUser = {
 // Create test context
 function createTestContext(user: typeof mockUser | null = mockUser) {
   return {
-    db: mockDb,
+    db: mockDb as any, // Cast mock to PrismaClient for testing
     user,
     req: new Request('http://localhost/api/trpc'),
   }
@@ -118,7 +120,7 @@ describe('tRPC Procedures', () => {
 
       const caller = appRouter.createCaller(ctx)
 
-      await expect(caller.auth.me()).rejects.toThrow('User must be authenticated')
+      await expect(caller.auth.me()).rejects.toThrow('Authentication required')
     })
   })
 
@@ -238,10 +240,7 @@ describe('tRPC Procedures', () => {
         },
         take: 11,
         cursor: undefined,
-        orderBy: [
-          { priority: 'desc' },
-          { createdAt: 'asc' },
-        ],
+        orderBy: [{ priority: 'desc' }, { createdAt: 'asc' }],
       })
     })
 
@@ -249,10 +248,10 @@ describe('tRPC Procedures', () => {
       const ctx = createTestContext()
       mockDb.printJob.count
         .mockResolvedValueOnce(10) // total
-        .mockResolvedValueOnce(3)  // queued
-        .mockResolvedValueOnce(1)  // printing
-        .mockResolvedValueOnce(5)  // completed
-        .mockResolvedValueOnce(1)  // failed
+        .mockResolvedValueOnce(3) // queued
+        .mockResolvedValueOnce(1) // printing
+        .mockResolvedValueOnce(5) // completed
+        .mockResolvedValueOnce(1) // failed
 
       const caller = appRouter.createCaller(ctx)
       const result = await caller.queue.stats()
@@ -279,7 +278,7 @@ describe('tRPC Procedures', () => {
           designer: 'Test Designer',
           category: 'invalid-category' as any,
           imageUrls: [],
-        })
+        }),
       ).rejects.toThrow()
     })
 
@@ -295,7 +294,7 @@ describe('tRPC Procedures', () => {
           colorName: 'Red',
           colorHex: 'invalid-hex',
           costPerGramBase: 0.05,
-        })
+        }),
       ).rejects.toThrow()
     })
 
@@ -309,7 +308,7 @@ describe('tRPC Procedures', () => {
           id: 'job-123',
           status: 'printing',
           completionPercentage: 150, // Invalid: > 100
-        })
+        }),
       ).rejects.toThrow()
     })
   })

@@ -17,6 +17,7 @@ FM5 (Filament Manager v5) is built on a modern, type-safe full-stack architectur
 ### React Ecosystem
 
 #### React 19.0.0
+
 - **Purpose**: Core UI library with latest features
 - **Key Features**:
   - Server Components support
@@ -25,6 +26,7 @@ FM5 (Filament Manager v5) is built on a modern, type-safe full-stack architectur
   - Built-in optimizations for modern browsers
 
 #### TanStack Router 1.130.2
+
 - **Purpose**: Type-safe file-based routing
 - **Key Features**:
   - File-based route generation
@@ -46,6 +48,7 @@ export const Route = createRoute({
 ```
 
 #### TanStack Query 5.89.0
+
 - **Purpose**: Server state management and caching
 - **Integration**: Seamlessly integrated with tRPC
 - **Features**:
@@ -55,6 +58,7 @@ export const Route = createRoute({
   - Devtools integration
 
 #### TanStack Form 1.23.0
+
 - **Purpose**: Type-safe form handling
 - **Features**:
   - Schema validation integration
@@ -63,6 +67,7 @@ export const Route = createRoute({
   - Accessibility support
 
 #### React Aria Components 1.12.2
+
 - **Purpose**: Accessible UI components
 - **Rationale**: Ensures WCAG compliance out of the box
 - **Integration**: Foundation for custom component library
@@ -70,6 +75,7 @@ export const Route = createRoute({
 ### Styling and UI
 
 #### Tailwind CSS 4.0.6
+
 - **Purpose**: Utility-first CSS framework
 - **Configuration**: Custom design system integration
 - **Benefits**:
@@ -84,6 +90,7 @@ import '@tailwindcss/vite'
 ```
 
 #### Styling Architecture
+
 - **Global Styles**: `src/styles.css` for base styles
 - **Component Styles**: Tailwind classes with consistent patterns
 - **Theme System**: Custom CSS variables for brand colors
@@ -91,6 +98,7 @@ import '@tailwindcss/vite'
 ### Development and Build Tools
 
 #### Vite 6.3.5
+
 - **Purpose**: Build tool and development server
 - **Features**:
   - Lightning-fast HMR
@@ -101,18 +109,15 @@ import '@tailwindcss/vite'
 ```typescript
 // Vite configuration
 export default {
-  plugins: [
-    react(),
-    '@tanstack/router-plugin',
-    '@tailwindcss/vite'
-  ],
+  plugins: [react(), '@tanstack/router-plugin', '@tailwindcss/vite'],
   server: {
-    port: 3000
-  }
+    port: 3000,
+  },
 }
 ```
 
 #### TypeScript 5.7.2
+
 - **Purpose**: Type safety and developer experience
 - **Configuration**: Strict mode enabled
 - **Integration**: Full stack type safety with tRPC
@@ -122,10 +127,12 @@ export default {
 ### Runtime and Framework
 
 #### Node.js (ES Modules)
+
 - **Type**: `"module"` in package.json
 - **Features**: Native ES module support for modern JavaScript
 
 #### TanStack Start 1.131.7
+
 - **Purpose**: Full-stack React framework
 - **Features**:
   - Server-side rendering
@@ -136,6 +143,7 @@ export default {
 ### API Layer
 
 #### tRPC 11.5.1
+
 - **Purpose**: End-to-end type-safe API
 - **Components**:
   - `@trpc/server`: Server-side procedures
@@ -155,6 +163,7 @@ export type AppRouter = typeof appRouter
 ```
 
 #### SuperJSON 2.2.2
+
 - **Purpose**: JSON serialization with type preservation
 - **Features**:
   - Date object preservation
@@ -165,6 +174,7 @@ export type AppRouter = typeof appRouter
 ### Database Stack
 
 #### PostgreSQL
+
 - **Purpose**: Primary database
 - **Features**:
   - JSONB for flexible metadata storage
@@ -173,6 +183,7 @@ export type AppRouter = typeof appRouter
   - Advanced indexing and performance
 
 #### Prisma 6.16.2
+
 - **Purpose**: Database ORM and migration tool
 - **Components**:
   - `prisma`: CLI tool for migrations
@@ -186,6 +197,7 @@ export const prisma = new PrismaClient({
 ```
 
 #### Database Schema Features
+
 - **User Isolation**: All tables include `userId` foreign key
 - **JSONB Fields**: Flexible metadata storage (e.g., `bambuMetadata`)
 - **Enums**: Type-safe status and category fields
@@ -194,6 +206,7 @@ export const prisma = new PrismaClient({
 ### Schema Validation
 
 #### Zod 4.1.11
+
 - **Purpose**: Runtime schema validation
 - **Integration**:
   - tRPC input/output validation
@@ -216,6 +229,7 @@ export type Filament = z.infer<typeof FilamentSchema>
 ```
 
 #### ArkType 2.1.22
+
 - **Purpose**: Alternative type validation system
 - **Status**: Present in dependencies, may be used for specific validation cases
 - **Note**: Project primarily uses Zod for consistency
@@ -225,6 +239,7 @@ export type Filament = z.infer<typeof FilamentSchema>
 ### Testing Framework
 
 #### Vitest 3.0.5
+
 - **Purpose**: Fast unit and integration testing
 - **Features**:
   - Native ES modules support
@@ -233,11 +248,13 @@ export type Filament = z.infer<typeof FilamentSchema>
   - Coverage reporting
 
 #### React Testing Library 16.2.0
+
 - **Purpose**: Component testing utilities
 - **Philosophy**: Testing from user perspective
 - **Integration**: Works seamlessly with Vitest
 
 #### jsdom 26.0.0
+
 - **Purpose**: DOM simulation for testing
 - **Usage**: Enables React component testing in Node.js environment
 
@@ -252,6 +269,7 @@ export default {
 ```
 
 ### Testing Strategy
+
 - **Unit Tests**: Pure functions, hooks, utilities
 - **Integration Tests**: tRPC procedures, database operations
 - **Component Tests**: UI components with React Testing Library
@@ -262,11 +280,13 @@ export default {
 ### Code Quality
 
 #### ESLint
+
 - **Configuration**: `@tanstack/eslint-config`
 - **Purpose**: Code linting and consistency
 - **Integration**: Automated fixing with Prettier
 
 #### Prettier 3.5.3
+
 - **Purpose**: Code formatting
 - **Configuration**: Standard settings with minor customizations
 - **Integration**: ESLint integration for conflict resolution
@@ -274,6 +294,7 @@ export default {
 ### Development Experience
 
 #### TanStack Devtools
+
 - **Components**:
   - React Query Devtools
   - Router Devtools
@@ -296,6 +317,7 @@ export default {
 ```
 
 #### Hot Module Replacement
+
 - **Vite HMR**: Instant feedback during development
 - **React Fast Refresh**: Preserves component state during updates
 
@@ -304,6 +326,7 @@ export default {
 ### Build System
 
 #### Nitro
+
 - **Purpose**: Universal deployment
 - **Features**:
   - Multiple deployment targets
@@ -312,6 +335,7 @@ export default {
   - Static site generation
 
 #### Build Outputs
+
 - **`.output/`**: Production build artifacts
 - **`public/`**: Static assets
 - **Server**: Universal server bundle
@@ -319,6 +343,7 @@ export default {
 ### Environment Configuration
 
 #### Environment Variables
+
 ```typescript
 // Required environment variables
 DATABASE_URL=postgresql://...
@@ -327,6 +352,7 @@ NODE_ENV=development|production|test
 ```
 
 #### Development vs Production
+
 - **Development**:
   - Prisma query logging enabled
   - Devtools enabled
@@ -339,11 +365,13 @@ NODE_ENV=development|production|test
 ## Package Management
 
 ### Dependency Strategy
+
 - **Main Dependencies**: Production runtime requirements
 - **Dev Dependencies**: Development and build tools only
 - **Peer Dependencies**: Handled automatically by package managers
 
 ### Version Management
+
 - **Semantic Versioning**: All packages use semver
 - **Lock Files**: `package-lock.json` for deterministic builds
 - **Regular Updates**: Frequent updates to latest stable versions
@@ -351,6 +379,7 @@ NODE_ENV=development|production|test
 ### Key Dependency Categories
 
 #### Core Runtime (Production)
+
 ```json
 {
   "react": "^19.0.0",
@@ -362,6 +391,7 @@ NODE_ENV=development|production|test
 ```
 
 #### Development Tools
+
 ```json
 {
   "typescript": "^5.7.2",
@@ -375,16 +405,19 @@ NODE_ENV=development|production|test
 ## Performance Characteristics
 
 ### Bundle Size Optimization
+
 - **Tree Shaking**: Vite eliminates unused code
 - **Code Splitting**: Automatic route-based splitting
 - **Lazy Loading**: Dynamic imports for large components
 
 ### Runtime Performance
+
 - **React 19**: Improved rendering performance
 - **TanStack Query**: Intelligent caching and background updates
 - **Prisma**: Optimized database queries with connection pooling
 
 ### Development Performance
+
 - **Vite**: Sub-second cold starts and instant HMR
 - **TypeScript**: Incremental compilation
 - **ESLint**: Fast linting with caching
@@ -392,16 +425,19 @@ NODE_ENV=development|production|test
 ## Security Considerations
 
 ### Type Safety
+
 - **End-to-End**: From database to frontend
 - **Runtime Validation**: Zod schemas prevent invalid data
 - **SQL Injection Prevention**: Prisma query builder
 
 ### Authentication and Authorization
+
 - **JWT Tokens**: Secure user authentication (to be implemented)
 - **User Isolation**: Database-level user data separation
 - **tRPC Middleware**: Authentication enforcement
 
 ### Data Protection
+
 - **Environment Variables**: Sensitive configuration externalized
 - **CORS**: Proper cross-origin request handling
 - **Input Validation**: All user inputs validated with Zod
@@ -409,11 +445,13 @@ NODE_ENV=development|production|test
 ## Migration and Upgrade Strategy
 
 ### Database Migrations
+
 - **Prisma Migrate**: Schema versioning and deployment
 - **Rollback Support**: Safe schema changes
 - **Data Migrations**: Custom scripts for data transformations
 
 ### Package Updates
+
 - **Regular Updates**: Monthly dependency reviews
 - **Breaking Changes**: Careful evaluation and testing
 - **LTS Strategy**: Preference for stable, supported versions
@@ -421,12 +459,14 @@ NODE_ENV=development|production|test
 ## Future Technology Considerations
 
 ### Planned Additions
+
 - **Authentication Provider**: Clerk or Auth0 integration
 - **File Processing**: STL/3MF file handling capabilities
 - **Background Jobs**: Queue system for print job management
 - **Monitoring**: Application performance monitoring
 
 ### Potential Upgrades
+
 - **React Server Components**: Enhanced SSR capabilities
 - **Edge Runtime**: Global deployment optimization
 - **Streaming**: Real-time updates for print job status
@@ -434,6 +474,7 @@ NODE_ENV=development|production|test
 ## Development Commands
 
 ### Available Scripts
+
 ```bash
 npm run dev       # Development server with HMR
 npm run build     # Production build
@@ -445,6 +486,7 @@ npm run check     # Format + lint fix
 ```
 
 ### Development Workflow
+
 1. **Setup**: `npm install` - Install dependencies
 2. **Development**: `npm run dev` - Start development server
 3. **Testing**: `npm run test` - Run tests during development

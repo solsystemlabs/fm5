@@ -10,7 +10,7 @@ export const filamentsRouter = createTRPCRouter({
         materialType: z.enum(['PLA', 'PETG', 'ABS', 'TPU']).optional(),
         search: z.string().optional(),
         limit: z.number().min(1).max(100).default(50),
-      })
+      }),
     )
     .output(z.array(FilamentSchema))
     .query(async ({ ctx, input }) => {
@@ -33,7 +33,12 @@ export const filamentsRouter = createTRPCRouter({
         orderBy: { demandCount: 'desc' },
       })
 
-      return filaments
+      // Transform Prisma model to match Zod schema
+      return filaments.map(filament => ({
+        ...filament,
+        costPerGramBase: filament.costPerGramBase.toNumber(),
+        purchaseUrl: filament.purchaseUrl ?? undefined,
+      }))
     }),
 
   // Get single filament by ID
@@ -52,7 +57,12 @@ export const filamentsRouter = createTRPCRouter({
         throw new Error('Filament not found')
       }
 
-      return filament
+      // Transform Prisma model to match Zod schema
+      return {
+        ...filament,
+        costPerGramBase: filament.costPerGramBase.toNumber(),
+        purchaseUrl: filament.purchaseUrl ?? undefined,
+      }
     }),
 
   // Create new filament
@@ -65,7 +75,7 @@ export const filamentsRouter = createTRPCRouter({
         colorHex: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
         costPerGramBase: z.number(),
         purchaseUrl: z.string().url().optional(),
-      })
+      }),
     )
     .output(FilamentSchema)
     .mutation(async ({ ctx, input }) => {
@@ -79,7 +89,12 @@ export const filamentsRouter = createTRPCRouter({
         },
       })
 
-      return filament
+      // Transform Prisma model to match Zod schema
+      return {
+        ...filament,
+        costPerGramBase: filament.costPerGramBase.toNumber(),
+        purchaseUrl: filament.purchaseUrl ?? undefined,
+      }
     }),
 
   // Update existing filament
@@ -90,10 +105,13 @@ export const filamentsRouter = createTRPCRouter({
         brand: z.string().optional(),
         materialType: z.enum(['PLA', 'PETG', 'ABS', 'TPU']).optional(),
         colorName: z.string().optional(),
-        colorHex: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+        colorHex: z
+          .string()
+          .regex(/^#[0-9A-Fa-f]{6}$/)
+          .optional(),
         costPerGramBase: z.number().optional(),
         purchaseUrl: z.string().url().optional(),
-      })
+      }),
     )
     .output(FilamentSchema)
     .mutation(async ({ ctx, input }) => {
@@ -118,7 +136,12 @@ export const filamentsRouter = createTRPCRouter({
         where: { id },
       })
 
-      return updatedFilament
+      // Transform Prisma model to match Zod schema
+      return {
+        ...updatedFilament,
+        costPerGramBase: updatedFilament.costPerGramBase.toNumber(),
+        purchaseUrl: updatedFilament.purchaseUrl ?? undefined,
+      }
     }),
 
   // Delete filament
@@ -144,7 +167,7 @@ export const filamentsRouter = createTRPCRouter({
         z.object({
           filamentId: z.string().optional(),
           lowStock: z.boolean().optional(),
-        })
+        }),
       )
       .output(z.array(FilamentInventorySchema))
       .query(async ({ ctx, input }) => {
@@ -154,7 +177,9 @@ export const filamentsRouter = createTRPCRouter({
           userId: ctx.user.id,
           ...(filamentId && { filamentId }),
           ...(lowStock && {
-            quantityGrams: { lte: ctx.db.filamentInventory.fields.lowStockThreshold },
+            quantityGrams: {
+              lte: ctx.db.filamentInventory.fields.lowStockThreshold,
+            },
           }),
         }
 
@@ -163,7 +188,14 @@ export const filamentsRouter = createTRPCRouter({
           orderBy: { lastUpdated: 'desc' },
         })
 
-        return inventory
+        // Transform Prisma model to match Zod schema
+        return inventory.map(item => ({
+          ...item,
+          actualCostPerGram: item.actualCostPerGram.toNumber(),
+          batchIdentifier: item.batchIdentifier ?? undefined,
+          purchaseDate: item.purchaseDate ?? undefined,
+          expiryDate: item.expiryDate ?? undefined,
+        }))
       }),
 
     // Add inventory
@@ -177,7 +209,7 @@ export const filamentsRouter = createTRPCRouter({
           lowStockThreshold: z.number(),
           purchaseDate: z.date().optional(),
           expiryDate: z.date().optional(),
-        })
+        }),
       )
       .output(FilamentInventorySchema)
       .mutation(async ({ ctx, input }) => {
@@ -202,7 +234,14 @@ export const filamentsRouter = createTRPCRouter({
           },
         })
 
-        return inventory
+        // Transform Prisma model to match Zod schema
+        return {
+          ...inventory,
+          actualCostPerGram: inventory.actualCostPerGram.toNumber(),
+          batchIdentifier: inventory.batchIdentifier ?? undefined,
+          purchaseDate: inventory.purchaseDate ?? undefined,
+          expiryDate: inventory.expiryDate ?? undefined,
+        }
       }),
 
     // Update inventory
@@ -211,7 +250,7 @@ export const filamentsRouter = createTRPCRouter({
         z.object({
           id: z.string(),
           quantityGrams: z.number(),
-        })
+        }),
       )
       .output(FilamentInventorySchema)
       .mutation(async ({ ctx, input }) => {
@@ -232,11 +271,19 @@ export const filamentsRouter = createTRPCRouter({
           throw new Error('Inventory not found or access denied')
         }
 
-        const updatedInventory = await ctx.db.filamentInventory.findUniqueOrThrow({
-          where: { id },
-        })
+        const updatedInventory =
+          await ctx.db.filamentInventory.findUniqueOrThrow({
+            where: { id },
+          })
 
-        return updatedInventory
+        // Transform Prisma model to match Zod schema
+        return {
+          ...updatedInventory,
+          actualCostPerGram: updatedInventory.actualCostPerGram.toNumber(),
+          batchIdentifier: updatedInventory.batchIdentifier ?? undefined,
+          purchaseDate: updatedInventory.purchaseDate ?? undefined,
+          expiryDate: updatedInventory.expiryDate ?? undefined,
+        }
       }),
   }),
 })

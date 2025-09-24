@@ -8,6 +8,6 @@ This specification focuses on creating an intuitive, efficient interface that tr
 
 ## Change Log
 
-| Date | Version | Description | Author |
-|------|---------|-------------|--------|
-| 2025-09-18 | 1.0 | Initial UI/UX specification | UX Expert Sally |
+| Date       | Version | Description                 | Author          |
+| ---------- | ------- | --------------------------- | --------------- |
+| 2025-09-18 | 1.0     | Initial UI/UX specification | UX Expert Sally |

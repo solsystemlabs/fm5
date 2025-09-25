@@ -1,12 +1,16 @@
 import { PrismaClient } from '@prisma/client'
 
-// Global variable to store the Prisma instance in development
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
+/**
+ * Xata-compatible database configuration for production environments
+ * Uses HTTP-based connection suitable for Cloudflare Workers
+ */
+
+declare global {
+   
+  var prismaXata: PrismaClient | undefined
 }
 
 function createPrismaClient(): PrismaClient {
-  // Use Xata URL in production/staging, fallback to local DATABASE_URL
   const databaseUrl = process.env.XATA_DATABASE_URL || process.env.DATABASE_URL
 
   if (!databaseUrl) {
@@ -28,6 +32,8 @@ function createPrismaClient(): PrismaClient {
   })
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient()
+export const prismaXata = globalThis.prismaXata ?? createPrismaClient()
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+if (process.env.NODE_ENV !== 'production') {
+  globalThis.prismaXata = prismaXata
+}

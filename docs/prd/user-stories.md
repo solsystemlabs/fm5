@@ -121,25 +121,27 @@ so that user management and security are established from the foundation.
 
 **Story 0.6: CI/CD Pipeline and Deployment Infrastructure**
 As a developer,
-I want automated deployment pipeline and infrastructure configuration,
-so that code can be deployed safely and consistently to production.
+I want automated deployment pipeline and production infrastructure configured with Cloudflare Workers,
+so that code can be deployed safely and consistently to staging and production environments with global performance.
 
 **Acceptance Criteria:**
 
-1. GitHub Actions workflow configured for automated testing and deployment
-2. Environment-specific configuration (dev, staging, production)
-3. Database migration automation integrated with deployment
-4. Docker production build configuration optimized
-5. Infrastructure as Code (IaC) setup for cloud resources
+1. **Cloudflare Workers Deployment**: Staging and production Workers configured with automated deployment
+2. **Xata Database Integration**: Production PostgreSQL databases configured for staging and production environments
+3. **GitHub Actions CI/CD**: Automated testing pipeline with staging deployment and manual production promotion
+4. **Environment Configuration**: Complete environment variable management and secrets configuration
+5. **Wrangler Infrastructure**: Infrastructure as Code using Wrangler CLI for deployment lifecycle management
+6. **Monitoring and Health Checks**: Basic monitoring, logging, and health check endpoints configured
+7. **Rollback Procedures**: Deployment rollback and recovery procedures documented and tested
 
 **Technical Requirements:**
 
-- Automated testing pipeline runs on pull requests
-- Production Docker image optimized for performance and security
-- Environment variable management for different deployment stages
-- Database backup and recovery procedures automated
-- Blue-green or rolling deployment strategy implemented
-- Health check endpoints for monitoring deployment status
+- Automated testing pipeline runs on pull requests with Cloudflare Workers deployment
+- Cloudflare Workers optimized for performance and security with global edge distribution
+- Environment variable management using Wrangler secrets for staging and production
+- Xata database integration with HTTP API for connection management
+- Wrangler CLI deployment with rollback capabilities and version management
+- Health check endpoints for monitoring Workers and database connectivity
 
 **Story 0.7: External Service Integration Planning**
 As a developer,

@@ -17,7 +17,7 @@ export const variantsRouter = createTRPCRouter({
       })
 
       // Transform Prisma model to match Zod schema (Decimal -> number)
-      return variants.map(variant => ({
+      return variants.map((variant) => ({
         ...variant,
         layerHeight: variant.layerHeight.toNumber(),
         costToProduceUsd: variant.costToProduceUsd.toNumber(),

@@ -1,0 +1,6 @@
+{
+  "databaseURL": "https://Taylor-Eernisse-s-workspace-clbd2m.us-east-1.xata.sh/db/fm5",
+  "codegen": {
+    "output": "src/xata.ts"
+  }
+}

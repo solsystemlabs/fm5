@@ -42,7 +42,7 @@ export const queueRouter = createTRPCRouter({
       }
 
       return {
-        jobs: jobs.map(job => ({
+        jobs: jobs.map((job) => ({
           ...job,
           estimatedStartTime: job.estimatedStartTime ?? undefined,
           estimatedCompletionTime: job.estimatedCompletionTime ?? undefined,
@@ -169,7 +169,8 @@ export const queueRouter = createTRPCRouter({
       return {
         ...updatedJob,
         estimatedStartTime: updatedJob.estimatedStartTime ?? undefined,
-        estimatedCompletionTime: updatedJob.estimatedCompletionTime ?? undefined,
+        estimatedCompletionTime:
+          updatedJob.estimatedCompletionTime ?? undefined,
         actualCompletionTime: updatedJob.actualCompletionTime ?? undefined,
         failureReason: updatedJob.failureReason ?? undefined,
         completionPercentage: updatedJob.completionPercentage ?? undefined,
@@ -208,7 +209,8 @@ export const queueRouter = createTRPCRouter({
       return {
         ...updatedJob,
         estimatedStartTime: updatedJob.estimatedStartTime ?? undefined,
-        estimatedCompletionTime: updatedJob.estimatedCompletionTime ?? undefined,
+        estimatedCompletionTime:
+          updatedJob.estimatedCompletionTime ?? undefined,
         actualCompletionTime: updatedJob.actualCompletionTime ?? undefined,
         failureReason: updatedJob.failureReason ?? undefined,
         completionPercentage: updatedJob.completionPercentage ?? undefined,

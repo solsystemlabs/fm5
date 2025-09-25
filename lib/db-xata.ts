@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client/edge'
 
 /**
  * Xata-compatible database configuration for production environments
@@ -6,7 +6,6 @@ import { PrismaClient } from '@prisma/client'
  */
 
 declare global {
-   
   var prismaXata: PrismaClient | undefined
 }
 

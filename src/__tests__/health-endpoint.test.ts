@@ -8,11 +8,21 @@ describe('Health Endpoint', () => {
     // The actual implementation will be added when health endpoint routing is resolved
     const expectedEndpoint = '/health'
     const expectedMethods = ['GET']
-    const expectedResponseFields = ['status', 'timestamp', 'environment', 'services']
+    const expectedResponseFields = [
+      'status',
+      'timestamp',
+      'environment',
+      'services',
+    ]
 
     expect(expectedEndpoint).toBe('/health')
     expect(expectedMethods).toContain('GET')
-    expect(expectedResponseFields).toEqual(['status', 'timestamp', 'environment', 'services'])
+    expect(expectedResponseFields).toEqual([
+      'status',
+      'timestamp',
+      'environment',
+      'services',
+    ])
   })
 
   it('should return health check structure', () => {

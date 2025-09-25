@@ -99,8 +99,8 @@ wrangler deploy --env production
 
 Both environments include health check endpoints:
 
-- **Staging**: `https://fm5-staging.your-domain.workers.dev/health`
-- **Production**: `https://fm5-production.your-domain.workers.dev/health`
+- **Staging**: `https://fm5-staging.your-subdomain.workers.dev/health`
+- **Production**: `https://fm5-production.your-subdomain.workers.dev/health`
 
 Health check response:
 
@@ -205,7 +205,7 @@ wrangler secret list --env production
 
 ```bash
 # Test database connectivity
-curl https://fm5-production.your-domain.workers.dev/health
+curl https://fm5-production.your-subdomain.workers.dev/health
 
 # Check specific service logs
 wrangler tail --env production --grep "Database health check"

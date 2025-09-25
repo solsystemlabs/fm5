@@ -8,6 +8,7 @@ export default [
     ignores: [
       '.nitro/**',
       '.output/**',
+      '.wrangler/**',
       'dist/**',
       'node_modules/**',
       '*.config.js',

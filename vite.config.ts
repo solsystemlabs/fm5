@@ -12,6 +12,7 @@ const config = defineConfig({
     }),
     tailwindcss(),
     tanstackStart({
+      target: 'cloudflare-module', // Key configuration for Cloudflare compatibility
       customViteReactPlugin: true,
     }),
     viteReact(),

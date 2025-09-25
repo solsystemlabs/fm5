@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client/edge'
 
 // Global variable to store the Prisma instance in development
 const globalForPrisma = globalThis as unknown as {

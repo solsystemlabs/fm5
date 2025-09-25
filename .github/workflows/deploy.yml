@@ -119,7 +119,7 @@ jobs:
       - name: Run staging health check
         run: |
           sleep 30
-          curl -f https://fm5-staging.your-domain.workers.dev/health || exit 1
+          curl -f https://fm5-staging.your-subdomain.workers.dev/health || exit 1
 
   deploy-production:
     name: Deploy to Production
@@ -167,7 +167,7 @@ jobs:
       - name: Run production health check
         run: |
           sleep 30
-          curl -f https://fm5-production.your-domain.workers.dev/health || exit 1
+          curl -f https://fm5-production.your-subdomain.workers.dev/health || exit 1
 
       - name: Create deployment tag
         run: |

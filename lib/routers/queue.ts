@@ -7,16 +7,18 @@ export const queueRouter = createTRPCRouter({
   list: protectedProcedure
     .input(
       z.object({
-        status: z.enum(['queued', 'printing', 'completed', 'failed']).optional(),
+        status: z
+          .enum(['queued', 'printing', 'completed', 'failed'])
+          .optional(),
         limit: z.number().min(1).max(100).default(20),
         cursor: z.string().optional(),
-      })
+      }),
     )
     .output(
       z.object({
         jobs: z.array(PrintJobSchema),
         nextCursor: z.string().optional(),
-      })
+      }),
     )
     .query(async ({ ctx, input }) => {
       const { status, limit, cursor } = input
@@ -30,10 +32,7 @@ export const queueRouter = createTRPCRouter({
         where,
         take: limit + 1,
         cursor: cursor ? { id: cursor } : undefined,
-        orderBy: [
-          { priority: 'desc' },
-          { createdAt: 'asc' },
-        ],
+        orderBy: [{ priority: 'desc' }, { createdAt: 'asc' }],
       })
 
       let nextCursor: typeof cursor | undefined = undefined
@@ -43,7 +42,14 @@ export const queueRouter = createTRPCRouter({
       }
 
       return {
-        jobs,
+        jobs: jobs.map(job => ({
+          ...job,
+          estimatedStartTime: job.estimatedStartTime ?? undefined,
+          estimatedCompletionTime: job.estimatedCompletionTime ?? undefined,
+          actualCompletionTime: job.actualCompletionTime ?? undefined,
+          failureReason: job.failureReason ?? undefined,
+          completionPercentage: job.completionPercentage ?? undefined,
+        })),
         nextCursor,
       }
     }),
@@ -64,7 +70,15 @@ export const queueRouter = createTRPCRouter({
         throw new Error('Print job not found')
       }
 
-      return job
+      // Transform Prisma model to match Zod schema (null -> undefined)
+      return {
+        ...job,
+        estimatedStartTime: job.estimatedStartTime ?? undefined,
+        estimatedCompletionTime: job.estimatedCompletionTime ?? undefined,
+        actualCompletionTime: job.actualCompletionTime ?? undefined,
+        failureReason: job.failureReason ?? undefined,
+        completionPercentage: job.completionPercentage ?? undefined,
+      }
     }),
 
   // Add new print job to queue
@@ -75,7 +89,7 @@ export const queueRouter = createTRPCRouter({
         priority: z.number().default(1),
         estimatedStartTime: z.date().optional(),
         estimatedCompletionTime: z.date().optional(),
-      })
+      }),
     )
     .output(PrintJobSchema)
     .mutation(async ({ ctx, input }) => {
@@ -100,7 +114,15 @@ export const queueRouter = createTRPCRouter({
         },
       })
 
-      return job
+      // Transform Prisma model to match Zod schema (null -> undefined)
+      return {
+        ...job,
+        estimatedStartTime: job.estimatedStartTime ?? undefined,
+        estimatedCompletionTime: job.estimatedCompletionTime ?? undefined,
+        actualCompletionTime: job.actualCompletionTime ?? undefined,
+        failureReason: job.failureReason ?? undefined,
+        completionPercentage: job.completionPercentage ?? undefined,
+      }
     }),
 
   // Update print job status
@@ -112,14 +134,17 @@ export const queueRouter = createTRPCRouter({
         completionPercentage: z.number().min(0).max(100).optional(),
         failureReason: z.string().optional(),
         actualCompletionTime: z.date().optional(),
-      })
+      }),
     )
     .output(PrintJobSchema)
     .mutation(async ({ ctx, input }) => {
       const { id, ...updateData } = input
 
       // Set completion time automatically if status is completed
-      if (updateData.status === 'completed' && !updateData.actualCompletionTime) {
+      if (
+        updateData.status === 'completed' &&
+        !updateData.actualCompletionTime
+      ) {
         updateData.actualCompletionTime = new Date()
         updateData.completionPercentage = 100
       }
@@ -140,7 +165,15 @@ export const queueRouter = createTRPCRouter({
         where: { id },
       })
 
-      return updatedJob
+      // Transform Prisma model to match Zod schema (null -> undefined)
+      return {
+        ...updatedJob,
+        estimatedStartTime: updatedJob.estimatedStartTime ?? undefined,
+        estimatedCompletionTime: updatedJob.estimatedCompletionTime ?? undefined,
+        actualCompletionTime: updatedJob.actualCompletionTime ?? undefined,
+        failureReason: updatedJob.failureReason ?? undefined,
+        completionPercentage: updatedJob.completionPercentage ?? undefined,
+      }
     }),
 
   // Update print job priority
@@ -149,7 +182,7 @@ export const queueRouter = createTRPCRouter({
       z.object({
         id: z.string(),
         priority: z.number(),
-      })
+      }),
     )
     .output(PrintJobSchema)
     .mutation(async ({ ctx, input }) => {
@@ -171,7 +204,15 @@ export const queueRouter = createTRPCRouter({
         where: { id },
       })
 
-      return updatedJob
+      // Transform Prisma model to match Zod schema (null -> undefined)
+      return {
+        ...updatedJob,
+        estimatedStartTime: updatedJob.estimatedStartTime ?? undefined,
+        estimatedCompletionTime: updatedJob.estimatedCompletionTime ?? undefined,
+        actualCompletionTime: updatedJob.actualCompletionTime ?? undefined,
+        failureReason: updatedJob.failureReason ?? undefined,
+        completionPercentage: updatedJob.completionPercentage ?? undefined,
+      }
     }),
 
   // Delete print job
@@ -198,15 +239,23 @@ export const queueRouter = createTRPCRouter({
         printing: z.number(),
         completed: z.number(),
         failed: z.number(),
-      })
+      }),
     )
     .query(async ({ ctx }) => {
       const [total, queued, printing, completed, failed] = await Promise.all([
         ctx.db.printJob.count({ where: { userId: ctx.user.id } }),
-        ctx.db.printJob.count({ where: { userId: ctx.user.id, status: 'queued' } }),
-        ctx.db.printJob.count({ where: { userId: ctx.user.id, status: 'printing' } }),
-        ctx.db.printJob.count({ where: { userId: ctx.user.id, status: 'completed' } }),
-        ctx.db.printJob.count({ where: { userId: ctx.user.id, status: 'failed' } }),
+        ctx.db.printJob.count({
+          where: { userId: ctx.user.id, status: 'queued' },
+        }),
+        ctx.db.printJob.count({
+          where: { userId: ctx.user.id, status: 'printing' },
+        }),
+        ctx.db.printJob.count({
+          where: { userId: ctx.user.id, status: 'completed' },
+        }),
+        ctx.db.printJob.count({
+          where: { userId: ctx.user.id, status: 'failed' },
+        }),
       ])
 
       return {

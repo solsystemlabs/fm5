@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { FilamentSchema, ModelSchema, PrintJobSchema, UserSchema } from '../../lib/schemas'
+import {
+  FilamentSchema,
+  ModelSchema,
+  PrintJobSchema,
+  UserSchema,
+} from '../../lib/schemas'
 import type { z } from 'zod'
 
 describe('tRPC and Zod Schema Validation', () => {
@@ -9,6 +14,8 @@ describe('tRPC and Zod Schema Validation', () => {
         id: 'user-123',
         email: 'test@example.com',
         name: 'Test User',
+        emailVerified: true,
+        role: 'owner' as const,
         preferences: {
           units: 'metric' as const,
           notifications: {
@@ -158,6 +165,8 @@ describe('tRPC and Zod Schema Validation', () => {
         id: 'user-123',
         email: 'test@example.com',
         name: 'Test User',
+        emailVerified: false,
+        role: 'owner',
         preferences: {},
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -195,6 +204,8 @@ describe('tRPC and Zod Schema Validation', () => {
         id: 'user-123',
         email: 'test@example.com',
         name: 'Test User',
+        emailVerified: false,
+        role: 'owner' as const,
         preferences: {},
         createdAt: new Date(),
         updatedAt: new Date(),

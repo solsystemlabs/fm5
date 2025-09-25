@@ -6,14 +6,14 @@ services:
       POSTGRES_DB: printmgmt_dev
       POSTGRES_USER: printmgmt_user
       POSTGRES_PASSWORD: dev_password
-    command: ["postgres", "-c", "shared_preload_libraries=pg_stat_statements"]
+    command: ['postgres', '-c', 'shared_preload_libraries=pg_stat_statements']
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db/init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U printmgmt_user -d printmgmt_dev"]
+      test: ['CMD-SHELL', 'pg_isready -U printmgmt_user -d printmgmt_dev']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -25,12 +25,12 @@ services:
     image: redis:7-alpine
     container_name: fm5_redis
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes --appendfsync everysec
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 3s
       retries: 3
@@ -45,13 +45,13 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin123
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - '9000:9000'
+      - '9001:9001'
     volumes:
       - minio_data:/data
     command: server /data --console-address ":9001"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
       interval: 30s
       timeout: 20s
       retries: 3

@@ -1,6 +1,7 @@
 # Technical Implementation
 
 ## Technology Stack
+
 - **Frontend Framework**: Tanstack Start (React-based full-stack framework)
 - **Styling**: TailwindCSS for responsive design
 - **Database**: PostgreSQL with PrismaORM and Tanstack DB
@@ -17,6 +18,7 @@
 ## Database Schema Design
 
 **Core Entities:**
+
 - **Users**: User accounts with authentication and business profile information
 - **Models**: Base 3D designs with designer attribution and categorization (user-isolated)
 - **ModelVariants**: Specific configurations with slicer settings and file references (user-isolated)
@@ -26,6 +28,7 @@
 - **MarketEvents**: Event planning and themed inventory management (user-isolated)
 
 **Key Relationships:**
+
 - User (1:N) Models - user owns multiple models
 - User (1:N) FilamentInventory - user-specific inventory tracking
 - User (1:N) PrintJobs - user-specific print queue
@@ -35,12 +38,14 @@
 - PrintJob (M:1) ModelVariant - production queue relationships
 
 ## File Processing Architecture
+
 - **Upload Pipeline**: Direct-to-R2 uploads with progress tracking
 - **Metadata Extraction**: Server-side processing of .gcode/.3mf archives
 - **Image Processing**: Automatic thumbnail generation and storage
 - **Backup Strategy**: Automated versioning and disaster recovery
 
 ## Security and Compliance
+
 - **Authentication**: JWT-based authentication with secure session management
 - **Data Protection**: Industry-standard encryption for sensitive business data with user isolation
 - **Access Control**: Row-level security ensuring complete user data isolation

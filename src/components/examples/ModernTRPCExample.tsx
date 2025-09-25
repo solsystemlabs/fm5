@@ -111,8 +111,8 @@ function MutationExamples() {
       </button>
 
       <p className="text-sm text-gray-600">
-        This demonstrates optimistic updates - the model appears immediately
-        and rolls back on error.
+        This demonstrates optimistic updates - the model appears immediately and
+        rolls back on error.
       </p>
     </div>
   )
@@ -157,8 +157,8 @@ function CacheUtilsExample() {
       ))}
 
       <p className="text-sm text-gray-600 mt-4">
-        These utilities provide fine-grained cache control with automatic
-        type safety and optimized network requests.
+        These utilities provide fine-grained cache control with automatic type
+        safety and optimized network requests.
       </p>
     </div>
   )
@@ -184,7 +184,8 @@ export function RealTimeQueueExample() {
       )}
 
       <div className="text-xs text-gray-500">
-        Updates every 10 seconds • Last updated: {new Date().toLocaleTimeString()}
+        Updates every 10 seconds • Last updated:{' '}
+        {new Date().toLocaleTimeString()}
       </div>
     </div>
   )

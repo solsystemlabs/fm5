@@ -2,7 +2,7 @@
 
 ## Router Definition with Zod Validation
 
-```typescript
+````typescript
 import { initTRPC } from '@trpc/server';
 import { UserSchema, ModelSchema, ModelVariantSchema, FilamentSchema, FilamentInventorySchema } from '@/lib/schemas';
 import { authenticateUser } from '@/lib/auth';
@@ -195,7 +195,7 @@ This architecture focuses on creating a scalable, efficient system for small 3D 
 
 **Tanstack DB Integration:**
 - **Reactive Collections**: Client-side database with differential dataflow
-- **Live Queries**: Automatic updates when underlying data changes  
+- **Live Queries**: Automatic updates when underlying data changes
 - **Optimistic Mutations**: Immediate UI updates with automatic rollback
 - **Sub-millisecond Performance**: Complex queries with joins across collections
 - **Eliminates Query Boilerplate**: Collections replace most useQuery patterns
@@ -216,27 +216,27 @@ graph TB
     Router --> Pages[Page Components]
     Pages --> Query[Tanstack Query]
     Query --> API[API Routes]
-    
+
     API --> Auth[Authentication]
     API --> FileProc[File Processing]
     API --> JobQueue[Job Queue]
     API --> Database[(PostgreSQL)]
-    
+
     FileProc --> R2[Cloudflare R2]
     JobQueue --> Workers[Background Workers]
-    
+
     subgraph "Client-Side Processing"
         Upload[File Upload] --> Extract[Metadata Extraction]
         Extract --> Validate[Validation/Sanitization]
         Validate --> Submit[Submit to Server]
     end
-    
+
     subgraph "Background Processing"
         Workers --> FileStore[File Storage]
         Workers --> DBUpdate[Database Updates]
         Workers --> Progress[Progress Updates]
     end
-```
+````
 
 ## Core Architectural Principles
 
@@ -259,7 +259,7 @@ erDiagram
     filament_inventory ||--o{ filaments : "stocks"
     market_events ||--o{ event_products : "features"
     model_variants ||--o{ event_products : "assigned to"
-    
+
     models {
         uuid id PK
         string name
@@ -270,7 +270,7 @@ erDiagram
         timestamp created_at
         timestamp updated_at
     }
-    
+
     model_variants {
         uuid id PK
         uuid model_id FK
@@ -290,7 +290,7 @@ erDiagram
         timestamp created_at
         timestamp updated_at
     }
-    
+
     filaments {
         uuid id PK
         string brand
@@ -303,7 +303,7 @@ erDiagram
         timestamp created_at
         timestamp updated_at
     }
-    
+
     filament_inventory {
         uuid id PK
         uuid filament_id FK
@@ -321,7 +321,7 @@ erDiagram
 ## Zod Schema Definitions
 
 ```typescript
-import { z } from 'zod';
+import { z } from 'zod'
 
 // User Authentication Schema
 export const UserSchema = type({
@@ -337,13 +337,13 @@ export const UserSchema = type({
       email: 'boolean',
       lowStock: 'boolean',
       printComplete: 'boolean',
-      systemUpdates: 'boolean'
-    })
+      systemUpdates: 'boolean',
+    }),
   }),
   createdAt: 'Date',
   updatedAt: 'Date',
-  'lastLoginAt?': 'Date'
-});
+  'lastLoginAt?': 'Date',
+})
 
 // Core Model Types using Zod (now with user isolation)
 export const ModelSchema = type({
@@ -355,8 +355,8 @@ export const ModelSchema = type({
   imageUrls: 'string[]',
   category: "'keychain'|'earring'|'decoration'|'functional'",
   createdAt: 'Date',
-  updatedAt: 'Date'
-});
+  updatedAt: 'Date',
+})
 
 export const ModelVariantSchema = type({
   id: 'string',
@@ -365,23 +365,23 @@ export const ModelVariantSchema = type({
   name: 'string',
   version: 'number',
   slicedFileUrl: 'string',
-  
+
   // Fast-access structured fields
   layerHeight: 'number',
   nozzleTemperature: 'number',
   bedTemperature: 'number',
   printDurationMinutes: 'number',
-  
+
   // Complete Bambu Studio metadata (JSONB)
   bambuMetadata: 'unknown', // JSONB field - validated separately
-  
+
   // Business metrics
   costToProduceUsd: 'number',
   successRatePercentage: 'number',
-  
+
   createdAt: 'Date',
-  updatedAt: 'Date'
-});
+  updatedAt: 'Date',
+})
 
 // Filament specification (separate from inventory, user-isolated)
 export const FilamentSchema = type({
@@ -395,8 +395,8 @@ export const FilamentSchema = type({
   'purchaseUrl?': 'string',
   demandCount: 'number', // how many variants use this filament
   createdAt: 'Date',
-  updatedAt: 'Date'
-});
+  updatedAt: 'Date',
+})
 
 // Physical filament inventory (spools in stock, user-isolated)
 export const FilamentInventorySchema = type({
@@ -410,8 +410,8 @@ export const FilamentInventorySchema = type({
   'purchaseDate?': 'Date',
   'expiryDate?': 'Date',
   createdAt: 'Date',
-  lastUpdated: 'Date'
-});
+  lastUpdated: 'Date',
+})
 
 // Filament requirements (link between variants and filaments)
 export const FilamentRequirementSchema = type({
@@ -419,11 +419,11 @@ export const FilamentRequirementSchema = type({
   variantId: 'string',
   filamentId: 'string',
   amsSlot: 'number',
-  usageModel: 'number',    // grams used for model
-  usageWaste: 'number',    // grams wasted  
-  usagePurge: 'number',    // grams used for purging
-  createdAt: 'Date'
-});
+  usageModel: 'number', // grams used for model
+  usageWaste: 'number', // grams wasted
+  usagePurge: 'number', // grams used for purging
+  createdAt: 'Date',
+})
 
 export const PrintJobSchema = type({
   id: 'string',
@@ -436,8 +436,8 @@ export const PrintJobSchema = type({
   'actualCompletionTime?': 'Date',
   'failureReason?': 'string',
   'completionPercentage?': 'number>=0<=100',
-  createdAt: 'Date'
-});
+  createdAt: 'Date',
+})
 
 // Bambu Studio Metadata Structure
 export const BambuMetadataSchema = type({
@@ -449,41 +449,41 @@ export const BambuMetadataSchema = type({
     colorHex: 'string',
     amsSlot: 'number',
     usageModel: 'number',
-    usageWaste: 'number', 
-    usagePurge: 'number'
+    usageWaste: 'number',
+    usagePurge: 'number',
   }).array(),
-  
+
   // Print Settings
   nozzleSize: 'number',
   layerHeight: 'number',
-  
+
   // Brim Settings
   brimWidth: 'number',
   brimType: 'string',
   brimOffset: 'number',
-  
+
   // Time Calculations
   printTime: type({
     totalMinutes: 'number',
     modelTime: 'number',
     supportTime: 'number',
-    purgeTime: 'number'
+    purgeTime: 'number',
   }),
-  
+
   // All other Bambu Studio parameters (600+ fields)
   // Stored as JSONB and validated separately for flexibility
-  rawMetadata: 'unknown'
-});
+  rawMetadata: 'unknown',
+})
 
 // Infer TypeScript types from Zod schemas
-export type User = typeof UserSchema.infer;
-export type Model = typeof ModelSchema.infer;
-export type ModelVariant = typeof ModelVariantSchema.infer;
-export type Filament = typeof FilamentSchema.infer;
-export type FilamentInventory = typeof FilamentInventorySchema.infer;
-export type FilamentRequirement = typeof FilamentRequirementSchema.infer;
-export type PrintJob = typeof PrintJobSchema.infer;
-export type BambuMetadata = typeof BambuMetadataSchema.infer;
+export type User = typeof UserSchema.infer
+export type Model = typeof ModelSchema.infer
+export type ModelVariant = typeof ModelVariantSchema.infer
+export type Filament = typeof FilamentSchema.infer
+export type FilamentInventory = typeof FilamentInventorySchema.infer
+export type FilamentRequirement = typeof FilamentRequirementSchema.infer
+export type PrintJob = typeof PrintJobSchema.infer
+export type BambuMetadata = typeof BambuMetadataSchema.infer
 ```
 
 # Database Schema
@@ -531,23 +531,23 @@ CREATE TABLE model_variants (
     name VARCHAR(255) NOT NULL,
     version INTEGER NOT NULL DEFAULT 1,
     sliced_file_url TEXT NOT NULL,
-    
+
     -- Fast-access structured fields for common queries
     layer_height DECIMAL(4,2) NOT NULL,
     nozzle_temperature INTEGER NOT NULL,
     bed_temperature INTEGER NOT NULL,
     print_duration_minutes INTEGER NOT NULL,
-    
+
     -- Complete Bambu Studio metadata in JSONB
     bambu_metadata JSONB NOT NULL,
-    
+
     -- Business metrics
     cost_to_produce_usd DECIMAL(10,2) DEFAULT 0,
     success_rate_percentage DECIMAL(5,2) DEFAULT 0,
-    
+
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
+
     -- Ensure unique version per model
     UNIQUE(model_id, version)
 );
@@ -565,7 +565,7 @@ CREATE TABLE filaments (
     demand_count INTEGER NOT NULL DEFAULT 0, -- how many variants use this
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
+
     -- Ensure unique combination per user
     UNIQUE(user_id, brand, material_type, color_hex)
 );
@@ -595,7 +595,7 @@ CREATE TABLE filament_requirements (
     usage_waste INTEGER NOT NULL DEFAULT 0, -- grams wasted
     usage_purge INTEGER NOT NULL DEFAULT 0, -- grams for purging
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
+
     -- Ensure unique filament per variant per slot
     UNIQUE(variant_id, ams_slot)
 );
@@ -678,35 +678,35 @@ RETURNS TRIGGER AS $
 BEGIN
     -- Update demand count for old filament (if exists)
     IF TG_OP = 'UPDATE' AND OLD.filament_id IS DISTINCT FROM NEW.filament_id THEN
-        UPDATE filaments 
+        UPDATE filaments
         SET demand_count = (
-            SELECT COUNT(*) FROM filament_requirements 
+            SELECT COUNT(*) FROM filament_requirements
             WHERE filament_id = OLD.filament_id
         )
         WHERE id = OLD.filament_id;
     END IF;
-    
+
     -- Update demand count for new filament
     IF TG_OP IN ('INSERT', 'UPDATE') THEN
-        UPDATE filaments 
+        UPDATE filaments
         SET demand_count = (
-            SELECT COUNT(*) FROM filament_requirements 
+            SELECT COUNT(*) FROM filament_requirements
             WHERE filament_id = NEW.filament_id
         )
         WHERE id = NEW.filament_id;
     END IF;
-    
+
     -- Update demand count for deleted filament
     IF TG_OP = 'DELETE' THEN
-        UPDATE filaments 
+        UPDATE filaments
         SET demand_count = (
-            SELECT COUNT(*) FROM filament_requirements 
+            SELECT COUNT(*) FROM filament_requirements
             WHERE filament_id = OLD.filament_id
         )
         WHERE id = OLD.filament_id;
         RETURN OLD;
     END IF;
-    
+
     RETURN NEW;
 END;
 $ language 'plpgsql';
@@ -780,27 +780,28 @@ $ LANGUAGE plpgsql SECURITY DEFINER;
       .mutation(async ({ input }) => {
         // Retry failed upload with preserved metadata
       }),
-  }),
 
-  // Filament Management API (Protected)
-  filaments: t.router({
-    list: protectedProcedure
-      .input(type({
-        'materialType?': "'PLA'|'PETG'|'ABS'|'TPU'",
-        'brand?': 'string',
-        'sortBy?': "'demand'|'name'|'created'",
-        'includeInventory?': 'boolean'
-      }))
-      .output(type({
-        filaments: FilamentSchema.merge(type({
-          'inventory?': FilamentInventorySchema.array(),
-          totalQuantity: 'number',
-          inStock: 'boolean'
-        })).array()
-      }))
-      .query(async ({ input }) => {
-        // Get filaments with optional inventory data
-      }),
+}),
+
+// Filament Management API (Protected)
+filaments: t.router({
+list: protectedProcedure
+.input(type({
+'materialType?': "'PLA'|'PETG'|'ABS'|'TPU'",
+'brand?': 'string',
+'sortBy?': "'demand'|'name'|'created'",
+'includeInventory?': 'boolean'
+}))
+.output(type({
+filaments: FilamentSchema.merge(type({
+'inventory?': FilamentInventorySchema.array(),
+totalQuantity: 'number',
+inStock: 'boolean'
+})).array()
+}))
+.query(async ({ input }) => {
+// Get filaments with optional inventory data
+}),
 
     create: protectedProcedure
       .input(FilamentSchema.omit('id', 'userId', 'demandCount', 'createdAt', 'updatedAt'))
@@ -850,35 +851,36 @@ $ LANGUAGE plpgsql SECURITY DEFINER;
       .query(async ({ input }) => {
         // Generate shopping list based on inventory and demand
       }),
-  }),
 
-  // Print Queue API
-  queue: t.router({
-    list: t.procedure
-      .input(type({
-        'status?': "'queued'|'printing'|'completed'|'failed'",
-        'limit?': 'number>=1<=100'
-      }))
-      .output(type({
-        jobs: type({
-          id: 'string',
-          variant: ModelVariantSchema,
-          status: "'queued'|'printing'|'completed'|'failed'",
-          priority: 'number',
-          'estimatedStartTime?': 'Date',
-          'estimatedCompletionTime?': 'Date',
-          feasible: 'boolean',
-          'warnings?': 'string[]'
-        }).array(),
-        queueStats: type({
-          totalQueued: 'number',
-          totalPrintTime: 'number',
-          nextAvailableSlot: 'Date'
-        })
-      }))
-      .query(async ({ input }) => {
-        // Get print queue with feasibility checks
-      }),
+}),
+
+// Print Queue API
+queue: t.router({
+list: t.procedure
+.input(type({
+'status?': "'queued'|'printing'|'completed'|'failed'",
+'limit?': 'number>=1<=100'
+}))
+.output(type({
+jobs: type({
+id: 'string',
+variant: ModelVariantSchema,
+status: "'queued'|'printing'|'completed'|'failed'",
+priority: 'number',
+'estimatedStartTime?': 'Date',
+'estimatedCompletionTime?': 'Date',
+feasible: 'boolean',
+'warnings?': 'string[]'
+}).array(),
+queueStats: type({
+totalQueued: 'number',
+totalPrintTime: 'number',
+nextAvailableSlot: 'Date'
+})
+}))
+.query(async ({ input }) => {
+// Get print queue with feasibility checks
+}),
 
     add: t.procedure
       .input(type({
@@ -940,36 +942,40 @@ $ LANGUAGE plpgsql SECURITY DEFINER;
       .mutation(async ({ input }) => {
         // Update job status and handle automatic consumption tracking
       }),
-  }),
 
-  // Search API
-  search: t.router({
-    global: t.procedure
-      .input(type({
-        query: 'string',
-        'types?': "'models'|'variants'|'filaments'".array(),
-        'filters?': type({
-          'category?': "'keychain'|'earring'|'decoration'|'functional'",
-          'materialType?': "'PLA'|'PETG'|'ABS'|'TPU'",
-          'inStockOnly?': 'boolean',
-          'printTimeRange?': type({
-            min: 'number',
-            max: 'number'
-          })
-        })
-      }))
-      .output(type({
-        models: ModelSchema.array(),
-        variants: ModelVariantSchema.array(),
-        filaments: FilamentSchema.array(),
-        totalResults: 'number',
-        searchTime: 'number'
-      }))
-      .query(async ({ input }) => {
-        // Unified search across models, variants, and filaments
-      }),
-  }),
+}),
+
+// Search API
+search: t.router({
+global: t.procedure
+.input(type({
+query: 'string',
+'types?': "'models'|'variants'|'filaments'".array(),
+'filters?': type({
+'category?': "'keychain'|'earring'|'decoration'|'functional'",
+'materialType?': "'PLA'|'PETG'|'ABS'|'TPU'",
+'inStockOnly?': 'boolean',
+'printTimeRange?': type({
+min: 'number',
+max: 'number'
+})
+})
+}))
+.output(type({
+models: ModelSchema.array(),
+variants: ModelVariantSchema.array(),
+filaments: FilamentSchema.array(),
+totalResults: 'number',
+searchTime: 'number'
+}))
+.query(async ({ input }) => {
+// Unified search across models, variants, and filaments
+}),
+}),
 });
 
 export type AppRouter = typeof appRouter;
+
+```
+
 ```

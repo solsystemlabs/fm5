@@ -34,7 +34,14 @@ describe('Header Component Smoke Tests', () => {
   it('should have proper CSS classes for styling', () => {
     render(<Header />)
     const header = screen.getByRole('banner')
-    expect(header).toHaveClass('p-2', 'flex', 'gap-2', 'bg-white', 'text-black', 'justify-between')
+    expect(header).toHaveClass(
+      'p-2',
+      'flex',
+      'gap-2',
+      'bg-white',
+      'text-black',
+      'justify-between',
+    )
   })
 })
 

@@ -35,7 +35,7 @@ export function useModels(filters?: {
         (old) => ({
           models: old?.models ? [...old.models] : [],
           nextCursor: old?.nextCursor,
-        })
+        }),
       )
 
       return { previousModels }
@@ -45,7 +45,7 @@ export function useModels(filters?: {
       if (context?.previousModels) {
         utils.models.list.setData(
           { search: filters?.search, category: filters?.category, limit: 20 },
-          context.previousModels
+          context.previousModels,
         )
       }
     },

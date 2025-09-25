@@ -1,6 +1,7 @@
 # Cross-Epic Dependencies Summary
 
 **Updated Epic Sequencing Requirements (Post-PO Review):**
+
 1. **Epic 0** → Foundation (Infrastructure, Auth, CI/CD, External Services) - Must complete entirely
 2. **Epic 1** → User Management & Authentication - Must complete before any business features
 3. **Epic 2** → Digital Asset Management - Requires Epic 1 completion, must complete Story 2.3c before Epic 3
@@ -9,6 +10,7 @@
 6. **Epic 5** → POST-MVP (Advanced Intelligence) - Deferred until after core business value delivery
 
 **Critical Path Dependencies:**
+
 - Epic 0 (Foundation + Auth + CI/CD) → Epic 1 (User Management)
 - Epic 1 (User Management) → Epic 2 (File Management with User Isolation)
 - Epic 2 Story 2.3c (Metadata) → Epic 3 Story 3.1 (Filament Inventory)

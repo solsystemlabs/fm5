@@ -35,7 +35,7 @@ export interface DatabaseConfig {
  * Placeholder export to maintain module structure.
  * This will be replaced with actual database client export in future stories.
  */
-export const db: DatabaseClient | null = null;
+export const db: DatabaseClient | null = null
 
 /**
  * Placeholder for database initialization function.
@@ -44,7 +44,9 @@ export const db: DatabaseClient | null = null;
  * @param config - Database configuration options
  * @returns Promise resolving to initialized database client
  */
-export function initializeDatabase(_config?: DatabaseConfig): Promise<DatabaseClient | null> {
+export function initializeDatabase(
+  _config?: DatabaseConfig,
+): Promise<DatabaseClient | null> {
   // TODO: Implement database initialization in future stories
-  return Promise.resolve(null);
+  return Promise.resolve(null)
 }

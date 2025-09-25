@@ -1,7 +1,9 @@
 # External Service Setup Guide
+
 ## 3D Printing Business Management Platform
 
 ### Overview
+
 This guide outlines all external services that require **user setup** before development can begin. These are services that cannot be automated and require manual account creation, payment setup, or administrative access.
 
 ---
@@ -9,7 +11,9 @@ This guide outlines all external services that require **user setup** before dev
 ## 🚨 **CRITICAL: Complete ALL services before Epic 1 development begins**
 
 ### **User Responsibility Summary**
+
 The following services require **you** (the project owner) to:
+
 1. Create accounts manually
 2. Provide payment information
 3. Configure initial settings
@@ -24,6 +28,7 @@ The following services require **you** (the project owner) to:
 **Why Required**: Primary file storage for all 3D model files, sliced files, and images.
 
 **User Actions Required:**
+
 1. **Create Cloudflare Account**
    - Go to https://dash.cloudflare.com/sign-up
    - Use business email address
@@ -54,6 +59,7 @@ The following services require **you** (the project owner) to:
 **Why Required**: User authentication, registration, and session management.
 
 **User Actions Required:**
+
 1. **Create Clerk Account**
    - Go to https://clerk.com/
    - Sign up for free account using business email
@@ -87,6 +93,7 @@ The following services require **you** (the project owner) to:
 **Why Required**: Production and staging website access.
 
 **User Actions Required:**
+
 1. **Purchase Domain**
    - Recommended registrars: Namecheap, Google Domains, or AWS Route 53
    - Choose business-appropriate domain
@@ -113,6 +120,7 @@ The following services require **you** (the project owner) to:
 **Why Required**: User registration emails, password resets, notifications.
 
 **Option A: SendGrid (Recommended)**
+
 1. **Create SendGrid Account**
    - Go to https://sendgrid.com/
    - Sign up for free account
@@ -129,6 +137,7 @@ The following services require **you** (the project owner) to:
    - Share with development team securely
 
 **Option B: AWS SES**
+
 1. **AWS Account Required** (see AWS section below)
 2. **Domain Verification** in SES console
 3. **Sending Limit Increase** (start in sandbox mode)
@@ -143,6 +152,7 @@ The following services require **you** (the project owner) to:
 **Why Required**: Production hosting, database, CI/CD infrastructure.
 
 **User Actions Required:**
+
 1. **Create AWS Account**
    - Go to https://aws.amazon.com/
    - **Payment Required**: Valid credit card required
@@ -175,6 +185,7 @@ The following services require **you** (the project owner) to:
 **Why Required**: Source code hosting, CI/CD pipelines, team collaboration.
 
 **User Actions Required:**
+
 1. **Create GitHub Organization** (Recommended for business)
    - Go to https://github.com/organizations/new
    - Choose organization name (e.g., "your-business-3d-printing")
@@ -205,6 +216,7 @@ The following services require **you** (the project owner) to:
 **Why Required**: Production error monitoring and debugging.
 
 **User Actions Required:**
+
 1. **Create Sentry Account**
    - Go to https://sentry.io/signup/
    - **Free tier**: 5,000 errors/month, 1 user
@@ -228,6 +240,7 @@ The following services require **you** (the project owner) to:
 **Why Required**: Store Docker images for deployment.
 
 **User Actions Required:**
+
 1. **Enable GitHub Packages**
    - Already included with GitHub organization
    - No additional setup required
@@ -244,6 +257,7 @@ The following services require **you** (the project owner) to:
 ## **Service Setup Timeline & Dependencies**
 
 ### **Week 1 (Before Development Starts)**
+
 1. **Day 1**: AWS Account, GitHub, Cloudflare R2
 2. **Day 2**: Domain registration, DNS setup
 3. **Day 3**: Clerk authentication, Sentry monitoring
@@ -251,6 +265,7 @@ The following services require **you** (the project owner) to:
 5. **Day 5**: Credential sharing with development team
 
 ### **Dependencies**
+
 - **Domain DNS** → Must complete before SSL certificate setup
 - **AWS Account** → Required before infrastructure deployment
 - **Cloudflare R2** → Required before Epic 2 (file management)
@@ -263,11 +278,13 @@ The following services require **you** (the project owner) to:
 ### **🔒 SECURE CREDENTIAL SHARING REQUIRED**
 
 **DO NOT:**
+
 - Email credentials in plain text
 - Share via Slack/Teams
 - Commit credentials to code repositories
 
 **DO:**
+
 1. **Use Password Manager** (1Password, Bitwarden, LastPass)
    - Create shared vault for "3D Print Manager Project"
    - Add all service credentials
@@ -282,6 +299,7 @@ The following services require **you** (the project owner) to:
    - Update as services are added
 
 ### **Credential Checklist**
+
 - [ ] Cloudflare R2 Access Key & Secret
 - [ ] Clerk Publishable Key & Secret Key
 - [ ] SendGrid API Key
@@ -294,39 +312,43 @@ The following services require **you** (the project owner) to:
 
 ## **Cost Summary**
 
-| Service | Initial Cost | Monthly Cost | Annual Cost |
-|---------|-------------|--------------|-------------|
-| Domain Registration | $12 | $0 | $12 |
-| Cloudflare R2 | $0 | ~$5-15 | ~$60-180 |
-| AWS Hosting | $0 | ~$20-50 | ~$240-600 |
-| GitHub Team | $0 | $4/user | $48/user |
-| Clerk Auth | $0 | $0 | $0 (free tier) |
-| SendGrid | $0 | $0 | $0 (free tier) |
-| Sentry | $0 | $0 | $0 (free tier) |
-| **TOTAL** | **~$12** | **~$30-70** | **~$350-850** |
+| Service             | Initial Cost | Monthly Cost | Annual Cost    |
+| ------------------- | ------------ | ------------ | -------------- |
+| Domain Registration | $12          | $0           | $12            |
+| Cloudflare R2       | $0           | ~$5-15       | ~$60-180       |
+| AWS Hosting         | $0           | ~$20-50      | ~$240-600      |
+| GitHub Team         | $0           | $4/user      | $48/user       |
+| Clerk Auth          | $0           | $0           | $0 (free tier) |
+| SendGrid            | $0           | $0           | $0 (free tier) |
+| Sentry              | $0           | $0           | $0 (free tier) |
+| **TOTAL**           | **~$12**     | **~$30-70**  | **~$350-850**  |
 
-*Costs are estimates and may vary based on usage*
+_Costs are estimates and may vary based on usage_
 
 ---
 
 ## **Troubleshooting Common Issues**
 
 ### **Cloudflare R2 Access Denied**
+
 - Verify bucket names match exactly
 - Check API token permissions include correct buckets
 - Ensure token hasn't expired
 
 ### **Clerk Authentication Errors**
+
 - Verify domain URLs are correctly configured
 - Check that webhook URLs are accessible
 - Ensure API keys are for correct environment (dev/staging/prod)
 
 ### **DNS Not Propagating**
+
 - DNS changes can take 24-48 hours
 - Use tools like https://whatsmydns.net/ to check propagation
 - Clear local DNS cache if testing locally
 
 ### **AWS Billing Alerts**
+
 - Set up billing alerts immediately after account creation
 - Monitor costs daily during initial setup
 - Use AWS Cost Calculator for estimates
@@ -338,18 +360,21 @@ The following services require **you** (the project owner) to:
 Before declaring external services "complete":
 
 ### **Account Access**
+
 - [ ] Can log into all service dashboards
 - [ ] All accounts use business email address
 - [ ] MFA enabled where available
 - [ ] Payment methods added and verified
 
 ### **Credential Security**
+
 - [ ] All API keys generated and stored securely
 - [ ] Credentials shared with development team via secure method
 - [ ] No credentials committed to code repositories
 - [ ] Backup access documented (password manager, etc.)
 
 ### **Service Configuration**
+
 - [ ] All domains pointing to correct DNS servers
 - [ ] Cloudflare R2 buckets created and accessible
 - [ ] Clerk authentication configured for all environments
@@ -357,6 +382,7 @@ Before declaring external services "complete":
 - [ ] AWS billing alerts configured
 
 ### **Team Readiness**
+
 - [ ] Development team has access to all required credentials
 - [ ] Service documentation shared with team
 - [ ] Emergency contact procedures established
@@ -366,16 +392,16 @@ Before declaring external services "complete":
 
 ## **Emergency Contacts & Support**
 
-| Service | Support Method | Response Time |
-|---------|----------------|---------------|
-| Cloudflare | Support ticket | 24-48 hours |
-| Clerk | Email/Discord | 12-24 hours |
-| AWS | Support case | 12-24 hours (paid) |
-| SendGrid | Support ticket | 24-48 hours |
-| GitHub | Support ticket | 24-48 hours |
+| Service    | Support Method | Response Time      |
+| ---------- | -------------- | ------------------ |
+| Cloudflare | Support ticket | 24-48 hours        |
+| Clerk      | Email/Discord  | 12-24 hours        |
+| AWS        | Support case   | 12-24 hours (paid) |
+| SendGrid   | Support ticket | 24-48 hours        |
+| GitHub     | Support ticket | 24-48 hours        |
 
 **Critical Issues**: For production-down scenarios, escalate through paid support channels where available.
 
 ---
 
-*This guide ensures all external dependencies are properly configured before development begins, preventing project delays and security issues.*
+_This guide ensures all external dependencies are properly configured before development begins, preventing project delays and security issues._

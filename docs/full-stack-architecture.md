@@ -2,7 +2,7 @@
 
 ### Router Definition with Zod Validation
 
-```typescript
+````typescript
 import { initTRPC } from '@trpc/server';
 import { UserSchema, ModelSchema, ModelVariantSchema, FilamentSchema, FilamentInventorySchema } from '@/lib/schemas';
 import { authenticateUser } from '@/lib/auth';
@@ -195,7 +195,7 @@ This architecture focuses on creating a scalable, efficient system for small 3D 
 
 **Tanstack DB Integration:**
 - **Reactive Collections**: Client-side database with differential dataflow
-- **Live Queries**: Automatic updates when underlying data changes  
+- **Live Queries**: Automatic updates when underlying data changes
 - **Optimistic Mutations**: Immediate UI updates with automatic rollback
 - **Sub-millisecond Performance**: Complex queries with joins across collections
 - **Eliminates Query Boilerplate**: Collections replace most useQuery patterns
@@ -216,27 +216,27 @@ graph TB
     Router --> Pages[Page Components]
     Pages --> Query[Tanstack Query]
     Query --> API[API Routes]
-    
+
     API --> Auth[Authentication]
     API --> FileProc[File Processing]
     API --> JobQueue[Job Queue]
     API --> Database[(PostgreSQL)]
-    
+
     FileProc --> R2[Cloudflare R2]
     JobQueue --> Workers[Background Workers]
-    
+
     subgraph "Client-Side Processing"
         Upload[File Upload] --> Extract[Metadata Extraction]
         Extract --> Validate[Validation/Sanitization]
         Validate --> Submit[Submit to Server]
     end
-    
+
     subgraph "Background Processing"
         Workers --> FileStore[File Storage]
         Workers --> DBUpdate[Database Updates]
         Workers --> Progress[Progress Updates]
     end
-```
+````
 
 ### Core Architectural Principles
 
@@ -259,7 +259,7 @@ erDiagram
     filament_inventory ||--o{ filaments : "stocks"
     market_events ||--o{ event_products : "features"
     model_variants ||--o{ event_products : "assigned to"
-    
+
     models {
         uuid id PK
         string name
@@ -270,7 +270,7 @@ erDiagram
         timestamp created_at
         timestamp updated_at
     }
-    
+
     model_variants {
         uuid id PK
         uuid model_id FK
@@ -290,7 +290,7 @@ erDiagram
         timestamp created_at
         timestamp updated_at
     }
-    
+
     filaments {
         uuid id PK
         string brand
@@ -303,7 +303,7 @@ erDiagram
         timestamp created_at
         timestamp updated_at
     }
-    
+
     filament_inventory {
         uuid id PK
         uuid filament_id FK
@@ -321,7 +321,7 @@ erDiagram
 ### Zod Schema Definitions
 
 ```typescript
-import { type } from 'zod';
+import { type } from 'zod'
 
 // User Authentication Schema
 export const UserSchema = type({
@@ -337,13 +337,13 @@ export const UserSchema = type({
       email: 'boolean',
       lowStock: 'boolean',
       printComplete: 'boolean',
-      systemUpdates: 'boolean'
-    })
+      systemUpdates: 'boolean',
+    }),
   }),
   createdAt: 'Date',
   updatedAt: 'Date',
-  'lastLoginAt?': 'Date'
-});
+  'lastLoginAt?': 'Date',
+})
 
 // Core Model Types using Zod (now with user isolation)
 export const ModelSchema = type({
@@ -355,8 +355,8 @@ export const ModelSchema = type({
   imageUrls: 'string[]',
   category: "'keychain'|'earring'|'decoration'|'functional'",
   createdAt: 'Date',
-  updatedAt: 'Date'
-});
+  updatedAt: 'Date',
+})
 
 export const ModelVariantSchema = type({
   id: 'string',
@@ -365,23 +365,23 @@ export const ModelVariantSchema = type({
   name: 'string',
   version: 'number',
   slicedFileUrl: 'string',
-  
+
   // Fast-access structured fields
   layerHeight: 'number',
   nozzleTemperature: 'number',
   bedTemperature: 'number',
   printDurationMinutes: 'number',
-  
+
   // Complete Bambu Studio metadata (JSONB)
   bambuMetadata: 'unknown', // JSONB field - validated separately
-  
+
   // Business metrics
   costToProduceUsd: 'number',
   successRatePercentage: 'number',
-  
+
   createdAt: 'Date',
-  updatedAt: 'Date'
-});
+  updatedAt: 'Date',
+})
 
 // Filament specification (separate from inventory, user-isolated)
 export const FilamentSchema = type({
@@ -395,8 +395,8 @@ export const FilamentSchema = type({
   'purchaseUrl?': 'string',
   demandCount: 'number', // how many variants use this filament
   createdAt: 'Date',
-  updatedAt: 'Date'
-});
+  updatedAt: 'Date',
+})
 
 // Physical filament inventory (spools in stock, user-isolated)
 export const FilamentInventorySchema = type({
@@ -410,8 +410,8 @@ export const FilamentInventorySchema = type({
   'purchaseDate?': 'Date',
   'expiryDate?': 'Date',
   createdAt: 'Date',
-  lastUpdated: 'Date'
-});
+  lastUpdated: 'Date',
+})
 
 // Filament requirements (link between variants and filaments)
 export const FilamentRequirementSchema = type({
@@ -419,11 +419,11 @@ export const FilamentRequirementSchema = type({
   variantId: 'string',
   filamentId: 'string',
   amsSlot: 'number',
-  usageModel: 'number',    // grams used for model
-  usageWaste: 'number',    // grams wasted  
-  usagePurge: 'number',    // grams used for purging
-  createdAt: 'Date'
-});
+  usageModel: 'number', // grams used for model
+  usageWaste: 'number', // grams wasted
+  usagePurge: 'number', // grams used for purging
+  createdAt: 'Date',
+})
 
 export const PrintJobSchema = type({
   id: 'string',
@@ -436,8 +436,8 @@ export const PrintJobSchema = type({
   'actualCompletionTime?': 'Date',
   'failureReason?': 'string',
   'completionPercentage?': 'number>=0<=100',
-  createdAt: 'Date'
-});
+  createdAt: 'Date',
+})
 
 // Bambu Studio Metadata Structure
 export const BambuMetadataSchema = type({
@@ -449,41 +449,41 @@ export const BambuMetadataSchema = type({
     colorHex: 'string',
     amsSlot: 'number',
     usageModel: 'number',
-    usageWaste: 'number', 
-    usagePurge: 'number'
+    usageWaste: 'number',
+    usagePurge: 'number',
   }).array(),
-  
+
   // Print Settings
   nozzleSize: 'number',
   layerHeight: 'number',
-  
+
   // Brim Settings
   brimWidth: 'number',
   brimType: 'string',
   brimOffset: 'number',
-  
+
   // Time Calculations
   printTime: type({
     totalMinutes: 'number',
     modelTime: 'number',
     supportTime: 'number',
-    purgeTime: 'number'
+    purgeTime: 'number',
   }),
-  
+
   // All other Bambu Studio parameters (600+ fields)
   // Stored as JSONB and validated separately for flexibility
-  rawMetadata: 'unknown'
-});
+  rawMetadata: 'unknown',
+})
 
 // Infer TypeScript types from Zod schemas
-export type User = typeof UserSchema.infer;
-export type Model = typeof ModelSchema.infer;
-export type ModelVariant = typeof ModelVariantSchema.infer;
-export type Filament = typeof FilamentSchema.infer;
-export type FilamentInventory = typeof FilamentInventorySchema.infer;
-export type FilamentRequirement = typeof FilamentRequirementSchema.infer;
-export type PrintJob = typeof PrintJobSchema.infer;
-export type BambuMetadata = typeof BambuMetadataSchema.infer;
+export type User = typeof UserSchema.infer
+export type Model = typeof ModelSchema.infer
+export type ModelVariant = typeof ModelVariantSchema.infer
+export type Filament = typeof FilamentSchema.infer
+export type FilamentInventory = typeof FilamentInventorySchema.infer
+export type FilamentRequirement = typeof FilamentRequirementSchema.infer
+export type PrintJob = typeof PrintJobSchema.infer
+export type BambuMetadata = typeof BambuMetadataSchema.infer
 ```
 
 ## Database Schema
@@ -531,23 +531,23 @@ CREATE TABLE model_variants (
     name VARCHAR(255) NOT NULL,
     version INTEGER NOT NULL DEFAULT 1,
     sliced_file_url TEXT NOT NULL,
-    
+
     -- Fast-access structured fields for common queries
     layer_height DECIMAL(4,2) NOT NULL,
     nozzle_temperature INTEGER NOT NULL,
     bed_temperature INTEGER NOT NULL,
     print_duration_minutes INTEGER NOT NULL,
-    
+
     -- Complete Bambu Studio metadata in JSONB
     bambu_metadata JSONB NOT NULL,
-    
+
     -- Business metrics
     cost_to_produce_usd DECIMAL(10,2) DEFAULT 0,
     success_rate_percentage DECIMAL(5,2) DEFAULT 0,
-    
+
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
+
     -- Ensure unique version per model
     UNIQUE(model_id, version)
 );
@@ -565,7 +565,7 @@ CREATE TABLE filaments (
     demand_count INTEGER NOT NULL DEFAULT 0, -- how many variants use this
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
+
     -- Ensure unique combination per user
     UNIQUE(user_id, brand, material_type, color_hex)
 );
@@ -595,7 +595,7 @@ CREATE TABLE filament_requirements (
     usage_waste INTEGER NOT NULL DEFAULT 0, -- grams wasted
     usage_purge INTEGER NOT NULL DEFAULT 0, -- grams for purging
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
+
     -- Ensure unique filament per variant per slot
     UNIQUE(variant_id, ams_slot)
 );
@@ -678,35 +678,35 @@ RETURNS TRIGGER AS $
 BEGIN
     -- Update demand count for old filament (if exists)
     IF TG_OP = 'UPDATE' AND OLD.filament_id IS DISTINCT FROM NEW.filament_id THEN
-        UPDATE filaments 
+        UPDATE filaments
         SET demand_count = (
-            SELECT COUNT(*) FROM filament_requirements 
+            SELECT COUNT(*) FROM filament_requirements
             WHERE filament_id = OLD.filament_id
         )
         WHERE id = OLD.filament_id;
     END IF;
-    
+
     -- Update demand count for new filament
     IF TG_OP IN ('INSERT', 'UPDATE') THEN
-        UPDATE filaments 
+        UPDATE filaments
         SET demand_count = (
-            SELECT COUNT(*) FROM filament_requirements 
+            SELECT COUNT(*) FROM filament_requirements
             WHERE filament_id = NEW.filament_id
         )
         WHERE id = NEW.filament_id;
     END IF;
-    
+
     -- Update demand count for deleted filament
     IF TG_OP = 'DELETE' THEN
-        UPDATE filaments 
+        UPDATE filaments
         SET demand_count = (
-            SELECT COUNT(*) FROM filament_requirements 
+            SELECT COUNT(*) FROM filament_requirements
             WHERE filament_id = OLD.filament_id
         )
         WHERE id = OLD.filament_id;
         RETURN OLD;
     END IF;
-    
+
     RETURN NEW;
 END;
 $ language 'plpgsql';
@@ -780,27 +780,28 @@ $ LANGUAGE plpgsql SECURITY DEFINER;
       .mutation(async ({ input }) => {
         // Retry failed upload with preserved metadata
       }),
-  }),
 
-  // Filament Management API (Protected)
-  filaments: t.router({
-    list: protectedProcedure
-      .input(type({
-        'materialType?': "'PLA'|'PETG'|'ABS'|'TPU'",
-        'brand?': 'string',
-        'sortBy?': "'demand'|'name'|'created'",
-        'includeInventory?': 'boolean'
-      }))
-      .output(type({
-        filaments: FilamentSchema.merge(type({
-          'inventory?': FilamentInventorySchema.array(),
-          totalQuantity: 'number',
-          inStock: 'boolean'
-        })).array()
-      }))
-      .query(async ({ input }) => {
-        // Get filaments with optional inventory data
-      }),
+}),
+
+// Filament Management API (Protected)
+filaments: t.router({
+list: protectedProcedure
+.input(type({
+'materialType?': "'PLA'|'PETG'|'ABS'|'TPU'",
+'brand?': 'string',
+'sortBy?': "'demand'|'name'|'created'",
+'includeInventory?': 'boolean'
+}))
+.output(type({
+filaments: FilamentSchema.merge(type({
+'inventory?': FilamentInventorySchema.array(),
+totalQuantity: 'number',
+inStock: 'boolean'
+})).array()
+}))
+.query(async ({ input }) => {
+// Get filaments with optional inventory data
+}),
 
     create: protectedProcedure
       .input(FilamentSchema.omit('id', 'userId', 'demandCount', 'createdAt', 'updatedAt'))
@@ -850,35 +851,36 @@ $ LANGUAGE plpgsql SECURITY DEFINER;
       .query(async ({ input }) => {
         // Generate shopping list based on inventory and demand
       }),
-  }),
 
-  // Print Queue API
-  queue: t.router({
-    list: t.procedure
-      .input(type({
-        'status?': "'queued'|'printing'|'completed'|'failed'",
-        'limit?': 'number>=1<=100'
-      }))
-      .output(type({
-        jobs: type({
-          id: 'string',
-          variant: ModelVariantSchema,
-          status: "'queued'|'printing'|'completed'|'failed'",
-          priority: 'number',
-          'estimatedStartTime?': 'Date',
-          'estimatedCompletionTime?': 'Date',
-          feasible: 'boolean',
-          'warnings?': 'string[]'
-        }).array(),
-        queueStats: type({
-          totalQueued: 'number',
-          totalPrintTime: 'number',
-          nextAvailableSlot: 'Date'
-        })
-      }))
-      .query(async ({ input }) => {
-        // Get print queue with feasibility checks
-      }),
+}),
+
+// Print Queue API
+queue: t.router({
+list: t.procedure
+.input(type({
+'status?': "'queued'|'printing'|'completed'|'failed'",
+'limit?': 'number>=1<=100'
+}))
+.output(type({
+jobs: type({
+id: 'string',
+variant: ModelVariantSchema,
+status: "'queued'|'printing'|'completed'|'failed'",
+priority: 'number',
+'estimatedStartTime?': 'Date',
+'estimatedCompletionTime?': 'Date',
+feasible: 'boolean',
+'warnings?': 'string[]'
+}).array(),
+queueStats: type({
+totalQueued: 'number',
+totalPrintTime: 'number',
+nextAvailableSlot: 'Date'
+})
+}))
+.query(async ({ input }) => {
+// Get print queue with feasibility checks
+}),
 
     add: t.procedure
       .input(type({
@@ -940,39 +942,41 @@ $ LANGUAGE plpgsql SECURITY DEFINER;
       .mutation(async ({ input }) => {
         // Update job status and handle automatic consumption tracking
       }),
-  }),
 
-  // Search API
-  search: t.router({
-    global: t.procedure
-      .input(type({
-        query: 'string',
-        'types?': "'models'|'variants'|'filaments'".array(),
-        'filters?': type({
-          'category?': "'keychain'|'earring'|'decoration'|'functional'",
-          'materialType?': "'PLA'|'PETG'|'ABS'|'TPU'",
-          'inStockOnly?': 'boolean',
-          'printTimeRange?': type({
-            min: 'number',
-            max: 'number'
-          })
-        })
-      }))
-      .output(type({
-        models: ModelSchema.array(),
-        variants: ModelVariantSchema.array(),
-        filaments: FilamentSchema.array(),
-        totalResults: 'number',
-        searchTime: 'number'
-      }))
-      .query(async ({ input }) => {
-        // Unified search across models, variants, and filaments
-      }),
-  }),
+}),
+
+// Search API
+search: t.router({
+global: t.procedure
+.input(type({
+query: 'string',
+'types?': "'models'|'variants'|'filaments'".array(),
+'filters?': type({
+'category?': "'keychain'|'earring'|'decoration'|'functional'",
+'materialType?': "'PLA'|'PETG'|'ABS'|'TPU'",
+'inStockOnly?': 'boolean',
+'printTimeRange?': type({
+min: 'number',
+max: 'number'
+})
+})
+}))
+.output(type({
+models: ModelSchema.array(),
+variants: ModelVariantSchema.array(),
+filaments: FilamentSchema.array(),
+totalResults: 'number',
+searchTime: 'number'
+}))
+.query(async ({ input }) => {
+// Unified search across models, variants, and filaments
+}),
+}),
 });
 
 export type AppRouter = typeof appRouter;
-```
+
+````
 
 ## Tanstack DB Integration
 
@@ -1048,17 +1052,17 @@ import { eq, gt, and } from '@tanstack/db';
 export function useLowStockFilaments() {
   return useLiveQuery((query) =>
     query
-      .from({ 
+      .from({
         filaments: filamentsCollection,
-        inventory: filamentInventoryCollection 
+        inventory: filamentInventoryCollection
       })
-      .where(({ inventory }) => 
+      .where(({ inventory }) =>
         gt(inventory.lowStockThreshold, inventory.quantityGrams)
       )
       .select({
         filament: ({ filaments }) => filaments,
         inventory: ({ inventory }) => inventory,
-        shortage: ({ inventory }) => 
+        shortage: ({ inventory }) =>
           inventory.lowStockThreshold - inventory.quantityGrams
       })
       .orderBy(({ shortage }) => shortage, 'desc')
@@ -1079,7 +1083,7 @@ export function useHighDemandFilaments() {
 export function useQueueFeasibility() {
   return useLiveQuery((query) =>
     query
-      .from({ 
+      .from({
         queue: printQueueCollection,
         variants: modelVariantsCollection,
         requirements: filamentRequirementsCollection,
@@ -1107,11 +1111,11 @@ export function useAddToQueue() {
       priority,
       createdAt: new Date(),
     });
-    
+
     // tRPC mutation handles server sync and rollback on failure
   };
 }
-```
+````
 
 ### State Management with Collections
 
@@ -1129,50 +1133,51 @@ export function useModelBrowser() {
         imageUrls: ({ models }) => models.imageUrls,
         variantCount: ({ models }) => models.variants.length,
       })
-      .orderBy(({ models }) => models.updatedAt, 'desc')
-  );
+      .orderBy(({ models }) => models.updatedAt, 'desc'),
+  )
 
   // Search with live filtering
   const searchModels = (searchTerm: string) => {
     return useLiveQuery((query) =>
       query
         .from({ models: modelsCollection })
-        .where(({ models }) => 
-          models.name.includes(searchTerm) || 
-          models.designer.includes(searchTerm)
-        )
-    );
-  };
+        .where(
+          ({ models }) =>
+            models.name.includes(searchTerm) ||
+            models.designer.includes(searchTerm),
+        ),
+    )
+  }
 
-  return { models, searchModels };
+  return { models, searchModels }
 }
 
 // Inventory management with live updates
 export function useInventoryDashboard() {
-  const { data: lowStock } = useLowStockFilaments();
-  const { data: highDemand } = useHighDemandFilaments();
-  
+  const { data: lowStock } = useLowStockFilaments()
+  const { data: highDemand } = useHighDemandFilaments()
+
   const { data: inventoryStats } = useLiveQuery((query) =>
     query
-      .from({ 
+      .from({
         filaments: filamentsCollection,
-        inventory: filamentInventoryCollection 
+        inventory: filamentInventoryCollection,
       })
       .select({
         totalFilaments: ({ filaments }) => filaments.count(),
         totalSpools: ({ inventory }) => inventory.count(),
-        totalValue: ({ inventory }) => 
+        totalValue: ({ inventory }) =>
           inventory.sum(inventory.quantityGrams * inventory.actualCostPerGram),
-        averageAge: ({ inventory }) => 
-          inventory.avg(new Date() - inventory.purchaseDate)
-      })
-  );
+        averageAge: ({ inventory }) =>
+          inventory.avg(new Date() - inventory.purchaseDate),
+      }),
+  )
 
   return {
     lowStock,
     highDemand,
     inventoryStats,
-  };
+  }
 }
 ```
 
@@ -1247,20 +1252,20 @@ interface ModelCardProps {
 export function ModelCard({ variant, onEdit, className }: ModelCardProps) {
   const { addToQueue, checkFeasibility } = useQueue();
   const feasible = checkFeasibility(variant.id);
-  
+
   return (
     <div className={`bg-white rounded-lg shadow-sm border p-4 ${className}`}>
       <div className="aspect-square mb-3">
-        <img 
-          src={variant.model.imageUrls[0]} 
+        <img
+          src={variant.model.imageUrls[0]}
           alt={variant.name}
           className="w-full h-full object-cover rounded"
         />
       </div>
-      
+
       <h3 className="font-medium text-slate-900 mb-1">{variant.name}</h3>
       <p className="text-sm text-slate-600 mb-2">{variant.model.designer}</p>
-      
+
       <div className="flex items-center justify-between text-xs text-slate-500 mb-3">
         <span>{variant.printDurationMinutes}min</span>
         <span>{variant.layerHeight}mm</span>
@@ -1268,7 +1273,7 @@ export function ModelCard({ variant, onEdit, className }: ModelCardProps) {
           {feasible ? 'Ready' : 'Need Materials'}
         </span>
       </div>
-      
+
       <div className="flex gap-2">
         <Button
           size="sm"
@@ -1294,31 +1299,31 @@ export function ModelCard({ variant, onEdit, className }: ModelCardProps) {
 
 ```typescript
 // hooks/useModels.ts
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { apiClient } from '@/lib/api'
 
 export function useModels(searchParams: SearchParams = {}) {
   return useQuery({
     queryKey: ['models', searchParams],
     queryFn: () => apiClient.searchModels(searchParams),
     staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000,   // 10 minutes
-  });
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  })
 }
 
 export function useCreateModel() {
-  const queryClient = useQueryClient();
-  
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: apiClient.createModel,
     onSuccess: (newModel) => {
       // Invalidate and refetch models list
-      queryClient.invalidateQueries({ queryKey: ['models'] });
-      
+      queryClient.invalidateQueries({ queryKey: ['models'] })
+
       // Optimistically add to cache
-      queryClient.setQueryData(['models', newModel.id], newModel);
+      queryClient.setQueryData(['models', newModel.id], newModel)
     },
-  });
+  })
 }
 
 export function useModelDetails(modelId: string) {
@@ -1326,25 +1331,25 @@ export function useModelDetails(modelId: string) {
     queryKey: ['models', modelId],
     queryFn: () => apiClient.getModel(modelId),
     enabled: !!modelId,
-  });
+  })
 }
 
 // Prefetch related data strategy
 export function useModelWithVariants(modelId: string) {
-  const queryClient = useQueryClient();
-  
-  const modelQuery = useModelDetails(modelId);
-  
+  const queryClient = useQueryClient()
+
+  const modelQuery = useModelDetails(modelId)
+
   // Prefetch variants when model loads
   useEffect(() => {
     if (modelQuery.data?.variants) {
-      modelQuery.data.variants.forEach(variant => {
-        queryClient.setQueryData(['variants', variant.id], variant);
-      });
+      modelQuery.data.variants.forEach((variant) => {
+        queryClient.setQueryData(['variants', variant.id], variant)
+      })
     }
-  }, [modelQuery.data, queryClient]);
-  
-  return modelQuery;
+  }, [modelQuery.data, queryClient])
+
+  return modelQuery
 }
 ```
 
@@ -1356,117 +1361,118 @@ export function useModelWithVariants(modelId: string) {
 // lib/metadata-extractor.ts
 interface ExtractedMetadata {
   filaments: Array<{
-    type: string;
-    brand: string;
-    color: string;
-    colorHex: string;
-    amsSlot: number;
-    usageModel: number;
-    usageWaste: number;
-    usagePurge: number;
-  }>;
-  nozzleSize: number;
-  layerHeight: number;
-  brimWidth: number;
-  brimType: string;
+    type: string
+    brand: string
+    color: string
+    colorHex: string
+    amsSlot: number
+    usageModel: number
+    usageWaste: number
+    usagePurge: number
+  }>
+  nozzleSize: number
+  layerHeight: number
+  brimWidth: number
+  brimType: string
   printTime: {
-    totalMinutes: number;
-    modelTime: number;
-    supportTime: number;
-    purgeTime: number;
-  };
-  rawMetadata: Record<string, any>;
+    totalMinutes: number
+    modelTime: number
+    supportTime: number
+    purgeTime: number
+  }
+  rawMetadata: Record<string, any>
 }
 
 export class BambuStudioExtractor {
   static async extractFromFile(file: File): Promise<ExtractedMetadata> {
     // Only process .3mf and .gcode files
     if (!file.name.endsWith('.3mf') && !file.name.endsWith('.gcode')) {
-      throw new Error('Unsupported file format');
+      throw new Error('Unsupported file format')
     }
-    
+
     try {
-      let metadataContent: string;
-      
+      let metadataContent: string
+
       if (file.name.endsWith('.3mf')) {
-        metadataContent = await this.extractFrom3MF(file);
+        metadataContent = await this.extractFrom3MF(file)
       } else {
-        metadataContent = await this.extractFromGCode(file);
+        metadataContent = await this.extractFromGCode(file)
       }
-      
-      const rawMetadata = this.parseMetadataContent(metadataContent);
-      return this.transformToStructured(rawMetadata);
-      
+
+      const rawMetadata = this.parseMetadataContent(metadataContent)
+      return this.transformToStructured(rawMetadata)
     } catch (error) {
-      console.error('Metadata extraction failed:', error);
-      throw new Error('Failed to extract metadata from file');
+      console.error('Metadata extraction failed:', error)
+      throw new Error('Failed to extract metadata from file')
     }
   }
-  
+
   private static async extractFrom3MF(file: File): Promise<string> {
-    const JSZip = await import('jszip');
-    const zip = new JSZip.default();
-    
-    const contents = await zip.loadAsync(file);
-    const metadataFile = contents.file('metadata/slic3r_pe.config');
-    
+    const JSZip = await import('jszip')
+    const zip = new JSZip.default()
+
+    const contents = await zip.loadAsync(file)
+    const metadataFile = contents.file('metadata/slic3r_pe.config')
+
     if (!metadataFile) {
-      throw new Error('No Bambu Studio metadata found in .3mf file');
+      throw new Error('No Bambu Studio metadata found in .3mf file')
     }
-    
-    return await metadataFile.async('text');
+
+    return await metadataFile.async('text')
   }
-  
+
   private static async extractFromGCode(file: File): Promise<string> {
-    const text = await file.text();
-    const lines = text.split('\n');
-    
+    const text = await file.text()
+    const lines = text.split('\n')
+
     // Find metadata section in G-code comments
     const metadataLines = lines
-      .filter(line => line.startsWith('; '))
-      .map(line => line.substring(2));
-    
-    return metadataLines.join('\n');
+      .filter((line) => line.startsWith('; '))
+      .map((line) => line.substring(2))
+
+    return metadataLines.join('\n')
   }
-  
+
   private static parseMetadataContent(content: string): Record<string, any> {
-    const metadata: Record<string, any> = {};
-    const lines = content.split('\n');
-    
+    const metadata: Record<string, any> = {}
+    const lines = content.split('\n')
+
     for (const line of lines) {
-      const [key, ...valueParts] = line.split('=');
+      const [key, ...valueParts] = line.split('=')
       if (key && valueParts.length > 0) {
-        const value = valueParts.join('=').trim();
-        metadata[key.trim()] = this.parseValue(value);
+        const value = valueParts.join('=').trim()
+        metadata[key.trim()] = this.parseValue(value)
       }
     }
-    
-    return metadata;
+
+    return metadata
   }
-  
+
   private static parseValue(value: string): any {
     // Parse different value types
     if (value === 'true' || value === 'false') {
-      return value === 'true';
+      return value === 'true'
     }
-    
+
     if (!isNaN(Number(value))) {
-      return Number(value);
+      return Number(value)
     }
-    
+
     // Check for arrays
     if (value.startsWith('[') && value.endsWith(']')) {
       try {
-        return JSON.parse(value);
+        return JSON.parse(value)
       } catch {
-        return value;
+        return value
       }
     }
-    
-    return value;
+
+    return value
   }
-  
-  private static transformToStructured(raw: Record<string, any>): ExtractedMetadata {
+
+  private static transformToStructured(
+    raw: Record<string, any>,
+  ): ExtractedMetadata {
     // Transform raw metadata into structured format
     // This is where we extract the specific fields we need
     return {
@@ -1477,15 +1483,15 @@ export class BambuStudioExtractor {
       brimType: raw.brim_type || 'no_brim',
       printTime: this.extractPrintTime(raw),
       rawMetadata: raw,
-    };
+    }
   }
-  
+
   private static extractFilamentInfo(raw: Record<string, any>) {
     // Extract filament information from raw metadata
     // Bambu Studio stores this in specific fields
-    const filaments = [];
-    const filamentCount = raw.filament_count || 1;
-    
+    const filaments = []
+    const filamentCount = raw.filament_count || 1
+
     for (let i = 0; i < filamentCount; i++) {
       filaments.push({
         type: raw[`filament_type_${i}`] || 'PLA',
@@ -1496,53 +1502,56 @@ export class BambuStudioExtractor {
         usageModel: raw[`filament_used_model_${i}`] || 0,
         usageWaste: raw[`filament_used_waste_${i}`] || 0,
         usagePurge: raw[`filament_used_purge_${i}`] || 0,
-      });
+      })
     }
-    
-    return filaments;
+
+    return filaments
   }
-  
+
   private static extractPrintTime(raw: Record<string, any>) {
     return {
       totalMinutes: Math.round((raw.estimated_printing_time || 0) / 60),
       modelTime: Math.round((raw.model_printing_time || 0) / 60),
       supportTime: Math.round((raw.support_printing_time || 0) / 60),
       purgeTime: Math.round((raw.purge_printing_time || 0) / 60),
-    };
+    }
   }
-  
+
   // Validation and sanitization
   static validateAndSanitize(metadata: ExtractedMetadata): ExtractedMetadata {
     // Basic validation and sanitization
-    const sanitized = { ...metadata };
-    
+    const sanitized = { ...metadata }
+
     // Ensure filaments array is valid
-    sanitized.filaments = metadata.filaments.filter(f => 
-      f.type && f.brand && f.color
-    );
-    
+    sanitized.filaments = metadata.filaments.filter(
+      (f) => f.type && f.brand && f.color,
+    )
+
     // Validate numeric values
-    sanitized.nozzleSize = Math.max(0.1, Math.min(2.0, metadata.nozzleSize));
-    sanitized.layerHeight = Math.max(0.05, Math.min(1.0, metadata.layerHeight));
-    sanitized.brimWidth = Math.max(0, Math.min(50, metadata.brimWidth));
-    
+    sanitized.nozzleSize = Math.max(0.1, Math.min(2.0, metadata.nozzleSize))
+    sanitized.layerHeight = Math.max(0.05, Math.min(1.0, metadata.layerHeight))
+    sanitized.brimWidth = Math.max(0, Math.min(50, metadata.brimWidth))
+
     // Sanitize print time values
     sanitized.printTime = {
       totalMinutes: Math.max(0, metadata.printTime.totalMinutes),
       modelTime: Math.max(0, metadata.printTime.modelTime),
       supportTime: Math.max(0, metadata.printTime.supportTime),
       purgeTime: Math.max(0, metadata.printTime.purgeTime),
-    };
-    
+    }
+
     // Sanitize raw metadata (remove potentially dangerous keys)
-    const dangerousKeys = ['eval', 'function', 'script', 'onclick'];
+    const dangerousKeys = ['eval', 'function', 'script', 'onclick']
     sanitized.rawMetadata = Object.fromEntries(
-      Object.entries(metadata.rawMetadata).filter(([key]) => 
-        !dangerousKeys.some(dangerous => key.toLowerCase().includes(dangerous))
-      )
-    );
-    
-    return sanitized;
+      Object.entries(metadata.rawMetadata).filter(
+        ([key]) =>
+          !dangerousKeys.some((dangerous) =>
+            key.toLowerCase().includes(dangerous),
+          ),
+      ),
+    )
+
+    return sanitized
   }
 }
 ```
@@ -1574,14 +1583,14 @@ export function useFileUpload() {
   const queryClient = useQueryClient();
   const [uploadProgress, setUploadProgress] = useState<Map<string, UploadProgress>>(new Map());
   const [uploadStates, setUploadStates] = useState<Map<string, UploadState>>(new Map());
-  
+
   const uploadFiles = useMutation({
     mutationFn: async (files: FileList) => {
       const results = [];
-      
+
       for (const file of Array.from(files)) {
         const fileId = crypto.randomUUID();
-        
+
         try {
           // Step 1: Extract metadata on client
           setUploadProgress(prev => new Map(prev.set(fileId, {
@@ -1590,17 +1599,17 @@ export function useFileUpload() {
             progress: 10,
             status: 'extracting'
           })));
-          
+
           const extractedData = await BambuStudioExtractor.extractFromFile(file);
           const sanitizedData = BambuStudioExtractor.validateAndSanitize(extractedData);
-          
+
           // Store state for potential retry
           setUploadStates(prev => new Map(prev.set(fileId, {
             originalFile: file,
             extractedMetadata: extractedData,
             sanitizedMetadata: sanitizedData
           })));
-          
+
           // Step 2: Upload file to Cloudflare R2
           setUploadProgress(prev => new Map(prev.set(fileId, {
             fileId,
@@ -1609,13 +1618,13 @@ export function useFileUpload() {
             status: 'uploading',
             extractedData: sanitizedData
           })));
-          
+
           const uploadResponse = await trpc.files.upload.mutate({
             fileName: file.name,
             fileSize: file.size,
             contentType: file.type
           });
-          
+
           // Upload to R2 using signed URL
           await uploadToR2(uploadResponse.uploadUrl, file, {
             onProgress: (progress) => {
@@ -1625,14 +1634,14 @@ export function useFileUpload() {
               })));
             }
           });
-          
+
           // Step 3: Submit to server with extracted metadata
           setUploadProgress(prev => new Map(prev.set(fileId, {
             ...prev.get(fileId)!,
             progress: 80,
             status: 'processing'
           })));
-          
+
           const result = await trpc.variants.create.mutate({
             modelId: '', // Will be set by user in form
             variantData: {
@@ -1652,15 +1661,15 @@ export function useFileUpload() {
               usagePurge: f.usagePurge,
             }))
           });
-          
+
           setUploadProgress(prev => new Map(prev.set(fileId, {
             ...prev.get(fileId)!,
             progress: 100,
             status: 'completed'
           })));
-          
+
           results.push({ fileId, result });
-          
+
         } catch (error) {
           setUploadProgress(prev => new Map(prev.set(fileId, {
             fileId,
@@ -1671,11 +1680,11 @@ export function useFileUpload() {
             retryable: true, // Most errors are retryable
             extractedData: uploadStates.get(fileId)?.sanitizedMetadata
           })));
-          
+
           results.push({ fileId, error });
         }
       }
-      
+
       return results;
     },
     onSuccess: () => {
@@ -1684,17 +1693,17 @@ export function useFileUpload() {
       filamentsCollection.invalidate();
     }
   });
-  
+
   // Retry upload with preserved metadata
   const retryUpload = useMutation({
     mutationFn: async (fileId: string) => {
       const state = uploadStates.get(fileId);
       const progress = uploadProgress.get(fileId);
-      
+
       if (!state || !progress) {
         throw new Error('Upload state not found');
       }
-      
+
       try {
         // Reset progress but keep extracted data
         setUploadProgress(prev => new Map(prev.set(fileId, {
@@ -1703,13 +1712,13 @@ export function useFileUpload() {
           status: 'uploading',
           error: undefined
         })));
-        
+
         // Use preserved metadata and file
         const uploadResponse = await trpc.files.retry.mutate({
           jobId: fileId, // Reuse original job ID
           preserveMetadata: true
         });
-        
+
         if (state.originalFile) {
           await uploadToR2(uploadResponse.uploadUrl, state.originalFile, {
             onProgress: (progress) => {
@@ -1720,16 +1729,16 @@ export function useFileUpload() {
             }
           });
         }
-        
+
         setUploadProgress(prev => new Map(prev.set(fileId, {
           ...prev.get(fileId)!,
           progress: 100,
           status: 'completed',
           error: undefined
         })));
-        
+
         return { fileId, success: true };
-        
+
       } catch (error) {
         setUploadProgress(prev => new Map(prev.set(fileId, {
           ...prev.get(fileId)!,
@@ -1737,12 +1746,12 @@ export function useFileUpload() {
           error: error.message,
           retryable: true
         })));
-        
+
         throw error;
       }
     }
   });
-  
+
   const clearUpload = (fileId: string) => {
     setUploadProgress(prev => {
       const newMap = new Map(prev);
@@ -1755,7 +1764,7 @@ export function useFileUpload() {
       return newMap;
     });
   };
-  
+
   return {
     uploadFiles: uploadFiles.mutate,
     retryUpload: retryUpload.mutate,
@@ -1778,8 +1787,8 @@ export function FileUploadProgress({ uploads, onRetry, onClear }) {
           <div className="flex items-center justify-between mb-2">
             <span className="font-medium">{upload.fileName}</span>
             {upload.status === 'error' && upload.retryable && (
-              <Button 
-                size="sm" 
+              <Button
+                size="sm"
                 variant="outline"
                 onClick={() => onRetry(upload.fileId)}
               >
@@ -1787,37 +1796,37 @@ export function FileUploadProgress({ uploads, onRetry, onClear }) {
               </Button>
             )}
           </div>
-          
+
           <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-            <div 
+            <div
               className={`h-2 rounded-full transition-all duration-300 ${
-                upload.status === 'error' ? 'bg-red-500' : 
+                upload.status === 'error' ? 'bg-red-500' :
                 upload.status === 'completed' ? 'bg-green-500' : 'bg-blue-500'
               }`}
               style={{ width: `${upload.progress}%` }}
             />
           </div>
-          
+
           <div className="flex items-center justify-between text-sm">
             <span className={`capitalize ${
-              upload.status === 'error' ? 'text-red-600' : 
+              upload.status === 'error' ? 'text-red-600' :
               upload.status === 'completed' ? 'text-green-600' : 'text-blue-600'
             }`}>
               {upload.status === 'error' ? upload.error : upload.status}
             </span>
-            
+
             {upload.extractedData && (
               <span className="text-gray-600">
-                Metadata: {upload.extractedData.filaments.length} filaments, 
+                Metadata: {upload.extractedData.filaments.length} filaments,
                 {upload.extractedData.printTime.totalMinutes}min
               </span>
             )}
           </div>
-          
+
           {upload.status === 'completed' && (
-            <Button 
-              size="sm" 
-              variant="ghost" 
+            <Button
+              size="sm"
+              variant="ghost"
               onClick={() => onClear(upload.fileId)}
               className="mt-2"
             >
@@ -1844,7 +1853,7 @@ services:
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: devpass123
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -1857,7 +1866,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - '6379:6379'
     command: redis-server --appendonly yes
 
   app:
@@ -1865,11 +1874,11 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - DATABASE_URL=postgresql://dev:devpass123@postgres:5432/printmgmt_dev
       - REDIS_URL=redis://redis:6379
-      - CLOUDFLARE_R2_ENDPOINT=http://localhost:9000  # MinIO for local S3 simulation
+      - CLOUDFLARE_R2_ENDPOINT=http://localhost:9000 # MinIO for local S3 simulation
       - NODE_ENV=development
     volumes:
       - .:/app
@@ -1882,8 +1891,8 @@ services:
   minio:
     image: minio/minio
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - '9000:9000'
+      - '9001:9001'
     environment:
       - MINIO_ACCESS_KEY=minioaccess
       - MINIO_SECRET_KEY=miniosecret
@@ -1901,102 +1910,131 @@ volumes:
 ```typescript
 // lib/monitoring.ts - Updated with Tanstack DB metrics
 export class PerformanceMonitor {
-  static trackDatabaseQuery(queryName: string, duration: number, resultCount?: number) {
+  static trackDatabaseQuery(
+    queryName: string,
+    duration: number,
+    resultCount?: number,
+  ) {
     const metrics = {
       queryName,
       duration,
       resultCount,
       timestamp: new Date(),
-      slow: duration > 2000
-    };
-    
+      slow: duration > 2000,
+    }
+
     if (metrics.slow) {
       console.warn(`Slow query detected: ${queryName} took ${duration}ms`, {
         resultCount,
-        queryName
-      });
+        queryName,
+      })
     }
-    
+
     // Send metrics to monitoring service in production
     if (process.env.NODE_ENV === 'production') {
-      this.sendMetrics('database_query', metrics);
+      this.sendMetrics('database_query', metrics)
     }
   }
-  
-  static trackTanstackDBQuery(collectionName: string, operation: string, duration: number) {
+
+  static trackTanstackDBQuery(
+    collectionName: string,
+    operation: string,
+    duration: number,
+  ) {
     const metrics = {
       collection: collectionName,
       operation,
       duration,
-      timestamp: new Date()
-    };
-    
-    console.info(`TanStack DB ${operation} on ${collectionName}: ${duration}ms`);
-    
+      timestamp: new Date(),
+    }
+
+    console.info(`TanStack DB ${operation} on ${collectionName}: ${duration}ms`)
+
     if (process.env.NODE_ENV === 'production') {
-      this.sendMetrics('tanstack_db_query', metrics);
+      this.sendMetrics('tanstack_db_query', metrics)
     }
   }
-  
-  static trackFileUpload(fileName: string, fileSize: number, duration: number, success: boolean) {
-    const throughput = success ? fileSize / duration * 1000 : 0; // bytes per second
-    
+
+  static trackFileUpload(
+    fileName: string,
+    fileSize: number,
+    duration: number,
+    success: boolean,
+  ) {
+    const throughput = success ? (fileSize / duration) * 1000 : 0 // bytes per second
+
     const metrics = {
       fileName,
       fileSize,
       duration,
       throughput,
       success,
-      timestamp: new Date()
-    };
-    
-    console.info(`File upload: ${fileName} (${fileSize} bytes) in ${duration}ms`, {
-      success,
-      throughput: `${Math.round(throughput / 1024)}KB/s`
-    });
-    
+      timestamp: new Date(),
+    }
+
+    console.info(
+      `File upload: ${fileName} (${fileSize} bytes) in ${duration}ms`,
+      {
+        success,
+        throughput: `${Math.round(throughput / 1024)}KB/s`,
+      },
+    )
+
     if (process.env.NODE_ENV === 'production') {
-      this.sendMetrics('file_upload', metrics);
+      this.sendMetrics('file_upload', metrics)
     }
   }
-  
-  static trackSearchPerformance(query: string, resultCount: number, duration: number, searchType: string) {
+
+  static trackSearchPerformance(
+    query: string,
+    resultCount: number,
+    duration: number,
+    searchType: string,
+  ) {
     const metrics = {
       query,
       resultCount,
       duration,
       searchType,
       timestamp: new Date(),
-      slow: duration > 2000
-    };
-    
-    console.info(`Search "${query}" (${searchType}): ${resultCount} results in ${duration}ms`);
-    
-    if (metrics.slow) {
-      console.warn(`Slow search detected: "${query}" took ${duration}ms`);
+      slow: duration > 2000,
     }
-    
+
+    console.info(
+      `Search "${query}" (${searchType}): ${resultCount} results in ${duration}ms`,
+    )
+
+    if (metrics.slow) {
+      console.warn(`Slow search detected: "${query}" took ${duration}ms`)
+    }
+
     if (process.env.NODE_ENV === 'production') {
-      this.sendMetrics('search_performance', metrics);
+      this.sendMetrics('search_performance', metrics)
     }
   }
-  
-  static trackFilamentDemandChange(filamentId: string, oldDemand: number, newDemand: number) {
+
+  static trackFilamentDemandChange(
+    filamentId: string,
+    oldDemand: number,
+    newDemand: number,
+  ) {
     const metrics = {
       filamentId,
       oldDemand,
       newDemand,
       change: newDemand - oldDemand,
-      timestamp: new Date()
-    };
-    
-    console.info(`Filament demand change: ${filamentId} ${oldDemand} → ${newDemand}`);
-    
+      timestamp: new Date(),
+    }
+
+    console.info(
+      `Filament demand change: ${filamentId} ${oldDemand} → ${newDemand}`,
+    )
+
     if (process.env.NODE_ENV === 'production') {
-      this.sendMetrics('filament_demand_change', metrics);
+      this.sendMetrics('filament_demand_change', metrics)
     }
   }
-  
+
   private static sendMetrics(event: string, data: any) {
     // Implementation depends on monitoring service choice
     // Examples: DataDog, New Relic, custom analytics
@@ -2009,49 +2047,49 @@ export class PerformanceMonitor {
 ```typescript
 // scripts/migrate-from-folders.ts - Updated for new schema
 interface MigrationPlan {
-  sourceDirectory: string;
+  sourceDirectory: string
   modelMappings: Array<{
-    folderPath: string;
-    modelName: string;
-    designer: string;
-    category: string;
-  }>;
+    folderPath: string
+    modelName: string
+    designer: string
+    category: string
+  }>
   filamentMappings?: Array<{
-    brand: string;
-    materialType: string;
-    colorName: string;
-    colorHex: string;
-    costPerGram: number;
-    purchaseUrl?: string;
-  }>;
+    brand: string
+    materialType: string
+    colorName: string
+    colorHex: string
+    costPerGram: number
+    purchaseUrl?: string
+  }>
 }
 
 export class FolderMigrationTool {
   async migrateFolderStructure(plan: MigrationPlan) {
-    console.log('Starting migration from Windows folder structure...');
-    
+    console.log('Starting migration from Windows folder structure...')
+
     // Step 1: Create filament specifications first
     if (plan.filamentMappings) {
       for (const filamentSpec of plan.filamentMappings) {
-        await this.createFilamentSpecification(filamentSpec);
+        await this.createFilamentSpecification(filamentSpec)
       }
     }
-    
+
     // Step 2: Migrate model folders
     for (const mapping of plan.modelMappings) {
       try {
-        await this.migrateModelFolder(mapping);
+        await this.migrateModelFolder(mapping)
       } catch (error) {
-        console.error(`Failed to migrate ${mapping.folderPath}:`, error);
+        console.error(`Failed to migrate ${mapping.folderPath}:`, error)
       }
     }
-    
+
     // Step 3: Generate demand count report
-    await this.generateFilamentDemandReport();
-    
-    console.log('Migration completed');
+    await this.generateFilamentDemandReport()
+
+    console.log('Migration completed')
   }
-  
+
   private async createFilamentSpecification(spec: any) {
     try {
       const filament = await trpc.filaments.create.mutate({
@@ -2061,65 +2099,70 @@ export class FolderMigrationTool {
         colorHex: spec.colorHex,
         costPerGramBase: spec.costPerGram,
         purchaseUrl: spec.purchaseUrl,
-      });
-      
-      console.log(`Created filament specification: ${spec.brand} ${spec.colorName}`);
-      return filament;
+      })
+
+      console.log(
+        `Created filament specification: ${spec.brand} ${spec.colorName}`,
+      )
+      return filament
     } catch (error) {
-      console.error(`Failed to create filament ${spec.brand} ${spec.colorName}:`, error);
+      console.error(
+        `Failed to create filament ${spec.brand} ${spec.colorName}:`,
+        error,
+      )
     }
   }
-  
+
   private async migrateModelFolder(mapping: any) {
-    const files = await this.scanFolder(mapping.folderPath);
-    
+    const files = await this.scanFolder(mapping.folderPath)
+
     // Create model record
     const model = await trpc.models.create.mutate({
       name: mapping.modelName,
       designer: mapping.designer,
       category: mapping.category,
-    });
-    
+    })
+
     // Process each file
     for (const file of files) {
       if (this.isSlicedFile(file)) {
-        await this.migrateSlicedFile(file, model.id);
+        await this.migrateSlicedFile(file, model.id)
       } else if (this.isImageFile(file)) {
-        await this.migrateImageFile(file, model.id);
+        await this.migrateImageFile(file, model.id)
       }
     }
   }
-  
+
   private async migrateSlicedFile(filePath: string, modelId: string) {
     try {
       // Extract metadata from existing file
-      const fileContent = await fs.readFile(filePath);
+      const fileContent = await fs.readFile(filePath)
       const metadata = await BambuStudioExtractor.extractFromFile(
-        new File([fileContent], path.basename(filePath))
-      );
-      
+        new File([fileContent], path.basename(filePath)),
+      )
+
       // Upload file to Cloudflare R2
-      const uploadResponse = await this.uploadFileToR2(filePath);
-      
+      const uploadResponse = await this.uploadFileToR2(filePath)
+
       // Find or create matching filament specifications
-      const filamentRequirements = [];
+      const filamentRequirements = []
       for (const filamentData of metadata.filaments) {
         let filament = await this.findOrCreateFilament({
           brand: filamentData.brand,
           materialType: filamentData.type,
           colorName: filamentData.color,
           colorHex: filamentData.colorHex,
-        });
-        
+        })
+
         filamentRequirements.push({
           filamentId: filament.id,
           amsSlot: filamentData.amsSlot,
           usageModel: filamentData.usageModel,
           usageWaste: filamentData.usageWaste,
           usagePurge: filamentData.usagePurge,
-        });
+        })
       }
-      
+
       // Create variant record with filament requirements
       const variant = await trpc.variants.create.mutate({
         modelId,
@@ -2133,30 +2176,29 @@ export class FolderMigrationTool {
           bambuMetadata: metadata.rawMetadata,
         },
         filamentRequirements,
-      });
-      
-      console.log(`Migrated variant: ${variant.name}`);
-      
+      })
+
+      console.log(`Migrated variant: ${variant.name}`)
     } catch (error) {
-      console.error(`Failed to migrate sliced file ${filePath}:`, error);
+      console.error(`Failed to migrate sliced file ${filePath}:`, error)
     }
   }
-  
+
   private async findOrCreateFilament(specs: any) {
     // Try to find existing filament
     const existingFilaments = await trpc.filaments.list.query({
       brand: specs.brand,
       materialType: specs.materialType,
-    });
-    
-    const existing = existingFilaments.filaments.find(f => 
-      f.colorHex === specs.colorHex
-    );
-    
+    })
+
+    const existing = existingFilaments.filaments.find(
+      (f) => f.colorHex === specs.colorHex,
+    )
+
     if (existing) {
-      return existing;
+      return existing
     }
-    
+
     // Create new filament specification
     return await trpc.filaments.create.mutate({
       brand: specs.brand,
@@ -2164,31 +2206,35 @@ export class FolderMigrationTool {
       colorName: specs.colorName,
       colorHex: specs.colorHex,
       costPerGramBase: 0.05, // Default cost, can be updated later
-    });
+    })
   }
-  
+
   private async generateFilamentDemandReport() {
     const highDemandFilaments = await trpc.filaments.list.query({
       sortBy: 'demand',
-    });
-    
-    console.log('\n=== FILAMENT DEMAND REPORT ===');
-    console.log('High-demand filaments (consider purchasing):');
-    
+    })
+
+    console.log('\n=== FILAMENT DEMAND REPORT ===')
+    console.log('High-demand filaments (consider purchasing):')
+
     highDemandFilaments.filaments
-      .filter(f => f.demandCount >= 3)
+      .filter((f) => f.demandCount >= 3)
       .slice(0, 10)
-      .forEach(filament => {
-        console.log(`${filament.brand} ${filament.colorName} (${filament.materialType}): ${filament.demandCount} variants`);
-      });
-    
-    console.log('\nUnused filaments (consider removing):');
+      .forEach((filament) => {
+        console.log(
+          `${filament.brand} ${filament.colorName} (${filament.materialType}): ${filament.demandCount} variants`,
+        )
+      })
+
+    console.log('\nUnused filaments (consider removing):')
     highDemandFilaments.filaments
-      .filter(f => f.demandCount === 0)
+      .filter((f) => f.demandCount === 0)
       .slice(0, 5)
-      .forEach(filament => {
-        console.log(`${filament.brand} ${filament.colorName} (${filament.materialType}): 0 variants`);
-      });
+      .forEach((filament) => {
+        console.log(
+          `${filament.brand} ${filament.colorName} (${filament.materialType}): 0 variants`,
+        )
+      })
   }
 }
 
@@ -2200,14 +2246,14 @@ const migrationPlan: MigrationPlan = {
       folderPath: 'C:/Users/John/3D Models/Dragons',
       modelName: 'Dragon Collection',
       designer: 'Fantasy3D',
-      category: 'decoration'
+      category: 'decoration',
     },
     {
       folderPath: 'C:/Users/John/3D Models/Keychains',
       modelName: 'Custom Keychains',
       designer: 'Local Design',
-      category: 'keychain'
-    }
+      category: 'keychain',
+    },
   ],
   filamentMappings: [
     {
@@ -2216,7 +2262,8 @@ const migrationPlan: MigrationPlan = {
       colorName: 'Galaxy Black',
       colorHex: '#1a1a1a',
       costPerGram: 0.04,
-      purchaseUrl: 'https://www.prusa3d.com/product/prusament-pla-galaxy-black-1kg/'
+      purchaseUrl:
+        'https://www.prusa3d.com/product/prusament-pla-galaxy-black-1kg/',
     },
     {
       brand: 'Hatchbox',
@@ -2224,13 +2271,13 @@ const migrationPlan: MigrationPlan = {
       colorName: 'Red',
       colorHex: '#ff0000',
       costPerGram: 0.03,
-    }
-  ]
-};
+    },
+  ],
+}
 
 // Run migration
-const migrationTool = new FolderMigrationTool();
-await migrationTool.migrateFolderStructure(migrationPlan);
+const migrationTool = new FolderMigrationTool()
+await migrationTool.migrateFolderStructure(migrationPlan)
 ```
 
 ## Summary of Architecture Updates
@@ -2238,7 +2285,7 @@ await migrationTool.migrateFolderStructure(migrationPlan);
 ### **Key Improvements Made** ✅
 
 1. **Enhanced Retry Logic**: File uploads preserve metadata and allow easy retry without re-entering form data
-2. **PostgreSQL 18 Beta**: Updated to latest version with enhanced JSONB capabilities  
+2. **PostgreSQL 18 Beta**: Updated to latest version with enhanced JSONB capabilities
 3. **Filament/Inventory Separation**: Clean separation between filament specifications and physical inventory
 4. **Zod + tRPC Integration**: Full end-to-end type safety with runtime validation
 5. **Tanstack DB Implementation**: Reactive collections with live queries and optimistic updates
@@ -2248,7 +2295,7 @@ await migrationTool.migrateFolderStructure(migrationPlan);
 ### **Technical Benefits** 🎯
 
 - **Better UX**: Retry uploads without losing extracted metadata
-- **Data Integrity**: Separate filament specs from inventory enables better demand tracking  
+- **Data Integrity**: Separate filament specs from inventory enables better demand tracking
 - **Type Safety**: Zod ensures runtime validation matches TypeScript types
 - **Performance**: Tanstack DB provides sub-millisecond queries with automatic reactivity
 - **Scalability**: Schema designed for 1000+ models with proper indexing
@@ -2257,6 +2304,7 @@ await migrationTool.migrateFolderStructure(migrationPlan);
 ### **Development Ready** 🚀
 
 The architecture now provides:
+
 - Complete technical specifications for implementation
 - Proper error handling and retry mechanisms
 - Scalable database design with demand tracking
@@ -2273,34 +2321,34 @@ This architecture addresses all your technical concerns and provides a solid fou
 ```sql
 -- Search optimization for 1000+ models
 EXPLAIN ANALYZE
-SELECT 
+SELECT
     m.id, m.name, m.designer, m.category,
     mv.id as variant_id, mv.name as variant_name,
     mv.layer_height, mv.print_duration_minutes,
     mv.filament_colors, mv.cost_to_produce_usd
 FROM models m
 JOIN model_variants mv ON m.id = mv.model_id
-WHERE 
-    to_tsvector('english', m.name || ' ' || COALESCE(m.description, '')) 
+WHERE
+    to_tsvector('english', m.name || ' ' || COALESCE(m.description, ''))
     @@ plainto_tsquery('english', 'dragon keychain')
     AND mv.filament_material = 'PLA'
     AND mv.layer_height BETWEEN 0.15 AND 0.25
-ORDER BY 
-    ts_rank(to_tsvector('english', m.name || ' ' || COALESCE(m.description, '')), 
+ORDER BY
+    ts_rank(to_tsvector('english', m.name || ' ' || COALESCE(m.description, '')),
             plainto_tsquery('english', 'dragon keychain')) DESC,
     mv.print_duration_minutes ASC
 LIMIT 20 OFFSET 0;
 
 -- Index recommendations for sub-2-second searches
-CREATE INDEX CONCURRENTLY idx_models_search_ranked ON models 
+CREATE INDEX CONCURRENTLY idx_models_search_ranked ON models
 USING GIN (to_tsvector('english', name || ' ' || COALESCE(description, '')));
 
-CREATE INDEX CONCURRENTLY idx_variants_composite_search ON model_variants 
+CREATE INDEX CONCURRENTLY idx_variants_composite_search ON model_variants
 (filament_material, layer_height, print_duration_minutes);
 
 -- Materialized view for complex aggregations
 CREATE MATERIALIZED VIEW model_search_cache AS
-SELECT 
+SELECT
     m.id, m.name, m.designer, m.category, m.image_urls[1] as primary_image,
     COUNT(mv.id) as variant_count,
     MIN(mv.print_duration_minutes) as min_print_time,
@@ -2336,34 +2384,34 @@ CREATE TRIGGER refresh_search_cache_on_model_change
 export const cacheConfig = {
   // Model data - relatively stable
   models: {
-    staleTime: 10 * 60 * 1000,  // 10 minutes
-    gcTime: 30 * 60 * 1000,     // 30 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
   },
-  
+
   // Search results - cache aggressive due to frequent reuse
   search: {
-    staleTime: 5 * 60 * 1000,   // 5 minutes
-    gcTime: 15 * 60 * 1000,     // 15 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 15 * 60 * 1000, // 15 minutes
   },
-  
+
   // Inventory - needs to be fresh but not real-time
   inventory: {
-    staleTime: 2 * 60 * 1000,   // 2 minutes
-    gcTime: 10 * 60 * 1000,     // 10 minutes
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   },
-  
+
   // Print queue - near real-time
   queue: {
-    staleTime: 30 * 1000,       // 30 seconds
-    gcTime: 2 * 60 * 1000,      // 2 minutes
+    staleTime: 30 * 1000, // 30 seconds
+    gcTime: 2 * 60 * 1000, // 2 minutes
   },
-  
+
   // Analytics - can be older
   analytics: {
-    staleTime: 60 * 60 * 1000,  // 1 hour
+    staleTime: 60 * 60 * 1000, // 1 hour
     gcTime: 4 * 60 * 60 * 1000, // 4 hours
-  }
-};
+  },
+}
 
 // Prefetching strategy
 export function setupPrefetching(queryClient: QueryClient) {
@@ -2372,21 +2420,21 @@ export function setupPrefetching(queryClient: QueryClient) {
     queryKey: ['models', { popular: true, limit: 20 }],
     queryFn: () => apiClient.getPopularModels(),
     staleTime: cacheConfig.models.staleTime,
-  });
-  
+  })
+
   // Prefetch current inventory status
   queryClient.prefetchQuery({
     queryKey: ['inventory', 'status'],
     queryFn: () => apiClient.getInventoryStatus(),
     staleTime: cacheConfig.inventory.staleTime,
-  });
-  
+  })
+
   // Prefetch current queue
   queryClient.prefetchQuery({
     queryKey: ['queue', 'current'],
     queryFn: () => apiClient.getCurrentQueue(),
     staleTime: cacheConfig.queue.staleTime,
-  });
+  })
 }
 ```
 
@@ -2397,93 +2445,111 @@ export function setupPrefetching(queryClient: QueryClient) {
 ```typescript
 // lib/security.ts
 export class FileSecurityValidator {
-  private static readonly ALLOWED_EXTENSIONS = ['.3mf', '.gcode'];
-  private static readonly MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+  private static readonly ALLOWED_EXTENSIONS = ['.3mf', '.gcode']
+  private static readonly MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB
   private static readonly DANGEROUS_PATTERNS = [
     /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
     /javascript:/gi,
     /vbscript:/gi,
     /onload\s*=/gi,
     /onerror\s*=/gi,
-  ];
-  
+  ]
+
   static validateFile(file: File): { valid: boolean; error?: string } {
     // Check file size
     if (file.size > this.MAX_FILE_SIZE) {
-      return { valid: false, error: 'File size exceeds 100MB limit' };
+      return { valid: false, error: 'File size exceeds 100MB limit' }
     }
-    
+
     // Check file extension
-    const hasValidExtension = this.ALLOWED_EXTENSIONS.some(ext => 
-      file.name.toLowerCase().endsWith(ext)
-    );
-    
+    const hasValidExtension = this.ALLOWED_EXTENSIONS.some((ext) =>
+      file.name.toLowerCase().endsWith(ext),
+    )
+
     if (!hasValidExtension) {
-      return { valid: false, error: 'Only .3mf and .gcode files are allowed' };
+      return { valid: false, error: 'Only .3mf and .gcode files are allowed' }
     }
-    
-    return { valid: true };
+
+    return { valid: true }
   }
-  
-  static async scanFileContent(content: string): Promise<{ safe: boolean; threats?: string[] }> {
-    const threats = [];
-    
+
+  static async scanFileContent(
+    content: string,
+  ): Promise<{ safe: boolean; threats?: string[] }> {
+    const threats = []
+
     // Check for dangerous patterns
     for (const pattern of this.DANGEROUS_PATTERNS) {
       if (pattern.test(content)) {
-        threats.push(`Potentially dangerous content detected: ${pattern.source}`);
+        threats.push(
+          `Potentially dangerous content detected: ${pattern.source}`,
+        )
       }
     }
-    
+
     // Check for excessive data length that might indicate attack
-    if (content.length > 10 * 1024 * 1024) { // 10MB text limit
-      threats.push('File content exceeds safe text processing limits');
+    if (content.length > 10 * 1024 * 1024) {
+      // 10MB text limit
+      threats.push('File content exceeds safe text processing limits')
     }
-    
+
     return {
       safe: threats.length === 0,
-      threats: threats.length > 0 ? threats : undefined
-    };
+      threats: threats.length > 0 ? threats : undefined,
+    }
   }
-  
+
   static sanitizeMetadata(metadata: Record<string, any>): Record<string, any> {
-    const sanitized: Record<string, any> = {};
-    
+    const sanitized: Record<string, any> = {}
+
     for (const [key, value] of Object.entries(metadata)) {
       // Skip keys that might be dangerous
       if (this.isDangerousKey(key)) {
-        continue;
+        continue
       }
-      
+
       // Sanitize string values
       if (typeof value === 'string') {
-        sanitized[key] = this.sanitizeString(value);
+        sanitized[key] = this.sanitizeString(value)
       } else if (typeof value === 'number' && isFinite(value)) {
-        sanitized[key] = value;
+        sanitized[key] = value
       } else if (typeof value === 'boolean') {
-        sanitized[key] = value;
+        sanitized[key] = value
       } else if (Array.isArray(value)) {
         sanitized[key] = value
-          .filter(item => typeof item === 'string' || typeof item === 'number')
-          .map(item => typeof item === 'string' ? this.sanitizeString(item) : item);
+          .filter(
+            (item) => typeof item === 'string' || typeof item === 'number',
+          )
+          .map((item) =>
+            typeof item === 'string' ? this.sanitizeString(item) : item,
+          )
       }
       // Skip objects and other complex types for security
     }
-    
-    return sanitized;
+
+    return sanitized
   }
-  
+
   private static isDangerousKey(key: string): boolean {
     const dangerousKeywords = [
-      'eval', 'function', 'script', 'onclick', 'onload', 'onerror',
-      'javascript', 'vbscript', 'exec', 'system', 'cmd'
-    ];
-    
-    return dangerousKeywords.some(keyword => 
-      key.toLowerCase().includes(keyword)
-    );
+      'eval',
+      'function',
+      'script',
+      'onclick',
+      'onload',
+      'onerror',
+      'javascript',
+      'vbscript',
+      'exec',
+      'system',
+      'cmd',
+    ]
+
+    return dangerousKeywords.some((keyword) =>
+      key.toLowerCase().includes(keyword),
+    )
   }
-  
+
   private static sanitizeString(value: string): string {
     return value
       .replace(/[<>]/g, '') // Remove angle brackets
@@ -2491,7 +2557,7 @@ export class FileSecurityValidator {
       .replace(/vbscript:/gi, '') // Remove vbscript: protocol
       .replace(/on\w+\s*=/gi, '') // Remove event handlers
       .trim()
-      .substring(0, 1000); // Limit length
+      .substring(0, 1000) // Limit length
   }
 }
 ```
@@ -2500,8 +2566,8 @@ export class FileSecurityValidator {
 
 ```typescript
 // lib/auth.ts
-import { rateLimit } from 'express-rate-limit';
-import helmet from 'helmet';
+import { rateLimit } from 'express-rate-limit'
+import helmet from 'helmet'
 
 export const securityMiddleware = [
   helmet({
@@ -2510,8 +2576,8 @@ export const securityMiddleware = [
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'"], // Needed for Tanstack Start
         styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'", "https://*.r2.cloudflarestorage.com"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        connectSrc: ["'self'", 'https://*.r2.cloudflarestorage.com'],
         fontSrc: ["'self'"],
         objectSrc: ["'none'"],
         mediaSrc: ["'self'"],
@@ -2519,7 +2585,7 @@ export const securityMiddleware = [
       },
     },
   }),
-  
+
   rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // Limit each IP to 100 requests per windowMs
@@ -2527,26 +2593,26 @@ export const securityMiddleware = [
     standardHeaders: true,
     legacyHeaders: false,
   }),
-  
+
   // Specific rate limits for upload endpoints
   rateLimit({
     windowMs: 60 * 1000, // 1 minute
     max: 10, // 10 uploads per minute
     skip: (req) => !req.path.includes('/upload'),
   }),
-];
+]
 
 // Input validation middleware
 export function validateInput(schema: any) {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
-      const validated = schema.parse(req.body);
-      req.body = validated;
-      next();
+      const validated = schema.parse(req.body)
+      req.body = validated
+      next()
     } catch (error) {
-      res.status(400).json({ error: 'Invalid input data' });
+      res.status(400).json({ error: 'Invalid input data' })
     }
-  };
+  }
 }
 ```
 
@@ -2565,7 +2631,7 @@ services:
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: devpass123
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -2573,18 +2639,18 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - '6379:6379'
 
   app:
     build:
       context: .
       dockerfile: Dockerfile.dev
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - DATABASE_URL=postgresql://dev:devpass123@postgres:5432/printmgmt_dev
       - REDIS_URL=redis://redis:6379
-      - CLOUDFLARE_R2_ENDPOINT=http://localhost:9000  # MinIO for local S3 simulation
+      - CLOUDFLARE_R2_ENDPOINT=http://localhost:9000 # MinIO for local S3 simulation
     volumes:
       - .:/app
       - /app/node_modules
@@ -2602,21 +2668,21 @@ volumes:
 // Environment configuration
 interface EnvironmentConfig {
   database: {
-    url: string;
-    maxConnections: number;
-    ssl: boolean;
-  };
+    url: string
+    maxConnections: number
+    ssl: boolean
+  }
   storage: {
-    r2Endpoint: string;
-    accessKeyId: string;
-    secretAccessKey: string;
-    bucket: string;
-  };
+    r2Endpoint: string
+    accessKeyId: string
+    secretAccessKey: string
+    bucket: string
+  }
   app: {
-    port: number;
-    nodeEnv: string;
-    logLevel: string;
-  };
+    port: number
+    nodeEnv: string
+    logLevel: string
+  }
 }
 
 export const config: EnvironmentConfig = {
@@ -2636,7 +2702,7 @@ export const config: EnvironmentConfig = {
     nodeEnv: process.env.NODE_ENV || 'development',
     logLevel: process.env.LOG_LEVEL || 'info',
   },
-};
+}
 ```
 
 ### Performance Monitoring
@@ -2645,27 +2711,34 @@ export const config: EnvironmentConfig = {
 // lib/monitoring.ts
 export class PerformanceMonitor {
   static trackDatabaseQuery(queryName: string, duration: number) {
-    if (duration > 2000) { // Log slow queries
-      console.warn(`Slow query detected: ${queryName} took ${duration}ms`);
+    if (duration > 2000) {
+      // Log slow queries
+      console.warn(`Slow query detected: ${queryName} took ${duration}ms`)
     }
-    
+
     // Send metrics to monitoring service in production
     if (process.env.NODE_ENV === 'production') {
       // Implementation depends on monitoring service choice
     }
   }
-  
+
   static trackFileUpload(fileSize: number, duration: number) {
-    const throughput = fileSize / duration * 1000; // bytes per second
-    
-    console.info(`File upload: ${fileSize} bytes in ${duration}ms (${throughput} bytes/sec)`);
+    const throughput = (fileSize / duration) * 1000 // bytes per second
+
+    console.info(
+      `File upload: ${fileSize} bytes in ${duration}ms (${throughput} bytes/sec)`,
+    )
   }
-  
-  static trackSearchPerformance(query: string, resultCount: number, duration: number) {
-    console.info(`Search "${query}": ${resultCount} results in ${duration}ms`);
-    
+
+  static trackSearchPerformance(
+    query: string,
+    resultCount: number,
+    duration: number,
+  ) {
+    console.info(`Search "${query}": ${resultCount} results in ${duration}ms`)
+
     if (duration > 2000) {
-      console.warn(`Slow search detected: "${query}" took ${duration}ms`);
+      console.warn(`Slow search detected: "${query}" took ${duration}ms`)
     }
   }
 }
@@ -2678,64 +2751,64 @@ export class PerformanceMonitor {
 ```typescript
 // scripts/migrate-from-folders.ts
 interface MigrationPlan {
-  sourceDirectory: string;
+  sourceDirectory: string
   modelMappings: Array<{
-    folderPath: string;
-    modelName: string;
-    designer: string;
-    category: string;
-  }>;
+    folderPath: string
+    modelName: string
+    designer: string
+    category: string
+  }>
 }
 
 export class FolderMigrationTool {
   async migrateFolderStructure(plan: MigrationPlan) {
-    console.log('Starting migration from Windows folder structure...');
-    
+    console.log('Starting migration from Windows folder structure...')
+
     for (const mapping of plan.modelMappings) {
       try {
-        await this.migrateModelFolder(mapping);
+        await this.migrateModelFolder(mapping)
       } catch (error) {
-        console.error(`Failed to migrate ${mapping.folderPath}:`, error);
+        console.error(`Failed to migrate ${mapping.folderPath}:`, error)
       }
     }
-    
-    console.log('Migration completed');
+
+    console.log('Migration completed')
   }
-  
+
   private async migrateModelFolder(mapping: any) {
-    const files = await this.scanFolder(mapping.folderPath);
-    
+    const files = await this.scanFolder(mapping.folderPath)
+
     // Create model record
     const model = await this.createModel({
       name: mapping.modelName,
       designer: mapping.designer,
       category: mapping.category,
-    });
-    
+    })
+
     // Process each file
     for (const file of files) {
       if (this.isSlicedFile(file)) {
-        await this.migrateSlicedFile(file, model.id);
+        await this.migrateSlicedFile(file, model.id)
       } else if (this.isImageFile(file)) {
-        await this.migrateImageFile(file, model.id);
+        await this.migrateImageFile(file, model.id)
       }
     }
   }
-  
+
   private async migrateSlicedFile(filePath: string, modelId: string) {
     // Extract metadata from existing file
-    const metadata = await BambuStudioExtractor.extractFromFile(filePath);
-    
+    const metadata = await BambuStudioExtractor.extractFromFile(filePath)
+
     // Upload file to Cloudflare R2
-    const uploadUrl = await this.uploadFileToR2(filePath);
-    
+    const uploadUrl = await this.uploadFileToR2(filePath)
+
     // Create variant record
     await this.createVariant({
       modelId,
       name: this.deriveVariantName(filePath),
       slicedFileUrl: uploadUrl,
       extractedMetadata: metadata,
-    });
+    })
   }
 }
 ```
@@ -2743,6 +2816,7 @@ export class FolderMigrationTool {
 This architecture provides a robust, scalable foundation for your 3D printing business management platform. The hybrid database approach efficiently handles both structured queries and flexible metadata storage, while the client-side extraction ensures immediate user feedback and form auto-population.
 
 **Key architectural strengths:**
+
 - **Type-safe end-to-end** with Tanstack ecosystem
 - **Efficient file processing** with client-side extraction and background jobs
 - **Scalable search** optimized for 1000+ models with sub-2-second response

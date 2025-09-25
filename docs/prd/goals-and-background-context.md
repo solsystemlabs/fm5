@@ -3,7 +3,7 @@
 ## Goals
 
 - Eliminate file management chaos by providing systematic digital asset organization with searchable metadata
-- Automate filament inventory tracking and consumption calculations to prevent stockouts and enable data-driven purchasing  
+- Automate filament inventory tracking and consumption calculations to prevent stockouts and enable data-driven purchasing
 - Enable intelligent production planning through smart print queue management and sales velocity insights
 - Create operational efficiency that frees up 60% of admin time for R&D and market expansion activities
 - Support business growth through seasonal inventory planning and market event preparation tools
@@ -17,6 +17,6 @@ Our target user operates a small 3D printing business with designer partnerships
 
 ## Change Log
 
-| Date | Version | Description | Author |
-|------|---------|-------------|--------|
-| 2025-09-18 | 1.0 | Initial PRD creation from Project Brief | Product Manager John |
+| Date       | Version | Description                             | Author               |
+| ---------- | ------- | --------------------------------------- | -------------------- |
+| 2025-09-18 | 1.0     | Initial PRD creation from Project Brief | Product Manager John |

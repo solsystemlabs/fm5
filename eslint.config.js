@@ -11,7 +11,7 @@ export default [
       'dist/**',
       'node_modules/**',
       '*.config.js',
-      'routeTree.gen.ts'
-    ]
-  }
+      'routeTree.gen.ts',
+    ],
+  },
 ]

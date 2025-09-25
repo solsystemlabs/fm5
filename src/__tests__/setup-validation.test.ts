@@ -53,7 +53,7 @@ describe('Project Structure Validation', () => {
 
     expect(modernFeature()).toEqual({
       test: 'value',
-      additional: 'prop'
+      additional: 'prop',
     })
   })
 })

@@ -13,18 +13,15 @@ export function usePrintQueue() {
       // Refresh every 30 seconds for active queue monitoring
       refetchInterval: 30 * 1000,
       refetchOnWindowFocus: true,
-    }
+    },
   )
 
   // Queue statistics with caching
-  const statsQuery = api.queue.stats.useQuery(
-    undefined,
-    {
-      // Cache stats for 1 minute
-      staleTime: 60 * 1000,
-      refetchInterval: 60 * 1000,
-    }
-  )
+  const statsQuery = api.queue.stats.useQuery(undefined, {
+    // Cache stats for 1 minute
+    staleTime: 60 * 1000,
+    refetchInterval: 60 * 1000,
+  })
 
   // Add job to queue with optimistic updates
   const addJob = api.queue.add.useMutation({
@@ -68,9 +65,10 @@ export function usePrintQueue() {
               ? {
                   ...job,
                   status,
-                  completionPercentage: completionPercentage ?? job.completionPercentage,
+                  completionPercentage:
+                    completionPercentage ?? job.completionPercentage,
                 }
-              : job
+              : job,
           ) ?? [],
         nextCursor: old?.nextCursor,
       }))
@@ -110,9 +108,10 @@ export function usePrintQueue() {
     stats: statsQuery.data,
 
     // Computed values
-    activeJobs: queueQuery.data?.jobs.filter((job) =>
-      ['queued', 'printing'].includes(job.status)
-    ) ?? [],
+    activeJobs:
+      queueQuery.data?.jobs.filter((job) =>
+        ['queued', 'printing'].includes(job.status),
+      ) ?? [],
 
     // Loading states
     isLoading: queueQuery.isLoading || statsQuery.isLoading,
@@ -144,13 +143,15 @@ export function usePrintQueue() {
 /**
  * Hook for infinite scroll queue with pagination
  */
-export function useInfiniteQueue(status?: 'queued' | 'printing' | 'completed' | 'failed') {
+export function useInfiniteQueue(
+  status?: 'queued' | 'printing' | 'completed' | 'failed',
+) {
   const infiniteQuery = api.queue.list.useInfiniteQuery(
     { status, limit: 10 },
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
       refetchInterval: status ? undefined : 30 * 1000, // Only auto-refresh for all statuses
-    }
+    },
   )
 
   return {

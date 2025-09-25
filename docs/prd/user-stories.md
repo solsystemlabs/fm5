@@ -150,18 +150,18 @@ so that features requiring third-party services work reliably.
 
 1. Cloudflare R2 account setup with API keys and bucket configuration
 2. DNS configuration planned and domain registration requirements documented
-3. Email service provider selected and configured (SendGrid or AWS SES)
-4. CDN configuration planned for static asset delivery
+3. Resend email service configured with API keys and email templates
+4. Cloudflare CDN integration configured for global asset delivery
 5. Service monitoring and alerting configured
 
 **Technical Requirements:**
 
-- R2 bucket policies configured for secure file access
-- Email templates created for system notifications
-- CDN integration with R2 for optimized file delivery
-- Service health monitoring and automatic failover
-- API rate limiting and quota management
-- Cost monitoring and alerts for cloud services
+- R2 bucket policies configured for secure file access with staging/production separation
+- Resend email templates created for user verification and system notifications
+- Cloudflare CDN integrated with Workers for optimal static asset delivery
+- Cloudflare Analytics configured for service monitoring and performance tracking
+- Cloudflare Workers rate limiting and quota management implementation
+- Cost monitoring and alerts configured for Cloudflare services and Xata usage
 
 **Story 0.8: Error Handling and User Documentation Framework**
 As a developer,

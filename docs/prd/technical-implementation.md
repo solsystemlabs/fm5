@@ -5,15 +5,49 @@
 - **Frontend Framework**: Tanstack Start (React-based full-stack framework)
 - **Styling**: TailwindCSS for responsive design
 - **Database**: PostgreSQL with PrismaORM and Tanstack DB
-- **Authentication**: JWT tokens with secure session management (Clerk or Auth0)
+- **Authentication**: BetterAuth with JWT tokens and secure session management
 - **State Management**: Tanstack Query for server state, Tanstack Form for form handling
 - **UI Components**: React Aria for accessible component primitives
-- **Database Hosting**: Xata (staging/production), Docker PostgreSQL (local development)
+- **Database Hosting**: Xata PostgreSQL (staging/production), Docker PostgreSQL (local development)
 - **File Storage**: Cloudflare R2 for model and sliced files with user isolation
-- **Email Service**: SendGrid or AWS SES for transactional emails
-- **Monitoring**: Error tracking (Sentry) and performance monitoring
-- **CI/CD**: GitHub Actions for automated testing and deployment
+- **Email Service**: Resend for transactional emails
+- **Deployment Platform**: Cloudflare Workers for serverless edge deployment
+- **Monitoring**: Cloudflare Analytics and error tracking with performance monitoring
+- **CI/CD**: GitHub Actions with Wrangler deployment to staging and production Workers
 - **Development**: Docker for local environment consistency
+
+## Deployment Infrastructure
+
+### Cloud Architecture
+- **Deployment Platform**: Cloudflare Workers for global edge deployment with automatic scaling
+- **Database Production**: Xata PostgreSQL with generous free tier and built-in REST API
+- **File Storage**: Cloudflare R2 object storage with native Workers integration
+- **Email Service**: Resend for reliable transactional email delivery
+- **Infrastructure as Code**: Wrangler CLI for complete deployment lifecycle management
+
+### Environment Strategy
+- **Development**: Local Docker environment with PostgreSQL, Redis, and MinIO
+- **Staging**: Cloudflare Worker with Xata staging database and R2 staging bucket
+- **Production**: Cloudflare Worker with Xata production database and R2 production bucket
+- **Environment Isolation**: Complete separation of data and configurations between environments
+
+### CI/CD Pipeline
+- **Automated Testing**: GitHub Actions runs unit, integration, and security tests on all pull requests
+- **Staging Deployment**: Automatic deployment to staging Worker on main branch commits
+- **Production Deployment**: Manual promotion from staging to production via GitHub Actions
+- **Rollback Strategy**: Wrangler rollback commands and version-based deployment recovery
+
+### Operational Excellence
+- **Monitoring**: Cloudflare Analytics for performance metrics and error tracking
+- **Health Checks**: Automated endpoint monitoring for database and storage connectivity
+- **Security**: Environment variable encryption, API key rotation, and secure secrets management
+- **Cost Optimization**: Leverage free tiers and pay-per-use pricing for cost-effective scaling
+
+### Integration Points
+- **Authentication**: BetterAuth configured for Xata PostgreSQL and Cloudflare Workers runtime
+- **File Processing**: Direct R2 integration with Workers for efficient file operations
+- **Email Delivery**: Resend HTTP API integration optimized for serverless environment
+- **Database Access**: Xata HTTP API eliminating connection pooling complexity
 
 ## Database Schema Design
 

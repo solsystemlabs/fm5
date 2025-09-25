@@ -25,16 +25,16 @@ Configure these secrets in your GitHub repository settings:
 
 - `STAGING_JWT_SECRET` - JWT secret for staging
 - `STAGING_BETTER_AUTH_SECRET` - BetterAuth secret for staging
-- `STAGING_XATA_API_KEY` - Xata API key for staging database
-- `STAGING_XATA_DATABASE_URL` - Xata database URL for staging
+- `STAGING_XATA_DATABASE_URL` - Xata PostgreSQL URL for staging branch (postgresql://...)
+- `STAGING_XATA_SHADOW_DATABASE_URL` - Xata PostgreSQL URL for staging shadow database
 - `STAGING_RESEND_API_KEY` - Resend API key for staging emails
 
 **Production Environment:**
 
 - `PRODUCTION_JWT_SECRET` - JWT secret for production
 - `PRODUCTION_BETTER_AUTH_SECRET` - BetterAuth secret for production
-- `PRODUCTION_XATA_API_KEY` - Xata API key for production database
-- `PRODUCTION_XATA_DATABASE_URL` - Xata database URL for production
+- `PRODUCTION_XATA_DATABASE_URL` - Xata PostgreSQL URL for main branch (postgresql://...)
+- `PRODUCTION_XATA_SHADOW_DATABASE_URL` - Xata PostgreSQL URL for production shadow database
 - `PRODUCTION_RESEND_API_KEY` - Resend API key for production emails
 
 ### Wrangler Secrets Management
@@ -43,15 +43,15 @@ Configure these secrets in your GitHub repository settings:
 # Configure staging secrets
 wrangler secret put JWT_SECRET --env staging
 wrangler secret put BETTER_AUTH_SECRET --env staging
-wrangler secret put XATA_API_KEY --env staging
-wrangler secret put XATA_DATABASE_URL --env staging
+wrangler secret put DATABASE_URL --env staging
+wrangler secret put SHADOW_DATABASE_URL --env staging
 wrangler secret put RESEND_API_KEY --env staging
 
 # Configure production secrets
 wrangler secret put JWT_SECRET --env production
 wrangler secret put BETTER_AUTH_SECRET --env production
-wrangler secret put XATA_API_KEY --env production
-wrangler secret put XATA_DATABASE_URL --env production
+wrangler secret put DATABASE_URL --env production
+wrangler secret put SHADOW_DATABASE_URL --env production
 wrangler secret put RESEND_API_KEY --env production
 ```
 

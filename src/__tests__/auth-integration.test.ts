@@ -133,7 +133,7 @@ describe('BetterAuth Integration', () => {
       })
     })
 
-    it('should create a session on successful authentication', async () => {
+    it('should create a session on successful authentication', () => {
       expect(userSession.token).toBeDefined()
       expect(userSession.user).toBeDefined()
       expect(userSession.user.id).toBeDefined()

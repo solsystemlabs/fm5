@@ -35,7 +35,7 @@ export const authRouter = createTRPCRouter({
         isAuthenticated: z.boolean(),
       }),
     )
-    .query(async ({ ctx }) => {
+    .query(({ ctx }) => {
       return {
         userId: ctx.user.id,
         isAuthenticated: true,

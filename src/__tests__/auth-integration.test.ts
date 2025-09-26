@@ -1,18 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { auth } from '~/lib/auth'
-import { prisma } from '~/lib/db'
+import { testAuth as auth } from './test-auth'
+import { cleanupTestData, testPrisma } from './test-db'
 
 describe('BetterAuth Integration', () => {
   beforeEach(async () => {
-    await prisma.session.deleteMany()
-    await prisma.account.deleteMany()
-    await prisma.user.deleteMany()
+    await cleanupTestData()
   })
 
   afterEach(async () => {
-    await prisma.session.deleteMany()
-    await prisma.account.deleteMany()
-    await prisma.user.deleteMany()
+    await cleanupTestData()
   })
 
   describe('User Registration', () => {
@@ -33,8 +29,11 @@ describe('BetterAuth Integration', () => {
       expect(response.user.name).toBe(testUser.name)
       expect(response.user.emailVerified).toBe(false)
 
+      // Wait a bit to ensure database write is complete
+      await new Promise(resolve => setTimeout(resolve, 100))
+
       // Verify role is set correctly in database
-      const dbUser = await prisma.user.findUnique({
+      const dbUser = await testPrisma.user.findUnique({
         where: { email: testUser.email },
       })
       expect(dbUser?.role).toBe('owner')
@@ -142,7 +141,7 @@ describe('BetterAuth Integration', () => {
     it('should validate session token', async () => {
       // BetterAuth handles session validation differently in test environment
       // Let's verify the user session exists through the database instead
-      const dbSession = await prisma.session.findFirst({
+      const dbSession = await testPrisma.session.findFirst({
         where: { userId: userSession.user.id },
         include: { user: true },
       })
@@ -155,16 +154,16 @@ describe('BetterAuth Integration', () => {
     it('should handle sign out', async () => {
       // Instead of testing the API sign out directly (which has session context issues),
       // let's verify that sessions can be cleaned up via database
-      const sessionsBefore = await prisma.session.count({
+      const sessionsBefore = await testPrisma.session.count({
         where: { userId: userSession.user.id },
       })
 
       // Sign out by deleting the session (simulating what signOut would do)
-      await prisma.session.deleteMany({
+      await testPrisma.session.deleteMany({
         where: { userId: userSession.user.id },
       })
 
-      const sessionsAfter = await prisma.session.count({
+      const sessionsAfter = await testPrisma.session.count({
         where: { userId: userSession.user.id },
       })
 
@@ -186,7 +185,7 @@ describe('BetterAuth Integration', () => {
       })
 
       // Verify user exists in database
-      const dbUser = await prisma.user.findUnique({
+      const dbUser = await testPrisma.user.findUnique({
         where: { email: testUser.email },
       })
 
@@ -199,10 +198,10 @@ describe('BetterAuth Integration', () => {
 
     it('should create BetterAuth tables correctly', async () => {
       // Test that all required tables exist by running simple queries
-      await expect(prisma.user.findMany()).resolves.toBeDefined()
-      await expect(prisma.session.findMany()).resolves.toBeDefined()
-      await expect(prisma.account.findMany()).resolves.toBeDefined()
-      await expect(prisma.verification.findMany()).resolves.toBeDefined()
+      await expect(testPrisma.user.findMany()).resolves.toBeDefined()
+      await expect(testPrisma.session.findMany()).resolves.toBeDefined()
+      await expect(testPrisma.account.findMany()).resolves.toBeDefined()
+      await expect(testPrisma.verification.findMany()).resolves.toBeDefined()
     })
   })
 })

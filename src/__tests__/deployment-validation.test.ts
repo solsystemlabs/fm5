@@ -48,7 +48,7 @@ describe('Deployment Configuration Validation', () => {
 
     // Check required workflow structure
     expect(workflowConfig).toContain('name: Deploy to Cloudflare Workers')
-    expect(workflowConfig).toContain('test-and-build:')
+    expect(workflowConfig).toContain('build:')
     expect(workflowConfig).toContain('deploy-staging:')
     expect(workflowConfig).toContain('deploy-production:')
     expect(workflowConfig).toContain('cloudflare/wrangler-action@v3')

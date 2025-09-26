@@ -10,3 +10,8 @@ count.txt
 .output
 .vinxi
 todos.json
+
+.wrangler
+
+.env.staging
+.env.production

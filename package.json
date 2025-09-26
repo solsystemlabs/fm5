@@ -8,7 +8,7 @@
     "build": "vite build",
     "serve": "vite preview",
     "test": "vitest run",
-    "test:prepare": "prisma generate && prisma migrate deploy",
+    "test:prepare": "prisma generate && prisma migrate reset --force",
     "lint": "eslint",
     "format": "prettier . --write",
     "check": "prettier --write . && eslint --fix",

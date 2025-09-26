@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { TRPCError } from '@trpc/server'
+import { cleanupTestData } from './test-db'
 import { createTRPCContext } from '~/lib/trpc'
 import { appRouter } from '~/lib/routers/_app'
-import { prisma } from '~/lib/db'
 
 // Mock request helper
 const createMockRequest = (headers: Record<string, string> = {}) => {
@@ -15,17 +15,11 @@ const createMockRequest = (headers: Record<string, string> = {}) => {
 
 describe('tRPC Authentication Middleware', () => {
   beforeEach(async () => {
-    // Clean up test data
-    await prisma.session.deleteMany()
-    await prisma.account.deleteMany()
-    await prisma.user.deleteMany()
+    await cleanupTestData()
   })
 
   afterEach(async () => {
-    // Clean up test data
-    await prisma.session.deleteMany()
-    await prisma.account.deleteMany()
-    await prisma.user.deleteMany()
+    await cleanupTestData()
   })
 
   describe('Context Creation', () => {

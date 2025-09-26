@@ -34,7 +34,7 @@ export const filamentsRouter = createTRPCRouter({
       })
 
       // Transform Prisma model to match Zod schema
-      return filaments.map(filament => ({
+      return filaments.map((filament) => ({
         ...filament,
         costPerGramBase: filament.costPerGramBase.toNumber(),
         purchaseUrl: filament.purchaseUrl ?? undefined,
@@ -189,7 +189,7 @@ export const filamentsRouter = createTRPCRouter({
         })
 
         // Transform Prisma model to match Zod schema
-        return inventory.map(item => ({
+        return inventory.map((item) => ({
           ...item,
           actualCostPerGram: item.actualCostPerGram.toNumber(),
           batchIdentifier: item.batchIdentifier ?? undefined,

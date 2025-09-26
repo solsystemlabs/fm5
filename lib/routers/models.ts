@@ -50,7 +50,7 @@ export const modelsRouter = createTRPCRouter({
       }
 
       return {
-        models: models.map(model => ({
+        models: models.map((model) => ({
           ...model,
           description: model.description ?? undefined,
         })),

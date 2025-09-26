@@ -52,12 +52,14 @@ graph TB
 ### Core Infrastructure Components
 
 #### Cloudflare Workers
+
 - **Purpose**: Serverless application hosting with global edge distribution
 - **Scaling**: Automatic scaling based on demand
 - **Performance**: Sub-10ms cold start times, global edge network
 - **Cost**: Free tier: 100k requests/day, paid: $5/10M requests
 
 #### Xata PostgreSQL
+
 - **Purpose**: Primary database for all application data
 - **Free Tier**: 15GB storage, 250k monthly requests per database
 - **Features**: Built-in REST API, full-text search, edge caching
@@ -65,12 +67,14 @@ graph TB
 - **Connection**: Direct HTTP API calls (no connection pooling needed)
 
 #### Cloudflare R2
+
 - **Purpose**: File storage for 3D models, sliced files, and generated content
 - **Free Tier**: 10GB storage, 1M Class A operations/month
 - **Integration**: Native Cloudflare Workers integration
 - **Buckets**: Separate staging and production buckets for isolation
 
 #### Resend Email Service
+
 - **Purpose**: Transactional email delivery (user verification, notifications)
 - **Free Tier**: 3k emails/month, 100 emails/day
 - **Integration**: HTTP API compatible with Cloudflare Workers
@@ -81,6 +85,7 @@ graph TB
 ### Tooling Strategy: Wrangler CLI
 
 **Rationale**: Wrangler provides complete lifecycle management for Cloudflare Workers, including:
+
 - Environment variable management
 - Secret management
 - R2 bucket configuration
@@ -90,6 +95,7 @@ graph TB
 ### Configuration Files
 
 #### `wrangler.toml` (Staging)
+
 ```toml
 name = "fm5-staging"
 main = ".output/server/index.mjs"
@@ -108,6 +114,7 @@ bucket_name = "fm5-staging-files"
 ```
 
 #### `wrangler.toml` (Production)
+
 ```toml
 name = "fm5-production"
 main = ".output/server/index.mjs"
@@ -125,6 +132,7 @@ bucket_name = "fm5-production-files"
 ### Environment Variable Management
 
 **Staging Environment Variables:**
+
 ```bash
 # Database
 XATA_API_KEY=<staging-xata-api-key>
@@ -144,6 +152,7 @@ R2_SECRET_ACCESS_KEY=<staging-r2-secret-key>
 ```
 
 **Production Environment Variables:**
+
 ```bash
 # Database
 XATA_API_KEY=<production-xata-api-key>
@@ -167,6 +176,7 @@ R2_SECRET_ACCESS_KEY=<production-r2-secret-key>
 ### GitHub Actions Workflow
 
 #### Pipeline Stages
+
 1. **Code Quality**: ESLint, Prettier, TypeScript checking
 2. **Testing**: Unit tests, integration tests
 3. **Build**: Tanstack Start production build with Nitro
@@ -259,17 +269,20 @@ jobs:
 ### Xata Configuration
 
 #### Database Structure
+
 - **Staging Database**: `fm5-staging` - Full feature testing environment
 - **Production Database**: `fm5-production` - Live user data
 - **Schema Migrations**: Managed through Prisma + Xata schema sync
 
 #### Migration Strategy
+
 1. **Development**: Prisma migrate dev against local PostgreSQL
 2. **Staging**: Apply migrations to staging Xata database
 3. **Testing**: Validate migrations in staging environment
 4. **Production**: Apply tested migrations to production database
 
 #### Backup and Recovery
+
 - **Xata Automatic Backups**: Point-in-time recovery up to 7 days
 - **Migration Rollback**: Prisma migration rollback procedures
 - **Data Export**: Regular exports for compliance and backup
@@ -277,11 +290,13 @@ jobs:
 ## Container Integration
 
 ### Development Environment
+
 - **Docker Compose**: Existing development setup remains unchanged
 - **Local Testing**: Full stack runs locally with Docker services
 - **Environment Parity**: Local environment variables match staging/production
 
 ### Production Deployment
+
 - **No Containers**: Cloudflare Workers run directly on V8 isolates
 - **Build Output**: Tanstack Start Nitro output optimized for Workers runtime
 - **Asset Handling**: Static assets served via Cloudflare CDN
@@ -289,11 +304,12 @@ jobs:
 ## Integration Architecture
 
 ### BetterAuth Production Configuration
+
 ```typescript
 // lib/auth.ts - Production configuration
 export const auth = betterAuth({
   database: {
-    provider: "postgres",
+    provider: 'postgres',
     url: process.env.XATA_DATABASE_URL,
   },
   session: {
@@ -301,8 +317,8 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24, // 24 hours
   },
   jwt: {
-    issuer: "fm5-app",
-    audience: ["fm5-web"],
+    issuer: 'fm5-app',
+    audience: ['fm5-web'],
   },
   plugins: [
     nodejs(),
@@ -312,6 +328,7 @@ export const auth = betterAuth({
 ```
 
 ### Cloudflare R2 Integration
+
 ```typescript
 // lib/file-storage.ts
 interface Env {
@@ -321,7 +338,7 @@ interface Env {
 export async function uploadFile(
   env: Env,
   key: string,
-  file: File
+  file: File,
 ): Promise<void> {
   await env.FILE_STORAGE.put(key, file.stream(), {
     httpMetadata: {
@@ -332,6 +349,7 @@ export async function uploadFile(
 ```
 
 ### Resend Email Integration
+
 ```typescript
 // lib/email.ts
 import { Resend } from 'resend'
@@ -340,7 +358,7 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function sendVerificationEmail(
   email: string,
-  token: string
+  token: string,
 ): Promise<void> {
   await resend.emails.send({
     from: 'noreply@fm5.app',
@@ -354,18 +372,21 @@ export async function sendVerificationEmail(
 ## Monitoring and Operational Requirements
 
 ### Observability Stack
+
 - **Cloudflare Analytics**: Request metrics, performance monitoring
 - **Wrangler Tail**: Real-time log streaming for debugging
 - **Xata Metrics**: Database performance and usage monitoring
 - **Resend Analytics**: Email delivery and engagement metrics
 
 ### Alerting Strategy
+
 - **Error Rate Alerts**: >5% error rate triggers notification
 - **Performance Alerts**: >1000ms P95 response time alerts
 - **Database Alerts**: Connection failures or slow queries
 - **Email Delivery**: Bounce rate or delivery failure alerts
 
 ### Health Check Endpoints
+
 ```typescript
 // /health endpoint
 export async function healthCheck(): Promise<Response> {
@@ -376,24 +397,30 @@ export async function healthCheck(): Promise<Response> {
     // Check R2 connectivity
     const r2Check = await env.FILE_STORAGE.head('health-check')
 
-    return new Response(JSON.stringify({
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      services: {
-        database: 'ok',
-        storage: 'ok'
-      }
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    })
+    return new Response(
+      JSON.stringify({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        services: {
+          database: 'ok',
+          storage: 'ok',
+        },
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
   } catch (error) {
-    return new Response(JSON.stringify({
-      status: 'unhealthy',
-      error: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    })
+    return new Response(
+      JSON.stringify({
+        status: 'unhealthy',
+        error: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
   }
 }
 ```
@@ -401,18 +428,21 @@ export async function healthCheck(): Promise<Response> {
 ## Security Configuration
 
 ### Environment Security
+
 - **Secrets Management**: Cloudflare Workers secrets (encrypted at rest)
 - **API Key Rotation**: Regular rotation of database and service API keys
 - **CORS Configuration**: Strict origin policies for production
 - **Rate Limiting**: Per-user quotas via Cloudflare Workers
 
 ### Authentication Security
+
 - **JWT Configuration**: Short-lived access tokens, secure refresh flow
 - **Session Security**: HttpOnly cookies, secure flag, SameSite strict
 - **Password Policy**: BetterAuth default security policies
 - **MFA Support**: Ready for future multi-factor authentication
 
 ### File Security
+
 - **Upload Validation**: File type and size restrictions
 - **Access Control**: Signed URLs for secure file access
 - **User Isolation**: File paths include user ID for isolation
@@ -421,17 +451,20 @@ export async function healthCheck(): Promise<Response> {
 ## Cost Management
 
 ### Cost Optimization Strategy
+
 - **Cloudflare Workers**: $5/10M requests (very cost effective)
 - **Xata Free Tier**: 15GB storage, 250k requests/month per database
 - **R2 Storage**: $0.015/GB/month, free tier: 10GB
 - **Resend**: $20/month for 100k emails (after free tier)
 
 ### Monitoring and Alerts
+
 - **Usage Tracking**: Monthly cost reports via Cloudflare dashboard
 - **Threshold Alerts**: Notify before exceeding free tier limits
 - **Optimization**: Regular review of usage patterns and costs
 
 ### Scaling Considerations
+
 - **Database**: Xata scales automatically, pricing based on usage
 - **Workers**: Automatic scaling, pay per request model
 - **Storage**: R2 scales automatically, pay per GB stored
@@ -440,12 +473,14 @@ export async function healthCheck(): Promise<Response> {
 ## Compliance and Backup
 
 ### Data Protection
+
 - **GDPR Compliance**: User data export and deletion procedures
 - **Data Residency**: Cloudflare global network, Xata EU/US regions
 - **Encryption**: All data encrypted in transit and at rest
 - **Audit Logging**: Request logging for security and compliance
 
 ### Backup Strategy
+
 - **Database**: Xata automatic backups, point-in-time recovery
 - **File Storage**: R2 versioning and lifecycle policies
 - **Configuration**: Infrastructure configuration stored in Git

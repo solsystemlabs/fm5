@@ -1,0 +1,33 @@
+name = "fm5"
+main = ".output/server/index.mjs"
+compatibility_date = "2025-09-24"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = ".output/public"
+
+[observability]
+enabled = true
+
+# Development environment (local)
+[env.development]
+vars = { NODE_ENV = "development", APP_ENV = "development" }
+
+# Staging environment configuration
+[env.staging]
+name = "fm5-staging"
+vars = { NODE_ENV = "staging", APP_ENV = "staging" }
+
+[[env.staging.r2_buckets]]
+binding = "FILE_STORAGE"
+bucket_name = "fm5-staging-files"
+
+# Production environment configuration
+[env.production]
+name = "fm5-production"
+vars = { NODE_ENV = "production", APP_ENV = "production" }
+
+[[env.production.r2_buckets]]
+binding = "FILE_STORAGE"
+bucket_name = "fm5-production-files"
+

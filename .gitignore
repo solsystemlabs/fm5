@@ -4,9 +4,21 @@ dist
 dist-ssr
 *.local
 count.txt
+
+# Environment files - keep local dev, commit staging/production templates
 .env
+.env.local
+
+# Build and cache directories
 .nitro
 .tanstack
 .output
 .vinxi
+
+# Temporary files
 todos.json
+
+.wrangler
+
+.env.staging
+.env.production

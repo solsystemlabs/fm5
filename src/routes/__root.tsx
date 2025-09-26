@@ -1,6 +1,7 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanstackDevtools } from '@tanstack/react-devtools'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import * as React from 'react'
 
 import Header from '../components/layout/Header'
 import { TRPCProvider } from '../components/providers/TRPCProvider'
@@ -38,6 +39,7 @@ export const Route = createRootRoute({
  * @param props.children - Child components to render within the body
  * @returns JSX element containing the complete HTML document structure
  */
+
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -48,17 +50,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <TRPCProvider>
           <Header />
           {children}
-          <TanstackDevtools
-            config={{
-              position: 'bottom-left',
-            }}
-            plugins={[
-              {
-                name: 'Tanstack Router',
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-            ]}
-          />
+          <TanStackRouterDevtools />
+          <ReactQueryDevtools />
         </TRPCProvider>
         <Scripts />
       </body>

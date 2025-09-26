@@ -33,6 +33,13 @@
 - **Production**: Cloudflare Worker with Xata production database and R2 production bucket
 - **Environment Isolation**: Complete separation of data and configurations between environments
 
+### Testing Environment Strategy
+
+- **Local Testing**: Uses Docker PostgreSQL container for consistent local development testing
+- **CI/CD Testing**: Uses Xata test database branch to match production database technology
+- **Environment Detection**: Test configuration automatically detects CI environment and selects appropriate database
+- **Database Isolation**: Local and CI test databases are completely isolated from development/staging/production data
+
 ### CI/CD Pipeline
 
 - **Automated Testing**: GitHub Actions runs unit, integration, and security tests on all pull requests

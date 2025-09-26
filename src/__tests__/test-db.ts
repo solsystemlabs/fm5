@@ -1,11 +1,20 @@
 // Test-specific database client
 import { PrismaClient } from '@prisma/client'
 
-// Create a test-specific Prisma client with explicit local database URL
+// Environment-aware database URL selection
+const getDatabaseUrl = () => {
+  // Use Xata test database in CI, local Docker PostgreSQL in development
+  if (process.env.CI) {
+    return process.env.XATA_TEST_DATABASE_URL || process.env.DATABASE_URL
+  }
+  return 'postgresql://printmgmt_user:dev_password@localhost:5432/printmgmt_dev'
+}
+
+// Create a test-specific Prisma client with environment-aware database URL
 export const testPrisma = new PrismaClient({
   datasources: {
     db: {
-      url: 'postgresql://printmgmt_user:dev_password@localhost:5432/printmgmt_dev'
+      url: getDatabaseUrl()
     }
   },
   log: process.env.NODE_ENV === 'test' ? [] : ['error']

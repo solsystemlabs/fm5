@@ -1,6 +1,11 @@
 // Rate limiting validation tests for authentication endpoints
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import type { Request } from 'express'
+
+interface RequestLike {
+  ip: string
+  url: string
+  method: string
+}
 
 describe('Authentication Rate Limiting', () => {
   beforeEach(() => {
@@ -37,9 +42,9 @@ describe('Authentication Rate Limiting', () => {
         ip: '192.168.1.1',
         url: '/api/auth/login',
         method: 'POST'
-      } as Partial<Request>
+      } as RequestLike
 
-      const rateLimitCheck = (req: Partial<Request>) => {
+      const rateLimitCheck = (req: RequestLike) => {
         // Basic rate limiting logic validation
         return req.ip && req.url && req.method === 'POST'
       }
@@ -54,9 +59,9 @@ describe('Authentication Rate Limiting', () => {
         ip: '192.168.1.2',
         url: '/api/auth/register',
         method: 'POST'
-      } as Partial<Request>
+      } as RequestLike
 
-      const rateLimitCheck = (req: Partial<Request>) => {
+      const rateLimitCheck = (req: RequestLike) => {
         // Basic rate limiting logic validation
         return req.ip && req.url && req.method === 'POST'
       }

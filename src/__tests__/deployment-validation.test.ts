@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 describe('Deployment Configuration Validation', () => {
   it('should have wrangler.toml configuration', () => {
     const wranglerPath = join(process.cwd(), 'wrangler.toml')
-    let wranglerConfig: string
+    let wranglerConfig = ''
 
     expect(() => {
       wranglerConfig = readFileSync(wranglerPath, 'utf-8')
@@ -40,7 +40,7 @@ describe('Deployment Configuration Validation', () => {
 
   it('should have GitHub Actions workflow', () => {
     const workflowPath = join(process.cwd(), '.github/workflows/deploy.yml')
-    let workflowConfig: string
+    let workflowConfig = ''
 
     expect(() => {
       workflowConfig = readFileSync(workflowPath, 'utf-8')
@@ -68,7 +68,7 @@ describe('Deployment Configuration Validation', () => {
 
   it('should have deployment documentation', () => {
     const deploymentDocsPath = join(process.cwd(), 'DEPLOYMENT.md')
-    let deploymentDocs: string
+    let deploymentDocs = ''
 
     expect(() => {
       deploymentDocs = readFileSync(deploymentDocsPath, 'utf-8')

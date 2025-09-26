@@ -36,7 +36,9 @@ export const testAuth = betterAuth({
   },
   plugins: [
     jwt({
-      jwks: process.env.BETTER_AUTH_JWT_JWKS,
+      jwks: process.env.BETTER_AUTH_JWT_JWKS ? {
+        remoteUrl: process.env.BETTER_AUTH_JWT_JWKS,
+      } : undefined,
     }),
     reactStartCookies(),
   ],

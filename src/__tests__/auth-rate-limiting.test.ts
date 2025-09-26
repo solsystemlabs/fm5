@@ -41,7 +41,7 @@ describe('Authentication Rate Limiting', () => {
       const mockRequest = {
         ip: '192.168.1.1',
         url: '/api/auth/login',
-        method: 'POST'
+        method: 'POST',
       } as RequestLike
 
       const rateLimitCheck = (req: RequestLike) => {
@@ -58,7 +58,7 @@ describe('Authentication Rate Limiting', () => {
       const mockRequest = {
         ip: '192.168.1.2',
         url: '/api/auth/register',
-        method: 'POST'
+        method: 'POST',
       } as RequestLike
 
       const rateLimitCheck = (req: RequestLike) => {
@@ -111,10 +111,10 @@ describe('Authentication Rate Limiting', () => {
     it('should define appropriate rate limit thresholds', () => {
       // Test: Validate rate limiting configuration constants
       const RATE_LIMITS = {
-        LOGIN_ATTEMPTS: 5,        // per 15 minutes
-        JWT_VALIDATION: 100,      // per minute
-        SESSION_CREATION: 10,     // per minute
-        PASSWORD_RESET: 3,        // per hour
+        LOGIN_ATTEMPTS: 5, // per 15 minutes
+        JWT_VALIDATION: 100, // per minute
+        SESSION_CREATION: 10, // per minute
+        PASSWORD_RESET: 3, // per hour
       }
 
       expect(RATE_LIMITS.LOGIN_ATTEMPTS).toBeGreaterThan(0)
@@ -129,7 +129,7 @@ describe('Authentication Rate Limiting', () => {
         '/api/auth/login',
         '/api/auth/register',
         '/api/auth/session',
-        '/api/auth/logout'
+        '/api/auth/logout',
       ]
 
       // Validate all expected endpoints are covered
@@ -145,7 +145,7 @@ describe('Authentication Rate Limiting', () => {
       const rateLimitError = {
         code: 429,
         message: 'Too many authentication attempts. Please try again later.',
-        retryAfter: 900 // 15 minutes in seconds
+        retryAfter: 900, // 15 minutes in seconds
       }
 
       expect(rateLimitError.code).toBe(429)

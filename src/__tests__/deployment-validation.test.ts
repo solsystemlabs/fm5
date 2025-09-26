@@ -106,16 +106,16 @@ describe('Deployment Configuration Validation', () => {
 
   it('should have database configuration for Xata', () => {
     // Test the database configuration module exists
-    const fs = require('fs')
-    const path = require('path')
+    const fs = require('node:fs')
+    const path = require('node:path')
 
     // Check if database configuration files exist
     const dbPaths = [
       path.join(__dirname, '../../lib/db.ts'),
-      path.join(__dirname, '../lib/db.ts')
+      path.join(__dirname, '../lib/db.ts'),
     ]
 
-    const dbFileExists = dbPaths.some(dbPath => fs.existsSync(dbPath))
+    const dbFileExists = dbPaths.some((dbPath) => fs.existsSync(dbPath))
     expect(dbFileExists).toBe(true)
   })
 })

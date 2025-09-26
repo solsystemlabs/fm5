@@ -13,23 +13,27 @@ The FM5 project uses a three-tier environment setup:
 ## Environment Files
 
 ### `.env` (Local Development)
+
 - Contains local development database connections and services
 - Uses local Docker services (PostgreSQL, Redis, MinIO)
 - Safe default secrets for development
 - **Committed to git** as it contains no sensitive production data
 
 ### `.env.local` (Local Development Override)
+
 - Optional override file for local development
 - **Not committed to git**
 - Use this for personal local configuration overrides
 
 ### `.env.staging`
+
 - Contains staging-specific secrets and configurations
 - Real secrets for the staging environment
 - **Committed to git** (these are staging secrets, not production)
 - Automatically pushed to Cloudflare Workers staging environment
 
 ### `.env.production`
+
 - Contains production secrets and configurations
 - Real production secrets
 - **Committed to git** (team needs access to deploy)
@@ -46,12 +50,14 @@ The `./scripts/manage-secrets.sh` script automates secret management for Cloudfl
 ```
 
 **Actions:**
+
 - `push` - Push secrets from `.env.<environment>` to Cloudflare Workers
 - `pull` - Display current secrets in Cloudflare Workers (no values shown)
 - `list` - List all secrets in the environment
 - `delete` - Delete a specific secret from the environment
 
 **Environments:**
+
 - `staging` - Uses `.env.staging` file
 - `production` - Uses `.env.production` file
 
@@ -92,15 +98,18 @@ npm run deploy:production          # Build and deploy to production
 The following secrets are automatically managed by the script:
 
 ### Application Secrets
+
 - `JWT_SECRET` - JSON Web Token signing secret
 - `BETTER_AUTH_SECRET` - Better Auth library secret
 - `BETTER_AUTH_URL` - Base URL for auth callbacks
 
 ### Database & Storage
+
 - `XATA_API_KEY` - Xata database API key
 - `XATA_DATABASE_URL` - Xata database connection URL
 
 ### External Services
+
 - `RESEND_API_KEY` - Email service API key
 
 ## Workflow
@@ -108,12 +117,14 @@ The following secrets are automatically managed by the script:
 ### Setting up a new environment
 
 1. **Update environment file:**
+
    ```bash
    # Edit the appropriate file
    vim .env.staging  # or .env.production
    ```
 
 2. **Push secrets to Cloudflare:**
+
    ```bash
    npm run secrets:push:staging
    # or
@@ -130,11 +141,13 @@ The following secrets are automatically managed by the script:
 ### Updating secrets
 
 1. **Update the environment file:**
+
    ```bash
    vim .env.staging  # Update the secret value
    ```
 
 2. **Push updated secrets:**
+
    ```bash
    npm run secrets:push:staging
    ```
@@ -147,6 +160,7 @@ The following secrets are automatically managed by the script:
 ### Rotating secrets
 
 1. **Generate new secret values:**
+
    ```bash
    # Generate new JWT secret
    node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
@@ -155,6 +169,7 @@ The following secrets are automatically managed by the script:
 2. **Update environment file with new values**
 
 3. **Push new secrets:**
+
    ```bash
    npm run secrets:push:staging
    npm run secrets:push:production
@@ -173,16 +188,19 @@ The following secrets are automatically managed by the script:
 ## Troubleshooting
 
 ### Script fails to push secrets
+
 1. Ensure wrangler is authenticated: `wrangler whoami`
 2. Check you have access to the Cloudflare account
 3. Verify environment file exists and has correct format
 
 ### Secrets not taking effect
+
 1. Confirm secrets were pushed: `npm run secrets:list:staging`
 2. Redeploy the application: `npm run deploy:staging`
 3. Check Cloudflare Workers logs for errors
 
 ### Missing secrets in environment
+
 1. Add missing secrets to appropriate `.env.<environment>` file
 2. Update the `secrets` array in `manage-secrets.sh` if needed
 3. Push updated secrets
@@ -203,5 +221,5 @@ fm5/
 
 ---
 
-*Last Updated: 2025-09-25*
-*For questions or issues, refer to the main project documentation or contact the development team.*
+_Last Updated: 2025-09-25_
+_For questions or issues, refer to the main project documentation or contact the development team._

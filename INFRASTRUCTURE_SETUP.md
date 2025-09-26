@@ -7,6 +7,7 @@ This guide provides step-by-step instructions for setting up the complete FM5 in
 ## Prerequisites
 
 ✅ **Already Completed:**
+
 - Cloudflare account with Workers access
 - Xata account for database hosting
 - GitHub repository access
@@ -14,12 +15,14 @@ This guide provides step-by-step instructions for setting up the complete FM5 in
 ## Current Status
 
 ✅ **Wrangler Setup Complete:**
+
 - Wrangler CLI installed and authenticated (v4.40.0)
 - Account verified: me@tayloreernisse.com's Account (ef911de9808d5b042132327b8fb884f1)
 - R2 buckets created: `fm5-staging-files`, `fm5-production-files`
 - Basic secrets configured for testing
 
 ✅ **Configuration Files Updated:**
+
 - `vite.config.ts`: Added Cloudflare target configuration
 - `wrangler.toml`: Added assets directory and environment configurations
 
@@ -42,6 +45,7 @@ node -e "console.log('PRODUCTION_BETTER_AUTH_SECRET=' + require('crypto').random
 ### 2. Xata Database Setup
 
 **Create your databases:**
+
 1. Go to: https://app.xata.io
 2. Create new database: `fm5-staging`
 3. Create new database: `fm5-production`
@@ -49,6 +53,7 @@ node -e "console.log('PRODUCTION_BETTER_AUTH_SECRET=' + require('crypto').random
 5. Copy database URLs from each database settings page
 
 **Required Xata Information:**
+
 - `STAGING_XATA_API_KEY`: Your staging Xata API key
 - `STAGING_XATA_DATABASE_URL`: Your staging Xata database URL
 - `PRODUCTION_XATA_API_KEY`: Your production Xata API key
@@ -57,9 +62,10 @@ node -e "console.log('PRODUCTION_BETTER_AUTH_SECRET=' + require('crypto').random
 ### 3. Resend Email Service
 
 **Get Resend API key:**
+
 1. Go to: https://resend.com/api-keys
 2. Create new API key for FM5 project
-3. Copy the API key (starts with re_...)
+3. Copy the API key (starts with re\_...)
 
 ### 4. GitHub Repository Secrets
 
@@ -87,6 +93,7 @@ PRODUCTION_RESEND_API_KEY=<your-resend-api-key>
 ### 5. Wrangler Secrets Configuration
 
 **Configure staging secrets:**
+
 ```bash
 wrangler secret put JWT_SECRET --env staging
 # Enter your STAGING_JWT_SECRET when prompted
@@ -105,6 +112,7 @@ wrangler secret put RESEND_API_KEY --env staging
 ```
 
 **Configure production secrets:**
+
 ```bash
 wrangler secret put JWT_SECRET --env production
 wrangler secret put BETTER_AUTH_SECRET --env production
@@ -116,6 +124,7 @@ wrangler secret put RESEND_API_KEY --env production
 ### 6. Configuration Files Status
 
 **✅ vite.config.ts** - Updated with Cloudflare target:
+
 ```typescript
 tanstackStart({
   target: 'cloudflare-module', // Key configuration for Cloudflare compatibility
@@ -124,6 +133,7 @@ tanstackStart({
 ```
 
 **✅ wrangler.toml** - Updated with assets and environments:
+
 ```toml
 name = "fm5"
 main = ".output/server/index.mjs"
@@ -159,6 +169,7 @@ bucket_name = "fm5-production-files"
 **Issue:** The build process failed when trying to use Prisma with Cloudflare Workers due to WASM module loading.
 
 **Solution Applied:**
+
 1. **Updated Prisma imports** to use edge-compatible client:
    - Changed from `import { PrismaClient } from '@prisma/client'`
    - To `import { PrismaClient } from '@prisma/client/edge'`
@@ -187,6 +198,7 @@ wrangler deploy --env production
 ## Testing Deployment
 
 **✅ Live Deployment URLs:**
+
 - **Staging:** `https://fm5-staging.me-ef9.workers.dev/` ✅ **WORKING**
 - **Production:** `https://fm5-production.me-ef9.workers.dev/` (ready for deployment)
 
@@ -220,6 +232,7 @@ wrangler rollback --name fm5-production [DEPLOYMENT_ID]
 ## Summary
 
 **✅ Infrastructure Ready:**
+
 - Cloudflare Workers configured
 - Wrangler CLI working
 - R2 buckets created
@@ -238,6 +251,7 @@ The project now uses automated secret management with environment-specific files
 - `.env.production` - Production secrets (committed)
 
 **Automated Secret Management:**
+
 ```bash
 # Push secrets to environments
 npm run secrets:push:staging
@@ -255,6 +269,7 @@ npm run deploy:production
 See `docs/secrets-management.md` for complete documentation.
 
 **📋 Files Created/Modified:**
+
 - `vite.config.ts` - Added Cloudflare target
 - `wrangler.toml` - Updated with assets and environments
 - `scripts/manage-secrets.sh` - Automated secret management
@@ -265,5 +280,5 @@ See `docs/secrets-management.md` for complete documentation.
 
 ---
 
-*Last Updated: 2025-09-25*
-*Author: James (Dev Agent)*
+_Last Updated: 2025-09-25_
+_Author: James (Dev Agent)_

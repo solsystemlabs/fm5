@@ -14,10 +14,10 @@ const getDatabaseUrl = () => {
 export const testPrisma = new PrismaClient({
   datasources: {
     db: {
-      url: getDatabaseUrl()
-    }
+      url: getDatabaseUrl(),
+    },
   },
-  log: process.env.NODE_ENV === 'test' ? [] : ['error']
+  log: process.env.NODE_ENV === 'test' ? [] : ['error'],
 })
 
 // Ensure clean state before and after tests

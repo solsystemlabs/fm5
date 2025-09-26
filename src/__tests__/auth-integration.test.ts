@@ -33,7 +33,7 @@ describe('BetterAuth Integration', () => {
       let dbUser
       let attempts = 0
       do {
-        await new Promise(resolve => setTimeout(resolve, 50))
+        await new Promise((resolve) => setTimeout(resolve, 50))
         dbUser = await testPrisma.user.findUnique({
           where: { email: testUser.email },
         })

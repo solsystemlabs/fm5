@@ -24,6 +24,12 @@ export const testPrisma = new PrismaClient({
 export async function cleanupTestData() {
   try {
     // Delete in correct order to avoid foreign key constraints
+    await testPrisma.printJob.deleteMany()
+    await testPrisma.filamentRequirement.deleteMany()
+    await testPrisma.filamentInventory.deleteMany()
+    await testPrisma.filament.deleteMany()
+    await testPrisma.modelVariant.deleteMany()
+    await testPrisma.model.deleteMany()
     await testPrisma.session.deleteMany()
     await testPrisma.account.deleteMany()
     await testPrisma.verification.deleteMany()

@@ -1,3 +1,6 @@
+-- CreateExtension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- CreateEnum
 CREATE TYPE "public"."CategoryEnum" AS ENUM ('keychain', 'earring', 'decoration', 'functional');
 

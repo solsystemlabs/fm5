@@ -14,7 +14,7 @@ describe('BetterAuth Integration', () => {
   describe('User Registration', () => {
     it('should create a user with default owner role', async () => {
       const testUser = {
-        email: 'test@example.com',
+        email: `test-${Date.now()}@example.com`,
         password: 'testpassword123',
         name: 'Test User',
       }
@@ -46,7 +46,7 @@ describe('BetterAuth Integration', () => {
 
     it('should reject duplicate email registration', async () => {
       const testUser = {
-        email: 'duplicate@example.com',
+        email: `duplicate-${Date.now()}@example.com`,
         password: 'testpassword123',
         name: 'Test User 1',
       }
@@ -69,35 +69,46 @@ describe('BetterAuth Integration', () => {
   })
 
   describe('User Authentication', () => {
-    beforeEach(async () => {
-      // Create a test user for authentication tests
+    it('should authenticate user with correct credentials', async () => {
+      const authTestEmail = `auth-test-${Date.now()}-${Math.random()}@example.com`
+
+      // Create a test user for authentication
       await auth.api.signUpEmail({
         body: {
-          email: 'auth-test@example.com',
+          email: authTestEmail,
           password: 'testpassword123',
           name: 'Auth Test User',
         },
       })
-    })
 
-    it('should authenticate user with correct credentials', async () => {
       const response = await auth.api.signInEmail({
         body: {
-          email: 'auth-test@example.com',
+          email: authTestEmail,
           password: 'testpassword123',
         },
       })
 
       expect(response.user).toBeDefined()
-      expect(response.user.email).toBe('auth-test@example.com')
+      expect(response.user.email).toBe(authTestEmail)
       expect(response.token).toBeDefined()
     })
 
     it('should reject authentication with wrong password', async () => {
+      const authTestEmail = `auth-test-wrong-${Date.now()}-${Math.random()}@example.com`
+
+      // Create a test user
+      await auth.api.signUpEmail({
+        body: {
+          email: authTestEmail,
+          password: 'testpassword123',
+          name: 'Auth Test User',
+        },
+      })
+
       await expect(
         auth.api.signInEmail({
           body: {
-            email: 'auth-test@example.com',
+            email: authTestEmail,
             password: 'wrongpassword',
           },
         }),
@@ -108,7 +119,7 @@ describe('BetterAuth Integration', () => {
       await expect(
         auth.api.signInEmail({
           body: {
-            email: 'nonexistent@example.com',
+            email: `nonexistent-${Date.now()}@example.com`,
             password: 'testpassword123',
           },
         }),
@@ -121,9 +132,10 @@ describe('BetterAuth Integration', () => {
 
     beforeEach(async () => {
       // Create and authenticate a test user
+      const sessionTestEmail = `session-test-${Date.now()}@example.com`
       await auth.api.signUpEmail({
         body: {
-          email: 'session-test@example.com',
+          email: sessionTestEmail,
           password: 'testpassword123',
           name: 'Session Test User',
         },
@@ -131,7 +143,7 @@ describe('BetterAuth Integration', () => {
 
       userSession = await auth.api.signInEmail({
         body: {
-          email: 'session-test@example.com',
+          email: sessionTestEmail,
           password: 'testpassword123',
         },
       })
@@ -180,7 +192,7 @@ describe('BetterAuth Integration', () => {
   describe('Database Integration', () => {
     it('should store user data correctly in PostgreSQL', async () => {
       const testUser = {
-        email: 'db-test@example.com',
+        email: `db-test-${Date.now()}@example.com`,
         password: 'testpassword123',
         name: 'DB Test User',
       }

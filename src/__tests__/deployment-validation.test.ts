@@ -61,7 +61,7 @@ describe('Deployment Configuration Validation', () => {
     // Check deployment-specific environment variables
     expect(envExample).toContain('BETTER_AUTH_SECRET=')
     expect(envExample).toContain('XATA_API_KEY=')
-    expect(envExample).toContain('XATA_DATABASE_URL=')
+    expect(envExample).toContain('DATABASE_URL=')
     expect(envExample).toContain('RESEND_API_KEY=')
     expect(envExample).toContain('APP_ENV=')
   })

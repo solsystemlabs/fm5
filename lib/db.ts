@@ -6,28 +6,19 @@ const globalForPrisma = globalThis as unknown as {
 }
 
 function createPrismaClient(): PrismaClient {
-  // Environment detection
-  const appEnv = process.env.APP_ENV || process.env.NODE_ENV || 'development'
-
-  // Determine database URL based on environment
-  let databaseUrl: string
-
-  if (appEnv === 'production') {
-    // Production uses main branch
-    databaseUrl = process.env.DATABASE_URL || process.env.XATA_PRODUCTION_URL!
-  } else if (appEnv === 'staging') {
-    // Staging uses staging branch
-    databaseUrl = process.env.DATABASE_URL || process.env.XATA_STAGING_URL!
-  } else {
-    // Development uses local PostgreSQL or development branch
-    databaseUrl = process.env.DATABASE_URL || process.env.XATA_DEVELOPMENT_URL!
-  }
+  // Use DATABASE_URL from environment (Prisma standard)
+  // This will be:
+  // - Local PostgreSQL for development
+  // - Xata PostgreSQL URL for staging/production
+  const databaseUrl = process.env.DATABASE_URL
 
   if (!databaseUrl) {
     throw new Error(
-      'DATABASE_URL or XATA_DATABASE_URL environment variable is required',
+      'DATABASE_URL environment variable is required',
     )
   }
+
+  const appEnv = process.env.APP_ENV || process.env.NODE_ENV || 'development'
 
   return new PrismaClient({
     datasources: {

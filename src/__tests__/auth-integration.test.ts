@@ -29,13 +29,18 @@ describe('BetterAuth Integration', () => {
       expect(response.user.name).toBe(testUser.name)
       expect(response.user.emailVerified).toBe(false)
 
-      // Wait a bit to ensure database write is complete
-      await new Promise(resolve => setTimeout(resolve, 100))
+      // Wait for database transaction to complete and verify user exists
+      let dbUser
+      let attempts = 0
+      do {
+        await new Promise(resolve => setTimeout(resolve, 50))
+        dbUser = await testPrisma.user.findUnique({
+          where: { email: testUser.email },
+        })
+        attempts++
+      } while (!dbUser && attempts < 10)
 
-      // Verify role is set correctly in database
-      const dbUser = await testPrisma.user.findUnique({
-        where: { email: testUser.email },
-      })
+      expect(dbUser).toBeDefined()
       expect(dbUser?.role).toBe('owner')
     })
 

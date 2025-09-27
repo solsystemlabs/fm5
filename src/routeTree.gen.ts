@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthProfileRouteImport } from './routes/auth/profile'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { ServerRoute as HealthServerRouteImport } from './routes/health'
 import { ServerRoute as ApiTrpcTrpcServerRouteImport } from './routes/api/trpc/$trpc'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
@@ -39,6 +40,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/auth/login',
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
+} as any)
+const HealthServerRoute = HealthServerRouteImport.update({
+  id: '/health',
+  path: '/health',
+  getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiTrpcTrpcServerRoute = ApiTrpcTrpcServerRouteImport.update({
   id: '/api/trpc/$trpc',
@@ -85,27 +91,31 @@ export interface RootRouteChildren {
   AuthSignupRoute: typeof AuthSignupRoute
 }
 export interface FileServerRoutesByFullPath {
+  '/health': typeof HealthServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/trpc/$trpc': typeof ApiTrpcTrpcServerRoute
 }
 export interface FileServerRoutesByTo {
+  '/health': typeof HealthServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/trpc/$trpc': typeof ApiTrpcTrpcServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
+  '/health': typeof HealthServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/trpc/$trpc': typeof ApiTrpcTrpcServerRoute
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
-  fullPaths: '/api/auth/$' | '/api/trpc/$trpc'
+  fullPaths: '/health' | '/api/auth/$' | '/api/trpc/$trpc'
   fileServerRoutesByTo: FileServerRoutesByTo
-  to: '/api/auth/$' | '/api/trpc/$trpc'
-  id: '__root__' | '/api/auth/$' | '/api/trpc/$trpc'
+  to: '/health' | '/api/auth/$' | '/api/trpc/$trpc'
+  id: '__root__' | '/health' | '/api/auth/$' | '/api/trpc/$trpc'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
+  HealthServerRoute: typeof HealthServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
   ApiTrpcTrpcServerRoute: typeof ApiTrpcTrpcServerRoute
 }
@@ -144,6 +154,13 @@ declare module '@tanstack/react-router' {
 }
 declare module '@tanstack/react-start/server' {
   interface ServerFileRoutesByPath {
+    '/health': {
+      id: '/health'
+      path: '/health'
+      fullPath: '/health'
+      preLoaderRoute: typeof HealthServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/trpc/$trpc': {
       id: '/api/trpc/$trpc'
       path: '/api/trpc/$trpc'
@@ -171,6 +188,7 @@ export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
+  HealthServerRoute: HealthServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
   ApiTrpcTrpcServerRoute: ApiTrpcTrpcServerRoute,
 }

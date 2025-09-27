@@ -55,13 +55,25 @@ jobs:
       - name: Build application
         run: npm run build
 
+      - name: Verify build output
+        run: |
+          echo "Checking build output..."
+          ls -la .output/ || echo "No .output directory"
+          find .output -type f | head -10 || echo "No files found"
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-output
-          path: .output/
+          name: build-output-${{ github.sha }}
+          path: |
+            .output/server/
+            .output/public/
+            .output/*.json
           retention-days: 1
           if-no-files-found: error
+          compression-level: 0
+          overwrite: false
+          include-hidden-files: false
 
   security-scan:
     name: Security Scan
@@ -96,7 +108,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-output
+          name: build-output-${{ github.sha }}
           path: .output/
 
       - name: Deploy to Cloudflare Workers (Staging)
@@ -135,7 +147,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-output
+          name: build-output-${{ github.sha }}
           path: .output/
 
       - name: Deploy to Cloudflare Workers (Production)

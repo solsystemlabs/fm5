@@ -8,7 +8,7 @@
     "build": "vite build",
     "serve": "vite preview",
     "test": "vitest run",
-    "test:prepare": "prisma generate && prisma db push --accept-data-loss",
+    "test:prepare": "prisma generate && prisma db push --skip-generate",
     "lint": "eslint",
     "format": "prettier . --write",
     "check": "prettier --write . && eslint --fix",

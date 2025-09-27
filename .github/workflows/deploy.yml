@@ -85,11 +85,11 @@ jobs:
             SHADOW_DATABASE_URL
             RESEND_API_KEY
         env:
-          JWT_SECRET: ${{ secrets.STAGING_JWT_SECRET }}
-          BETTER_AUTH_SECRET: ${{ secrets.STAGING_BETTER_AUTH_SECRET }}
-          DATABASE_URL: ${{ secrets.STAGING_XATA_DATABASE_URL }}
-          SHADOW_DATABASE_URL: ${{ secrets.STAGING_XATA_SHADOW_DATABASE_URL }}
-          RESEND_API_KEY: ${{ secrets.STAGING_RESEND_API_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SHADOW_DATABASE_URL: ${{ secrets.SHADOW_DATABASE_URL }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
 
       - name: Run staging health check
         run: |

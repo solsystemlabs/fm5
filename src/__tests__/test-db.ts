@@ -34,6 +34,9 @@ export async function cleanupTestData() {
     await testPrisma.account.deleteMany()
     await testPrisma.verification.deleteMany()
     await testPrisma.user.deleteMany()
+
+    // Force sync to ensure deletions are committed
+    await testPrisma.$executeRaw`SELECT 1`
   } catch (error) {
     console.warn('Test cleanup warning:', error)
   }

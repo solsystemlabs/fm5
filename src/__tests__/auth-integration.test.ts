@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { testAuth as auth } from './test-auth'
 import { cleanupTestData, testPrisma } from './test-db'
 
-describe('BetterAuth Integration', () => {
+describe.sequential('BetterAuth Integration', () => {
   beforeEach(async () => {
     await cleanupTestData()
   })
@@ -11,7 +11,7 @@ describe('BetterAuth Integration', () => {
     await cleanupTestData()
   })
 
-  describe('User Registration', () => {
+  describe.sequential('User Registration', () => {
     it('should create a user with default owner role', async () => {
       const testUser = {
         email: `test-${Date.now()}@example.com`,
@@ -29,34 +29,36 @@ describe('BetterAuth Integration', () => {
       expect(response.user.name).toBe(testUser.name)
       expect(response.user.emailVerified).toBe(false)
 
-      // Wait for database transaction to complete and verify user exists
-      let dbUser
-      let attempts = 0
-      do {
-        await new Promise((resolve) => setTimeout(resolve, 50))
-        dbUser = await testPrisma.user.findUnique({
-          where: { email: testUser.email },
-        })
-        attempts++
-      } while (!dbUser && attempts < 10)
+      // Verify user exists in database
+      const dbUser = await testPrisma.user.findUnique({
+        where: { email: testUser.email },
+      })
 
       expect(dbUser).toBeDefined()
+
       expect(dbUser?.role).toBe('owner')
     })
 
     it('should reject duplicate email registration', async () => {
       const testUser = {
-        email: `duplicate-${Date.now()}@example.com`,
+        email: `duplicate-${Date.now()}-${Math.random()}@example.com`,
         password: 'testpassword123',
         name: 'Test User 1',
       }
 
       // Create first user
-      await auth.api.signUpEmail({
+      const firstUser = await auth.api.signUpEmail({
         body: testUser,
       })
+      expect(firstUser.user).toBeDefined()
 
-      // Try to create duplicate user
+      // Verify first user exists in database
+      const dbUser = await testPrisma.user.findUnique({
+        where: { email: testUser.email },
+      })
+      expect(dbUser).toBeDefined()
+
+      // Try to create duplicate user - should throw an error
       await expect(
         auth.api.signUpEmail({
           body: {
@@ -68,18 +70,20 @@ describe('BetterAuth Integration', () => {
     })
   })
 
-  describe('User Authentication', () => {
+  describe.sequential('User Authentication', () => {
     it('should authenticate user with correct credentials', async () => {
       const authTestEmail = `auth-test-${Date.now()}-${Math.random()}@example.com`
 
       // Create a test user for authentication
-      await auth.api.signUpEmail({
+      const createdUser = await auth.api.signUpEmail({
         body: {
           email: authTestEmail,
           password: 'testpassword123',
           name: 'Auth Test User',
         },
       })
+      expect(createdUser.user).toBeDefined()
+
 
       const response = await auth.api.signInEmail({
         body: {
@@ -97,13 +101,15 @@ describe('BetterAuth Integration', () => {
       const authTestEmail = `auth-test-wrong-${Date.now()}-${Math.random()}@example.com`
 
       // Create a test user
-      await auth.api.signUpEmail({
+      const createdUser = await auth.api.signUpEmail({
         body: {
           email: authTestEmail,
           password: 'testpassword123',
           name: 'Auth Test User',
         },
       })
+      expect(createdUser.user).toBeDefined()
+
 
       await expect(
         auth.api.signInEmail({
@@ -127,19 +133,22 @@ describe('BetterAuth Integration', () => {
     })
   })
 
-  describe('Session Management', () => {
+  describe.sequential('Session Management', () => {
     let userSession: any
 
     beforeEach(async () => {
       // Create and authenticate a test user
-      const sessionTestEmail = `session-test-${Date.now()}@example.com`
-      await auth.api.signUpEmail({
+      const sessionTestEmail = `session-test-${Date.now()}-${Math.random()}@example.com`
+
+      const createdUser = await auth.api.signUpEmail({
         body: {
           email: sessionTestEmail,
           password: 'testpassword123',
           name: 'Session Test User',
         },
       })
+      expect(createdUser.user).toBeDefined()
+
 
       userSession = await auth.api.signInEmail({
         body: {
@@ -147,6 +156,7 @@ describe('BetterAuth Integration', () => {
           password: 'testpassword123',
         },
       })
+      expect(userSession.user).toBeDefined()
     })
 
     it('should create a session on successful authentication', () => {
@@ -189,17 +199,19 @@ describe('BetterAuth Integration', () => {
     })
   })
 
-  describe('Database Integration', () => {
+  describe.sequential('Database Integration', () => {
     it('should store user data correctly in PostgreSQL', async () => {
       const testUser = {
-        email: `db-test-${Date.now()}@example.com`,
+        email: `db-test-${Date.now()}-${Math.random()}@example.com`,
         password: 'testpassword123',
         name: 'DB Test User',
       }
 
-      await auth.api.signUpEmail({
+      const createdUser = await auth.api.signUpEmail({
         body: testUser,
       })
+      expect(createdUser.user).toBeDefined()
+
 
       // Verify user exists in database
       const dbUser = await testPrisma.user.findUnique({

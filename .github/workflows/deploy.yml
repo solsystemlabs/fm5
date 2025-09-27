@@ -3,6 +3,13 @@ name: Deploy to Cloudflare Workers
 on:
   push:
     branches: [master]
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - '.bmad-**/**'
+      - '.claude/**'
+      - 'scripts/verify-services.sh'
+      - 'verify-services.sh'
   workflow_dispatch:
     inputs:
       environment:

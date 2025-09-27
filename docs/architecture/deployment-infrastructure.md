@@ -192,9 +192,9 @@ name: Deploy to Cloudflare Workers
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
   test-and-build:
@@ -224,7 +224,7 @@ jobs:
   deploy-staging:
     needs: test-and-build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4

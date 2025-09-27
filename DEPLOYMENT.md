@@ -23,19 +23,19 @@ Configure these secrets in your GitHub repository settings:
 
 **Staging Environment:**
 
-- `STAGING_JWT_SECRET` - JWT secret for staging
-- `STAGING_BETTER_AUTH_SECRET` - BetterAuth secret for staging
-- `STAGING_XATA_DATABASE_URL` - Xata PostgreSQL URL for staging branch (postgresql://...)
-- `STAGING_XATA_SHADOW_DATABASE_URL` - Xata PostgreSQL URL for staging shadow database
-- `STAGING_RESEND_API_KEY` - Resend API key for staging emails
+- `JWT_SECRET` - JWT secret for staging (mapped from `STAGING_JWT_SECRET`)
+- `BETTER_AUTH_SECRET` - BetterAuth secret for staging (mapped from `STAGING_BETTER_AUTH_SECRET`)
+- `DATABASE_URL` - Xata PostgreSQL URL for staging branch (mapped from `STAGING_XATA_DATABASE_URL`)
+- `SHADOW_DATABASE_URL` - Xata PostgreSQL URL for staging shadow database (mapped from `STAGING_XATA_SHADOW_DATABASE_URL`)
+- `RESEND_API_KEY` - Resend API key for staging emails (mapped from `STAGING_RESEND_API_KEY`)
 
 **Production Environment:**
 
-- `PRODUCTION_JWT_SECRET` - JWT secret for production
-- `PRODUCTION_BETTER_AUTH_SECRET` - BetterAuth secret for production
-- `PRODUCTION_XATA_DATABASE_URL` - Xata PostgreSQL URL for main branch (postgresql://...)
-- `PRODUCTION_XATA_SHADOW_DATABASE_URL` - Xata PostgreSQL URL for production shadow database
-- `PRODUCTION_RESEND_API_KEY` - Resend API key for production emails
+- `JWT_SECRET` - JWT secret for production (mapped from `PRODUCTION_JWT_SECRET`)
+- `BETTER_AUTH_SECRET` - BetterAuth secret for production (mapped from `PRODUCTION_BETTER_AUTH_SECRET`)
+- `DATABASE_URL` - Xata PostgreSQL URL for master branch (mapped from `PRODUCTION_XATA_DATABASE_URL`)
+- `SHADOW_DATABASE_URL` - Xata PostgreSQL URL for production shadow database (mapped from `PRODUCTION_XATA_SHADOW_DATABASE_URL`)
+- `RESEND_API_KEY` - Resend API key for production emails (mapped from `PRODUCTION_RESEND_API_KEY`)
 
 ### Wrangler Secrets Management
 
@@ -59,9 +59,9 @@ wrangler secret put RESEND_API_KEY --env production
 
 ### Automatic Staging Deployment
 
-Staging deployment happens automatically on every push to `main` branch:
+Staging deployment happens automatically on every push to `master` branch:
 
-1. Code is pushed to `main` branch
+1. Code is pushed to `master` branch
 2. GitHub Actions runs:
    - ESLint and Prettier checks
    - TypeScript compilation
@@ -99,8 +99,8 @@ wrangler deploy --env production
 
 Both environments include health check endpoints:
 
-- **Staging**: `https://fm5-staging.your-subdomain.workers.dev/health`
-- **Production**: `https://fm5-production.your-subdomain.workers.dev/health`
+- **Staging**: `https://fm5-staging.solsystemlabs.com/health`
+- **Production**: `https://fm5.solsystemlabs.com/health`
 
 Health check response:
 
@@ -205,7 +205,7 @@ wrangler secret list --env production
 
 ```bash
 # Test database connectivity
-curl https://fm5-production.your-subdomain.workers.dev/health
+curl https://fm5.solsystemlabs.com/health
 
 # Check specific service logs
 wrangler tail --env production --grep "Database health check"

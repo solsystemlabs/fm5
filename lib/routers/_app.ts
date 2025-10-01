@@ -4,6 +4,7 @@ import { modelsRouter } from './models'
 import { variantsRouter } from './variants'
 import { filamentsRouter } from './filaments'
 import { queueRouter } from './queue'
+import { devRouter } from './dev'
 
 export const appRouter = createTRPCRouter({
   auth: authRouter,
@@ -11,6 +12,7 @@ export const appRouter = createTRPCRouter({
   variants: variantsRouter,
   filaments: filamentsRouter,
   queue: queueRouter,
+  dev: devRouter,
 })
 
 // Export type definition of API

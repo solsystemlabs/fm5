@@ -12,6 +12,8 @@ import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DevServicesRouteImport } from './routes/dev/services'
+import { Route as DevHealthRouteImport } from './routes/dev/health'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthProfileRouteImport } from './routes/auth/profile'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
@@ -24,6 +26,16 @@ const rootServerRouteImport = createServerRootRoute()
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevServicesRoute = DevServicesRouteImport.update({
+  id: '/dev/services',
+  path: '/dev/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevHealthRoute = DevHealthRouteImport.update({
+  id: '/dev/health',
+  path: '/dev/health',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
@@ -62,12 +74,16 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/profile': typeof AuthProfileRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/dev/health': typeof DevHealthRoute
+  '/dev/services': typeof DevServicesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/profile': typeof AuthProfileRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/dev/health': typeof DevHealthRoute
+  '/dev/services': typeof DevServicesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -75,13 +91,34 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/profile': typeof AuthProfileRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/dev/health': typeof DevHealthRoute
+  '/dev/services': typeof DevServicesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth/login' | '/auth/profile' | '/auth/signup'
+  fullPaths:
+    | '/'
+    | '/auth/login'
+    | '/auth/profile'
+    | '/auth/signup'
+    | '/dev/health'
+    | '/dev/services'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth/login' | '/auth/profile' | '/auth/signup'
-  id: '__root__' | '/' | '/auth/login' | '/auth/profile' | '/auth/signup'
+  to:
+    | '/'
+    | '/auth/login'
+    | '/auth/profile'
+    | '/auth/signup'
+    | '/dev/health'
+    | '/dev/services'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth/login'
+    | '/auth/profile'
+    | '/auth/signup'
+    | '/dev/health'
+    | '/dev/services'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -89,6 +126,8 @@ export interface RootRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   AuthProfileRoute: typeof AuthProfileRoute
   AuthSignupRoute: typeof AuthSignupRoute
+  DevHealthRoute: typeof DevHealthRoute
+  DevServicesRoute: typeof DevServicesRoute
 }
 export interface FileServerRoutesByFullPath {
   '/health': typeof HealthServerRoute
@@ -127,6 +166,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/services': {
+      id: '/dev/services'
+      path: '/dev/services'
+      fullPath: '/dev/services'
+      preLoaderRoute: typeof DevServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/health': {
+      id: '/dev/health'
+      path: '/dev/health'
+      fullPath: '/dev/health'
+      preLoaderRoute: typeof DevHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/signup': {
@@ -183,6 +236,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthProfileRoute: AuthProfileRoute,
   AuthSignupRoute: AuthSignupRoute,
+  DevHealthRoute: DevHealthRoute,
+  DevServicesRoute: DevServicesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

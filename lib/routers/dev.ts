@@ -6,12 +6,12 @@
  */
 
 import { z } from 'zod'
-import { router, publicProcedure } from '../trpc'
+import { createTRPCRouter, publicProcedure } from '../trpc'
 import { createStorageAdapter, generateFilePath } from '../storage'
-import { createEmailAdapter, EmailTemplates } from '../email-service'
+import { EmailTemplates, createEmailAdapter } from '../email-service'
 import { performHealthCheck } from '../health-check'
 
-export const devRouter = router({
+export const devRouter = createTRPCRouter({
   /**
    * Test R2/MinIO file upload
    */
@@ -23,8 +23,8 @@ export const devRouter = router({
         contentType: z.string().default('application/octet-stream'),
       })
     )
-    .mutation(async ({ input, ctx }) => {
-      const storage = createStorageAdapter(ctx.env)
+    .mutation(async ({ input }) => {
+      const storage = createStorageAdapter()
 
       // Use test user/model IDs
       const testUserId = 'test-user'
@@ -56,8 +56,8 @@ export const devRouter = router({
         key: z.string(),
       })
     )
-    .query(async ({ input, ctx }) => {
-      const storage = createStorageAdapter(ctx.env)
+    .query(async ({ input }) => {
+      const storage = createStorageAdapter()
 
       const result = await storage.get(input.key)
 
@@ -67,11 +67,11 @@ export const devRouter = router({
 
       // Read stream content
       const reader = result.body.getReader()
-      const chunks: Uint8Array[] = []
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        chunks.push(value)
+      const chunks: Array<Uint8Array> = []
+      let readResult = await reader.read()
+      while (!readResult.done) {
+        chunks.push(readResult.value)
+        readResult = await reader.read()
       }
       const content = new TextDecoder().decode(Buffer.concat(chunks))
 
@@ -134,8 +134,8 @@ export const devRouter = router({
   /**
    * Get service health status
    */
-  getServiceHealth: publicProcedure.query(async ({ ctx }) => {
-    const healthResult = await performHealthCheck(ctx.env)
+  getServiceHealth: publicProcedure.query(async () => {
+    const healthResult = await performHealthCheck()
 
     return healthResult
   }),
@@ -143,8 +143,8 @@ export const devRouter = router({
   /**
    * List test files
    */
-  listTestFiles: publicProcedure.query(async ({ ctx }) => {
-    const storage = createStorageAdapter(ctx.env)
+  listTestFiles: publicProcedure.query(async () => {
+    const storage = createStorageAdapter()
 
     const testUserId = 'test-user'
     const result = await storage.list({ prefix: `users/${testUserId}/`, limit: 50 })
@@ -169,8 +169,8 @@ export const devRouter = router({
         key: z.string(),
       })
     )
-    .mutation(async ({ input, ctx }) => {
-      const storage = createStorageAdapter(ctx.env)
+    .mutation(async ({ input }) => {
+      const storage = createStorageAdapter()
 
       await storage.delete(input.key)
 

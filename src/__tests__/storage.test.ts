@@ -4,15 +4,15 @@
  * Tests unified storage interface for both MinIO (dev) and R2 (staging/prod)
  */
 
-import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import {
   createStorageAdapter,
   generateFilePath,
   validateFileOwnership,
   validateFileSize,
   validateFileType,
-  type StorageAdapter,
 } from '../../lib/storage'
+import type { StorageAdapter, WorkerEnv } from '../../lib/storage'
 
 describe('Storage Service', () => {
   let storage: StorageAdapter
@@ -158,16 +158,18 @@ describe('Storage Service', () => {
     it.skipIf(!minioAvailable)('should download a file successfully', async () => {
       const result = await storage.get(testKey)
       expect(result).not.toBeNull()
-      expect(result?.body).toBeInstanceOf(ReadableStream)
-      expect(result?.metadata.key).toBe(testKey)
+      if (!result) return
+
+      expect(result.body).toBeInstanceOf(ReadableStream)
+      expect(result.metadata.key).toBe(testKey)
 
       // Read stream content
-      const reader = result!.body.getReader()
-      const chunks: Uint8Array[] = []
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        chunks.push(value)
+      const reader = result.body.getReader()
+      const chunks: Array<Uint8Array> = []
+      let readResult = await reader.read()
+      while (!readResult.done) {
+        chunks.push(readResult.value)
+        readResult = await reader.read()
       }
       const content = new TextDecoder().decode(Buffer.concat(chunks))
       expect(content).toBe('Test file content for storage test')
@@ -241,9 +243,14 @@ describe('Storage Service', () => {
         head: vi.fn(),
         delete: vi.fn(),
         list: vi.fn(),
-      } as unknown as R2Bucket
+        createMultipartUpload: vi.fn(),
+        resumeMultipartUpload: vi.fn(),
+      }
 
-      const adapter = createStorageAdapter({ FILE_STORAGE: mockR2Bucket })
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      type R2Bucket = import('@cloudflare/workers-types').R2Bucket
+      const env: WorkerEnv = { FILE_STORAGE: mockR2Bucket as R2Bucket }
+      const adapter = createStorageAdapter(env)
       expect(adapter).toBeDefined()
     })
   })

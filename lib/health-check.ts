@@ -8,7 +8,7 @@
  * - Email (Resend): GET /domains API endpoint
  */
 
-import { db } from './db'
+import type { WorkerEnv } from './storage'
 
 export type ServiceStatus = 'ok' | 'degraded' | 'down'
 
@@ -37,8 +37,11 @@ async function checkDatabase(): Promise<ServiceHealth> {
   const startTime = Date.now()
 
   try {
+    // Lazy import to avoid loading Prisma in client bundle
+    const { prisma } = await import('./db')
+
     // Prisma recommended: lightweight SELECT 1 query
-    await db.$queryRaw`SELECT 1`
+    await prisma.$queryRaw`SELECT 1`
 
     return {
       status: 'ok',
@@ -96,7 +99,7 @@ async function checkMinIO(): Promise<ServiceHealth> {
 /**
  * Checks R2 storage service using S3 HeadBucket API
  */
-async function checkR2(env?: { FILE_STORAGE?: R2Bucket }): Promise<ServiceHealth> {
+async function checkR2(env?: WorkerEnv): Promise<ServiceHealth> {
   const startTime = Date.now()
 
   // In Cloudflare Workers, we can use the R2 binding directly
@@ -165,7 +168,7 @@ async function checkResend(): Promise<ServiceHealth> {
     const response = await fetch('https://api.resend.com/domains', {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       signal: AbortSignal.timeout(5000), // 5 second timeout
@@ -211,7 +214,10 @@ function determineOverallStatus(services: {
   email: ServiceHealth
 }): 'healthy' | 'degraded' | 'unhealthy' {
   // If any critical service (database, storage) is down, system is unhealthy
-  if (services.database.status === 'down' || services.storage.status === 'down') {
+  if (
+    services.database.status === 'down' ||
+    services.storage.status === 'down'
+  ) {
     return 'unhealthy'
   }
 
@@ -235,7 +241,9 @@ function determineOverallStatus(services: {
 /**
  * Performs a complete health check of all services
  */
-export async function performHealthCheck(env?: { FILE_STORAGE?: R2Bucket }): Promise<HealthCheckResult> {
+export async function performHealthCheck(
+  env?: WorkerEnv,
+): Promise<HealthCheckResult> {
   const [database, storage, email] = await Promise.all([
     checkDatabase(),
     checkR2(env),
@@ -256,7 +264,9 @@ export async function performHealthCheck(env?: { FILE_STORAGE?: R2Bucket }): Pro
 /**
  * Returns HTTP status code based on health status
  */
-export function getHealthStatusCode(status: 'healthy' | 'degraded' | 'unhealthy'): number {
+export function getHealthStatusCode(
+  status: 'healthy' | 'degraded' | 'unhealthy',
+): number {
   switch (status) {
     case 'healthy':
       return 200

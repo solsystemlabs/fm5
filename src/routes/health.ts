@@ -1,5 +1,5 @@
 import { createServerFileRoute } from '@tanstack/react-start/server'
-import { performHealthCheck, getHealthStatusCode } from '../../lib/health-check'
+import { getHealthStatusCode, performHealthCheck } from '../../lib/health-check'
 
 export const ServerRoute = createServerFileRoute('/health').methods({
   GET: async () => {

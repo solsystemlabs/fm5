@@ -194,16 +194,16 @@ function EmailTester() {
 
   const handleSend = async () => {
     try {
-      const result = await sendMutation.mutateAsync({
+      const emailResult = await sendMutation.mutateAsync({
         to: email,
         template,
         userName,
       })
 
-      if (result.success) {
-        setResult(`✅ Email sent successfully! Message ID: ${result.messageId}`)
+      if (emailResult.success) {
+        setResult(`✅ Email sent successfully! Message ID: ${emailResult.messageId}`)
       } else {
-        setResult(`❌ Failed to send email: ${result.error}`)
+        setResult(`❌ Failed to send email: ${emailResult.error}`)
       }
     } catch (error: any) {
       setResult(`❌ Error: ${error.message}`)

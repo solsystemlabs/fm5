@@ -2,8 +2,9 @@
  * External Services Health Check Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { performHealthCheck, getHealthStatusCode } from '../../lib/health-check'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { getHealthStatusCode, performHealthCheck } from '../../lib/health-check'
+import type { WorkerEnv } from '../../lib/storage'
 
 describe('Health Check Service', () => {
   describe('Health Status Code Mapping', () => {
@@ -156,9 +157,14 @@ describe('Health Check Service', () => {
         put: vi.fn(),
         delete: vi.fn(),
         list: vi.fn(),
-      } as unknown as R2Bucket
+        createMultipartUpload: vi.fn(),
+        resumeMultipartUpload: vi.fn(),
+      }
 
-      const result = await performHealthCheck({ FILE_STORAGE: mockR2Bucket })
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      type R2Bucket = import('@cloudflare/workers-types').R2Bucket
+      const env: WorkerEnv = { FILE_STORAGE: mockR2Bucket as R2Bucket }
+      const result = await performHealthCheck(env)
 
       expect(result).toBeDefined()
       expect(result.services.storage).toBeDefined()

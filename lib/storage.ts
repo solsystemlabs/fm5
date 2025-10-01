@@ -14,6 +14,15 @@
 
 import * as Minio from 'minio'
 
+// Conditional R2 type import - only available in Cloudflare Workers
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+type R2Bucket = import('@cloudflare/workers-types').R2Bucket
+
+// Environment bindings type with optional R2 bucket
+export interface WorkerEnv {
+  FILE_STORAGE?: R2Bucket
+}
+
 /**
  * Storage operation result
  */
@@ -30,7 +39,7 @@ export interface StorageObject {
  * Storage list result
  */
 export interface StorageListResult {
-  objects: StorageObject[]
+  objects: Array<StorageObject>
   truncated: boolean
   cursor?: string
 }
@@ -42,19 +51,19 @@ export interface StorageAdapter {
   /**
    * Uploads a file to storage
    */
-  put(
+  put: (
     key: string,
     value: ReadableStream | ArrayBuffer | string | Blob,
     options: {
       contentType: string
       metadata?: Record<string, string>
     }
-  ): Promise<StorageObject>
+  ) => Promise<StorageObject>
 
   /**
    * Downloads a file from storage
    */
-  get(key: string): Promise<{
+  get: (key: string) => Promise<{
     body: ReadableStream
     metadata: StorageObject
   } | null>
@@ -62,21 +71,21 @@ export interface StorageAdapter {
   /**
    * Checks if a file exists
    */
-  head(key: string): Promise<StorageObject | null>
+  head: (key: string) => Promise<StorageObject | null>
 
   /**
    * Deletes a file
    */
-  delete(key: string): Promise<void>
+  delete: (key: string) => Promise<void>
 
   /**
    * Lists files with a prefix
    */
-  list(options: {
+  list: (options: {
     prefix?: string
     limit?: number
     cursor?: string
-  }): Promise<StorageListResult>
+  }) => Promise<StorageListResult>
 }
 
 /**
@@ -123,12 +132,12 @@ class MinioAdapter implements StorageAdapter {
 
     let buffer: Buffer
     if (value instanceof ReadableStream) {
-      const chunks: Uint8Array[] = []
+      const chunks: Array<Uint8Array> = []
       const reader = value.getReader()
-      while (true) {
-        const { done, value: chunk } = await reader.read()
-        if (done) break
-        chunks.push(chunk)
+      let readResult = await reader.read()
+      while (!readResult.done) {
+        chunks.push(readResult.value)
+        readResult = await reader.read()
       }
       buffer = Buffer.concat(chunks)
     } else if (value instanceof ArrayBuffer) {
@@ -225,7 +234,7 @@ class MinioAdapter implements StorageAdapter {
     prefix?: string
     limit?: number
   }): Promise<StorageListResult> {
-    const objects: StorageObject[] = []
+    const objects: Array<StorageObject> = []
     const stream = this.client.listObjects(
       this.bucketName,
       options.prefix || '',
@@ -239,10 +248,10 @@ class MinioAdapter implements StorageAdapter {
           return
         }
         objects.push({
-          key: obj.name,
-          size: obj.size,
-          etag: obj.etag,
-          uploaded: obj.lastModified,
+          key: obj.name || '',
+          size: obj.size || 0,
+          etag: obj.etag || '',
+          uploaded: obj.lastModified || new Date(),
         })
       })
       stream.on('end', () => {
@@ -270,7 +279,27 @@ class R2Adapter implements StorageAdapter {
       metadata?: Record<string, string>
     }
   ): Promise<StorageObject> {
-    const object = await this.bucket.put(key, value, {
+    // Convert Blob/ReadableStream to ArrayBuffer to avoid type conflicts
+    // between Node.js and Cloudflare Workers type definitions
+    let uploadValue: ArrayBuffer | string
+    if (value instanceof Blob) {
+      uploadValue = await value.arrayBuffer()
+    } else if (value instanceof ReadableStream) {
+      const chunks: Array<Uint8Array> = []
+      const reader = value.getReader()
+      let readResult = await reader.read()
+      while (!readResult.done) {
+        chunks.push(readResult.value)
+        readResult = await reader.read()
+      }
+      uploadValue = Buffer.concat(chunks).buffer
+    } else if (value instanceof ArrayBuffer) {
+      uploadValue = value
+    } else {
+      uploadValue = value
+    }
+
+    const object = await this.bucket.put(key, uploadValue, {
       httpMetadata: {
         contentType: options.contentType,
       },
@@ -295,7 +324,7 @@ class R2Adapter implements StorageAdapter {
     if (!object) return null
 
     return {
-      body: object.body,
+      body: object.body as ReadableStream,
       metadata: {
         key: object.key,
         size: object.size,
@@ -354,16 +383,22 @@ class R2Adapter implements StorageAdapter {
 /**
  * Creates a storage adapter based on the environment
  *
- * @param env - Optional Cloudflare Workers environment (for R2)
+ * Automatically detects environment and returns appropriate adapter:
+ * - Development: MinIO adapter
+ * - Staging/Production: R2 adapter (when FILE_STORAGE binding available)
+ *
+ * @param env - Optional Cloudflare Workers environment bindings
  * @returns Storage adapter instance
  */
-export function createStorageAdapter(env?: { FILE_STORAGE?: R2Bucket }): StorageAdapter {
-  // Use R2 if FILE_STORAGE binding is available (staging/production)
-  if (env?.FILE_STORAGE) {
+export function createStorageAdapter(env?: WorkerEnv): StorageAdapter {
+  const nodeEnv = process.env.NODE_ENV || process.env.APP_ENV
+
+  // Check if we have R2 binding and not in development
+  if (env?.FILE_STORAGE && nodeEnv !== 'development') {
     return new R2Adapter(env.FILE_STORAGE)
   }
 
-  // Use MinIO for local development
+  // Use MinIO for local development or when R2 not available
   return new MinioAdapter()
 }
 
@@ -404,7 +439,7 @@ export function validateFileSize(
  */
 export function validateFileType(
   contentType: string,
-  allowedTypes: string[] = [
+  allowedTypes: Array<string> = [
     'model/stl',
     'application/sla',
     'model/obj',

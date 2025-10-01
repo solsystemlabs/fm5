@@ -2,14 +2,13 @@
  * Email Service Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
-  createEmailAdapter,
-  sendVerificationEmail,
-  sendPasswordResetEmail,
-  sendWelcomeEmail,
   EmailTemplates,
-  type EmailAdapter,
+  createEmailAdapter,
+  sendPasswordResetEmail,
+  sendVerificationEmail,
+  sendWelcomeEmail,
 } from '../../lib/email-service'
 
 describe('Email Service', () => {

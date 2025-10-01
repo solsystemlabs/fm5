@@ -11,7 +11,8 @@
  * @see docs/architecture/deployment-infrastructure.md
  */
 
-import { Resend, type CreateEmailResponse } from 'resend'
+import {  Resend } from 'resend'
+import type {CreateEmailResponse} from 'resend';
 
 export interface EmailTemplate {
   subject: string
@@ -20,12 +21,12 @@ export interface EmailTemplate {
 }
 
 export interface SendEmailOptions {
-  to: string | string[]
+  to: string | Array<string>
   subject: string
   html: string
   text?: string
   from?: string
-  replyTo?: string | string[]
+  replyTo?: string | Array<string>
 }
 
 export interface EmailResult {
@@ -38,7 +39,7 @@ export interface EmailResult {
  * Email service adapter interface
  */
 export interface EmailAdapter {
-  send(options: SendEmailOptions): Promise<EmailResult>
+  send: (options: SendEmailOptions) => Promise<EmailResult>
 }
 
 /**
@@ -59,7 +60,7 @@ class ResendAdapter implements EmailAdapter {
         subject: options.subject,
         html: options.html,
         text: options.text,
-        reply_to: options.replyTo,
+        replyTo: options.replyTo,
       })
 
       if (result.error) {
@@ -71,7 +72,7 @@ class ResendAdapter implements EmailAdapter {
 
       return {
         success: true,
-        messageId: result.data?.id,
+        messageId: result.data.id,
       }
     } catch (error: any) {
       return {
@@ -86,7 +87,7 @@ class ResendAdapter implements EmailAdapter {
  * Console Email Adapter (for local development)
  */
 class ConsoleAdapter implements EmailAdapter {
-  async send(options: SendEmailOptions): Promise<EmailResult> {
+  send(options: SendEmailOptions): Promise<EmailResult> {
     console.log('═══════════════════════════════════════════════════════')
     console.log('📧 [DEV MODE] Email would be sent:')
     console.log('From:', options.from || 'noreply@fm5.app')
@@ -102,10 +103,10 @@ class ConsoleAdapter implements EmailAdapter {
     }
     console.log('═══════════════════════════════════════════════════════')
 
-    return {
+    return Promise.resolve({
       success: true,
       messageId: `dev-email-${Date.now()}`,
-    }
+    })
   }
 }
 

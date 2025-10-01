@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
@@ -23,61 +23,61 @@ model User {
   role                UserRoleEnum @default(owner)
 
   // BetterAuth relationships
-  accounts            account[]
-  sessions            session[]
+  accounts account[]
+  sessions session[]
 
   // Application relationships
-  models             Model[]
-  modelVariants      ModelVariant[]
-  filaments          Filament[]
-  filamentInventory  FilamentInventory[]
-  printJobs          PrintJob[]
+  models            Model[]
+  modelVariants     ModelVariant[]
+  filaments         Filament[]
+  filamentInventory FilamentInventory[]
+  printJobs         PrintJob[]
 
   @@map("users")
 }
 
 /// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model Model {
-  id          String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  userId      String         @map("user_id")
-  name        String         @db.VarChar(255)
-  designer    String         @db.VarChar(255)
+  id          String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId      String       @map("user_id")
+  name        String       @db.VarChar(255)
+  designer    String       @db.VarChar(255)
   description String?
-  imageUrls   String[]       @map("image_urls")
+  imageUrls   String[]     @map("image_urls")
   category    CategoryEnum
-  createdAt   DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   // Relationships
-  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  variants    ModelVariant[]
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  variants ModelVariant[]
 
   @@index([userId])
   @@map("models")
 }
 
 model ModelVariant {
-  id                    String                 @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  userId                String                 @map("user_id")
-  modelId               String                 @map("model_id") @db.Uuid
-  name                  String                 @db.VarChar(255)
-  version               Int                    @default(1)
-  slicedFileUrl         String                 @map("sliced_file_url")
-  layerHeight           Decimal                @map("layer_height") @db.Decimal(4, 2)
-  nozzleTemperature     Int                    @map("nozzle_temperature")
-  bedTemperature        Int                    @map("bed_temperature")
-  printDurationMinutes  Int                    @map("print_duration_minutes")
-  bambuMetadata         Json                   @map("bambu_metadata")
-  costToProduceUsd      Decimal                @default(0) @map("cost_to_produce_usd") @db.Decimal(10, 2)
-  successRatePercentage Decimal                @default(0) @map("success_rate_percentage") @db.Decimal(5, 2)
-  createdAt             DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt             DateTime               @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id                    String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId                String   @map("user_id")
+  modelId               String   @map("model_id") @db.Uuid
+  name                  String   @db.VarChar(255)
+  version               Int      @default(1)
+  slicedFileUrl         String   @map("sliced_file_url")
+  layerHeight           Decimal  @map("layer_height") @db.Decimal(4, 2)
+  nozzleTemperature     Int      @map("nozzle_temperature")
+  bedTemperature        Int      @map("bed_temperature")
+  printDurationMinutes  Int      @map("print_duration_minutes")
+  bambuMetadata         Json     @map("bambu_metadata")
+  costToProduceUsd      Decimal  @default(0) @map("cost_to_produce_usd") @db.Decimal(10, 2)
+  successRatePercentage Decimal  @default(0) @map("success_rate_percentage") @db.Decimal(5, 2)
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   // Relationships
-  user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  model                 Model                  @relation(fields: [modelId], references: [id], onDelete: Cascade)
-  filamentRequirements  FilamentRequirement[]
-  printJobs             PrintJob[]
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  model                Model                 @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  filamentRequirements FilamentRequirement[]
+  printJobs            PrintJob[]
 
   @@unique([modelId, version])
   @@index([userId])
@@ -88,22 +88,22 @@ model ModelVariant {
 }
 
 model Filament {
-  id                    String                 @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  userId                String                 @map("user_id")
-  brand                 String                 @db.VarChar(100)
-  materialType          MaterialTypeEnum       @map("material_type")
-  colorName             String                 @map("color_name") @db.VarChar(100)
-  colorHex              String                 @map("color_hex") @db.Char(7)
-  costPerGramBase       Decimal                @map("cost_per_gram_base") @db.Decimal(8, 4)
-  purchaseUrl           String?                @map("purchase_url")
-  demandCount           Int                    @default(0) @map("demand_count")
-  createdAt             DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt             DateTime               @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id              String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId          String           @map("user_id")
+  brand           String           @db.VarChar(100)
+  materialType    MaterialTypeEnum @map("material_type")
+  colorName       String           @map("color_name") @db.VarChar(100)
+  colorHex        String           @map("color_hex") @db.Char(7)
+  costPerGramBase Decimal          @map("cost_per_gram_base") @db.Decimal(8, 4)
+  purchaseUrl     String?          @map("purchase_url")
+  demandCount     Int              @default(0) @map("demand_count")
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   // Relationships
-  user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  inventory             FilamentInventory[]
-  filamentRequirements  FilamentRequirement[]
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  inventory            FilamentInventory[]
+  filamentRequirements FilamentRequirement[]
 
   @@unique([userId, brand, materialType, colorHex])
   @@index([userId])
@@ -126,8 +126,8 @@ model FilamentInventory {
   lastUpdated       DateTime  @updatedAt @map("last_updated") @db.Timestamptz(6)
 
   // Relationships
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  filament          Filament  @relation(fields: [filamentId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  filament Filament @relation(fields: [filamentId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([filamentId])
@@ -136,18 +136,18 @@ model FilamentInventory {
 }
 
 model FilamentRequirement {
-  id         String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  variantId  String        @map("variant_id") @db.Uuid
-  filamentId String        @map("filament_id") @db.Uuid
-  amsSlot    Int           @map("ams_slot")
-  usageModel Int           @default(0) @map("usage_model")
-  usageWaste Int           @default(0) @map("usage_waste")
-  usagePurge Int           @default(0) @map("usage_purge")
-  createdAt  DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  variantId  String   @map("variant_id") @db.Uuid
+  filamentId String   @map("filament_id") @db.Uuid
+  amsSlot    Int      @map("ams_slot")
+  usageModel Int      @default(0) @map("usage_model")
+  usageWaste Int      @default(0) @map("usage_waste")
+  usagePurge Int      @default(0) @map("usage_purge")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   // Relationships
-  variant    ModelVariant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
-  filament   Filament      @relation(fields: [filamentId], references: [id], onDelete: Cascade)
+  variant  ModelVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  filament Filament     @relation(fields: [filamentId], references: [id], onDelete: Cascade)
 
   @@unique([variantId, amsSlot])
   @@index([variantId])
@@ -170,8 +170,8 @@ model PrintJob {
   updatedAt               DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   // Relationships
-  user                    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  variant                 ModelVariant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  variant ModelVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([status])
@@ -181,19 +181,19 @@ model PrintJob {
 }
 
 model account {
-  id            String    @id
-  accountId     String    @map("account_id") @db.VarChar(255)
-  providerId    String    @map("provider_id") @db.VarChar(255)
-  userId        String    @map("user_id")
-  accessToken   String?   @map("access_token")
-  refreshToken  String?   @map("refresh_token")
-  idToken       String?   @map("id_token")
-  expiresAt     DateTime? @map("expires_at") @db.Timestamptz(6)
-  password      String?   @db.VarChar(255)
-  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt     DateTime  @map("updated_at") @db.Timestamptz(6)
+  id           String    @id
+  accountId    String    @map("account_id") @db.VarChar(255)
+  providerId   String    @map("provider_id") @db.VarChar(255)
+  userId       String    @map("user_id")
+  accessToken  String?   @map("access_token")
+  refreshToken String?   @map("refresh_token")
+  idToken      String?   @map("id_token")
+  expiresAt    DateTime? @map("expires_at") @db.Timestamptz(6)
+  password     String?   @db.VarChar(255)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @map("updated_at") @db.Timestamptz(6)
 
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([providerId, accountId])
   @@index([userId])
@@ -209,7 +209,7 @@ model session {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime @map("updated_at") @db.Timestamptz(6)
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }

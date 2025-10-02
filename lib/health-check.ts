@@ -5,7 +5,7 @@
  * - Database (Prisma): SELECT 1 query
  * - Storage (MinIO): /minio/health/live endpoint
  * - Storage (R2): HeadBucket S3 API call
- * - Email (Resend): GET /domains API endpoint
+ * - Email (Resend): GET /emails API endpoint
  */
 
 import type { WorkerEnv } from './storage'
@@ -144,7 +144,7 @@ async function checkResend(): Promise<ServiceHealth> {
   const apiKey = process.env.RESEND_API_KEY
   const isDevelopment = process.env.NODE_ENV === 'development'
 
-  // In development, console adapter always works
+  // In development without API key, email service isn't critical
   if (isDevelopment && !apiKey) {
     return {
       status: 'ok',
@@ -164,12 +164,11 @@ async function checkResend(): Promise<ServiceHealth> {
   }
 
   try {
-    // Check Resend API connectivity using /domains endpoint
-    const response = await fetch('https://api.resend.com/domains', {
+    // Check Resend API connectivity using /emails endpoint (lightweight check)
+    const response = await fetch('https://api.resend.com/emails', {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
       },
       signal: AbortSignal.timeout(5000), // 5 second timeout
     })

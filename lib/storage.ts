@@ -238,17 +238,23 @@ class MinioAdapter implements StorageAdapter {
     const stream = this.client.listObjects(
       this.bucketName,
       options.prefix || '',
-      false
+      true // recursive = true to get all files, not just directory prefixes
     )
 
     return new Promise((resolve, reject) => {
       stream.on('data', (obj) => {
+        // Skip directory entries (they have no name or prefix field)
+        if (!obj.name) {
+          return
+        }
+
         if (options.limit && objects.length >= options.limit) {
           stream.destroy()
           return
         }
+
         objects.push({
-          key: obj.name || '',
+          key: obj.name,
           size: obj.size || 0,
           etag: obj.etag || '',
           uploaded: obj.lastModified || new Date(),

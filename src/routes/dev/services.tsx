@@ -39,6 +39,7 @@ function StorageTester() {
   const [testKey, setTestKey] = useState<string>('')
   const [downloadResult, setDownloadResult] = useState<string>('')
 
+  const utils = trpc.useUtils()
   const uploadMutation = trpc.dev.testFileUpload.useMutation()
   const downloadQuery = trpc.dev.testFileDownload.useQuery(
     { key: testKey },
@@ -75,6 +76,17 @@ function StorageTester() {
       }
     } catch (error: any) {
       setDownloadResult(`❌ Error: ${error.message}`)
+    }
+  }
+
+  const handleDownloadFile = async (key: string) => {
+    try {
+      const result = await utils.dev.testFileDownload.fetch({ key })
+      if (result) {
+        setDownloadResult(`✅ Downloaded ${key}: ${result.content}`)
+      }
+    } catch (error: any) {
+      setDownloadResult(`❌ Error downloading ${key}: ${error.message}`)
     }
   }
 
@@ -163,18 +175,26 @@ function StorageTester() {
                 key={file.key}
                 className="flex justify-between items-center bg-gray-50 p-2 rounded"
               >
-                <div className="text-sm">
+                <div className="text-sm flex-1">
                   <div className="font-mono">{file.key}</div>
                   <div className="text-gray-500 text-xs">
                     {file.size} bytes • {new Date(file.uploaded).toLocaleString()}
                   </div>
                 </div>
-                <button
-                  onClick={() => handleDelete(file.key)}
-                  className="text-red-600 hover:text-red-800 text-sm"
-                >
-                  Delete
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleDownloadFile(file.key)}
+                    className="text-blue-600 hover:text-blue-800 text-sm"
+                  >
+                    Download
+                  </button>
+                  <button
+                    onClick={() => handleDelete(file.key)}
+                    className="text-red-600 hover:text-red-800 text-sm"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -262,11 +282,11 @@ function EmailTester() {
           </div>
         )}
 
-        <div className="bg-yellow-50 border border-yellow-200 p-3 rounded text-sm">
+        <div className="bg-blue-50 border border-blue-200 p-3 rounded text-sm">
           <p className="font-medium">Note:</p>
           <p className="text-gray-700">
-            In development mode, emails are logged to console instead of sent.
-            Check your terminal output to see the email content.
+            If RESEND_API_KEY is configured, emails will be sent via Resend API.
+            Otherwise, emails are logged to console.
           </p>
         </div>
       </div>

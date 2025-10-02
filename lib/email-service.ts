@@ -1,12 +1,11 @@
 /**
  * Resend Email Service
  *
- * Provides email delivery with environment-specific configuration.
+ * Provides email delivery with API key-based configuration.
  *
- * Environments:
- * - Development: Logs emails to console instead of sending
- * - Staging: Uses Resend with staging API key
- * - Production: Uses Resend with production API key
+ * Behavior:
+ * - If RESEND_API_KEY is set: Uses Resend API to actually send emails
+ * - If no API key: Logs emails to console (for development without Resend account)
  *
  * @see docs/architecture/deployment-infrastructure.md
  */
@@ -115,14 +114,13 @@ class ConsoleAdapter implements EmailAdapter {
  */
 export function createEmailAdapter(): EmailAdapter {
   const apiKey = process.env.RESEND_API_KEY
-  const env = process.env.NODE_ENV || process.env.APP_ENV
 
-  // Use console adapter for development
-  if (env === 'development' || !apiKey) {
+  // If no API key is configured, use console adapter
+  if (!apiKey) {
     return new ConsoleAdapter()
   }
 
-  // Use Resend for staging/production
+  // Use Resend for all environments when API key is present
   return new ResendAdapter(apiKey)
 }
 

@@ -82,9 +82,7 @@ function StorageTester() {
   const handleDownloadFile = async (key: string) => {
     try {
       const result = await utils.dev.testFileDownload.fetch({ key })
-      if (result) {
-        setDownloadResult(`✅ Downloaded ${key}: ${result.content}`)
-      }
+      setDownloadResult(`✅ Downloaded ${key}: ${result.content}`)
     } catch (error: any) {
       setDownloadResult(`❌ Error downloading ${key}: ${error.message}`)
     }

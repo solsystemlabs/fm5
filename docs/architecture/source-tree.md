@@ -145,7 +145,7 @@ docs/
 │   ├── 0.3.database-schema-and-prisma-setup.md
 │   ├── 0.4.trpc-and-zod-integration.md
 │   ├── 0.5.authentication-framework-setup.md
-│   └── 0.6.cicd-pipeline-deployment.md
+│   └── 0.7.cicd-pipeline-deployment.md
 ├── qa/                            # Quality assurance documentation
 │   └── assessments/               # QA assessment reports
 ├── front-end-spec.md              # Frontend specifications

@@ -234,29 +234,7 @@ so that user management and security are established from the foundation.
 - Authentication state management with Tanstack Query
 - Logout and session expiry handling
 
-**Story 0.6: CI/CD Pipeline and Deployment Infrastructure**
-As a developer,
-I want automated deployment pipeline and infrastructure configuration,
-so that code can be deployed safely and consistently to production.
-
-**Acceptance Criteria:**
-
-1. GitHub Actions workflow configured for automated testing and deployment
-2. Environment-specific configuration (dev, staging, production)
-3. Database migration automation integrated with deployment
-4. Docker production build configuration optimized
-5. Infrastructure as Code (IaC) setup for cloud resources
-
-**Technical Requirements:**
-
-- Automated testing pipeline runs on pull requests
-- Production Docker image optimized for performance and security
-- Environment variable management for different deployment stages
-- Database backup and recovery procedures automated
-- Blue-green or rolling deployment strategy implemented
-- Health check endpoints for monitoring deployment status
-
-**Story 0.7: External Service Integration Planning**
+**Story 0.6: External Service Integration Planning**
 As a developer,
 I want external service dependencies configured and ready,
 so that features requiring third-party services work reliably.
@@ -277,6 +255,28 @@ so that features requiring third-party services work reliably.
 - Service health monitoring and automatic failover
 - API rate limiting and quota management
 - Cost monitoring and alerts for cloud services
+
+**Story 0.7: CI/CD Pipeline and Deployment Infrastructure**
+As a developer,
+I want automated deployment pipeline and infrastructure configuration,
+so that code can be deployed safely and consistently to production.
+
+**Acceptance Criteria:**
+
+1. GitHub Actions workflow configured for automated testing and deployment
+2. Environment-specific configuration (dev, staging, production)
+3. Database migration automation integrated with deployment
+4. Docker production build configuration optimized
+5. Infrastructure as Code (IaC) setup for cloud resources
+
+**Technical Requirements:**
+
+- Automated testing pipeline runs on pull requests
+- Production Docker image optimized for performance and security
+- Environment variable management for different deployment stages
+- Database backup and recovery procedures automated
+- Blue-green or rolling deployment strategy implemented
+- Health check endpoints for monitoring deployment status
 
 **Story 0.8: Error Handling and User Documentation Framework**
 As a developer,
@@ -397,7 +397,7 @@ so that my business information remains private and secure.
 **Dependencies**: Must complete Epic 0 and Epic 1 entirely before beginning, specifically:
 
 - Epic 1 (User Management) - Required for user-specific file organization and access control
-- Story 0.7 (External Service Integration) - Required for R2 bucket configuration
+- Story 0.6 (External Service Integration) - Required for R2 bucket configuration
 - Story 0.8 (Error Handling Framework) - Required for file upload error states
 
 **Story 2.1: Cloudflare R2 Integration and File Storage Setup**
@@ -424,7 +424,7 @@ so that model and sliced files can be uploaded, stored, and accessed reliably wi
 - JWT token validation for all file operations
 - User quota and rate limiting per authentication framework
 
-**Dependencies**: Requires Epic 1 (User Management) and Story 0.7 (External Services)
+**Dependencies**: Requires Epic 1 (User Management) and Story 0.6 (External Services)
 
 **Story 2.2: Core Metadata Extraction Library**
 As a developer,

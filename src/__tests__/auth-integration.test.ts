@@ -84,7 +84,6 @@ describe.sequential('BetterAuth Integration', () => {
       })
       expect(createdUser.user).toBeDefined()
 
-
       const response = await auth.api.signInEmail({
         body: {
           email: authTestEmail,
@@ -109,7 +108,6 @@ describe.sequential('BetterAuth Integration', () => {
         },
       })
       expect(createdUser.user).toBeDefined()
-
 
       await expect(
         auth.api.signInEmail({
@@ -148,7 +146,6 @@ describe.sequential('BetterAuth Integration', () => {
         },
       })
       expect(createdUser.user).toBeDefined()
-
 
       userSession = await auth.api.signInEmail({
         body: {
@@ -211,7 +208,6 @@ describe.sequential('BetterAuth Integration', () => {
         body: testUser,
       })
       expect(createdUser.user).toBeDefined()
-
 
       // Verify user exists in database
       const dbUser = await testPrisma.user.findUnique({

@@ -21,7 +21,7 @@ export const devRouter = createTRPCRouter({
         filename: z.string(),
         content: z.string(),
         contentType: z.string().default('application/octet-stream'),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       const storage = createStorageAdapter()
@@ -54,7 +54,7 @@ export const devRouter = createTRPCRouter({
     .input(
       z.object({
         key: z.string(),
-      })
+      }),
     )
     .query(async ({ input }) => {
       const storage = createStorageAdapter()
@@ -93,7 +93,7 @@ export const devRouter = createTRPCRouter({
         to: z.string().email(),
         template: z.enum(['verification', 'passwordReset', 'welcome']),
         userName: z.string().optional(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       const adapter = createEmailAdapter()
@@ -103,13 +103,13 @@ export const devRouter = createTRPCRouter({
         case 'verification':
           emailTemplate = EmailTemplates.verification(
             'https://fm5.app/verify?token=test-token',
-            input.userName
+            input.userName,
           )
           break
         case 'passwordReset':
           emailTemplate = EmailTemplates.passwordReset(
             'https://fm5.app/reset?token=test-token',
-            input.userName
+            input.userName,
           )
           break
         case 'welcome':
@@ -147,7 +147,10 @@ export const devRouter = createTRPCRouter({
     const storage = createStorageAdapter()
 
     const testUserId = 'test-user'
-    const result = await storage.list({ prefix: `users/${testUserId}/`, limit: 50 })
+    const result = await storage.list({
+      prefix: `users/${testUserId}/`,
+      limit: 50,
+    })
 
     return {
       files: result.objects.map((obj) => ({
@@ -167,7 +170,7 @@ export const devRouter = createTRPCRouter({
     .input(
       z.object({
         key: z.string(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       const storage = createStorageAdapter()

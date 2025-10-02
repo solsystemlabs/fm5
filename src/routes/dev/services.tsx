@@ -43,7 +43,7 @@ function StorageTester() {
   const uploadMutation = trpc.dev.testFileUpload.useMutation()
   const downloadQuery = trpc.dev.testFileDownload.useQuery(
     { key: testKey },
-    { enabled: false }
+    { enabled: false },
   )
   const listQuery = trpc.dev.listTestFiles.useQuery()
   const deleteMutation = trpc.dev.deleteTestFile.useMutation()
@@ -156,7 +156,9 @@ function StorageTester() {
         </button>
 
         {downloadResult && (
-          <div className="bg-gray-100 p-3 rounded text-sm">{downloadResult}</div>
+          <div className="bg-gray-100 p-3 rounded text-sm">
+            {downloadResult}
+          </div>
         )}
 
         <hr className="my-4" />
@@ -176,7 +178,8 @@ function StorageTester() {
                 <div className="text-sm flex-1">
                   <div className="font-mono">{file.key}</div>
                   <div className="text-gray-500 text-xs">
-                    {file.size} bytes • {new Date(file.uploaded).toLocaleString()}
+                    {file.size} bytes •{' '}
+                    {new Date(file.uploaded).toLocaleString()}
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -204,7 +207,9 @@ function StorageTester() {
 
 function EmailTester() {
   const [email, setEmail] = useState('test@example.com')
-  const [template, setTemplate] = useState<'verification' | 'passwordReset' | 'welcome'>('verification')
+  const [template, setTemplate] = useState<
+    'verification' | 'passwordReset' | 'welcome'
+  >('verification')
   const [userName, setUserName] = useState('Test User')
   const [result, setResult] = useState<string>('')
 
@@ -219,7 +224,9 @@ function EmailTester() {
       })
 
       if (emailResult.success) {
-        setResult(`✅ Email sent successfully! Message ID: ${emailResult.messageId}`)
+        setResult(
+          `✅ Email sent successfully! Message ID: ${emailResult.messageId}`,
+        )
       } else {
         setResult(`❌ Failed to send email: ${emailResult.error}`)
       }
@@ -234,7 +241,9 @@ function EmailTester() {
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-2">Email Address</label>
+          <label className="block text-sm font-medium mb-2">
+            Email Address
+          </label>
           <input
             type="email"
             value={email}
@@ -257,7 +266,9 @@ function EmailTester() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">User Name (optional)</label>
+          <label className="block text-sm font-medium mb-2">
+            User Name (optional)
+          </label>
           <input
             type="text"
             value={userName}

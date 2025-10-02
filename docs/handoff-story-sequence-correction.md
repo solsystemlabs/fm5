@@ -14,6 +14,7 @@
 Epic 0 has a story numbering regression that needs correction. Stories 0.6 and 0.7 need to be swapped to fix logical dependency sequencing. This is a documentation-only change with zero functional impact.
 
 **What's Wrong**:
+
 - Story 0.6 is currently "CI/CD Pipeline" but should be "External Services"
 - Story 0.7 is currently "External Services" but should be "CI/CD Pipeline"
 - Epic 2 references "Story 0.7 (External Services)" but Story 0.7 is actually CI/CD
@@ -33,11 +34,13 @@ Epic 0 has a story numbering regression that needs correction. Stories 0.6 and 0
 **New**: `docs/stories/0.7.ci-cd-pipeline-deployment-infrastructure.md`
 
 **Command**:
+
 ```bash
 git mv docs/stories/0.6.ci-cd-pipeline-deployment-infrastructure.md docs/stories/0.7.ci-cd-pipeline-deployment-infrastructure.md
 ```
 
 **Content Edit**: Change status from "Done" to "Not Started"
+
 - **Line 5**: Change `Done` to `Not Started`
 
 ---
@@ -48,11 +51,13 @@ git mv docs/stories/0.6.ci-cd-pipeline-deployment-infrastructure.md docs/stories
 **New**: `docs/stories/0.6.external-service-integration-planning.md`
 
 **Command**:
+
 ```bash
 git mv docs/stories/0.7.external-service-integration-planning.story.md docs/stories/0.6.external-service-integration-planning.md
 ```
 
 **Content Edit**: Update status to "Done" (verify current status first)
+
 - Find the status field and set to `Done`
 
 ---
@@ -63,6 +68,7 @@ git mv docs/stories/0.7.external-service-integration-planning.story.md docs/stor
 **New**: `docs/qa/gates/0.7-ci-cd-pipeline-deployment-infrastructure.yml`
 
 **Command**:
+
 ```bash
 git mv docs/qa/gates/0.6-ci-cd-pipeline-deployment-infrastructure.yml docs/qa/gates/0.7-ci-cd-pipeline-deployment-infrastructure.yml
 ```
@@ -74,20 +80,26 @@ git mv docs/qa/gates/0.6-ci-cd-pipeline-deployment-infrastructure.yml docs/qa/ga
 **File**: `docs/prd.md`
 
 **Edit 1 (Line 237)**:
+
 ```markdown
 # OLD
+
 **Story 0.6: CI/CD Pipeline and Deployment Infrastructure**
 
 # NEW
+
 **Story 0.6: External Service Integration Planning**
 ```
 
 **Edit 2 (Line 259)**:
+
 ```markdown
 # OLD
+
 **Story 0.7: External Service Integration Planning**
 
 # NEW
+
 **Story 0.7: CI/CD Pipeline and Deployment Infrastructure**
 ```
 
@@ -98,20 +110,26 @@ git mv docs/qa/gates/0.6-ci-cd-pipeline-deployment-infrastructure.yml docs/qa/ga
 **File**: `docs/prd/user-stories.md`
 
 **Edit 1 (Line 122)**:
+
 ```markdown
 # OLD
+
 **Story 0.6: CI/CD Pipeline and Deployment Infrastructure**
 
 # NEW
+
 **Story 0.6: External Service Integration Planning**
 ```
 
 **Edit 2 (Line 146)**:
+
 ```markdown
 # OLD
+
 **Story 0.7: External Service Integration Planning**
 
 # NEW
+
 **Story 0.7: CI/CD Pipeline and Deployment Infrastructure**
 ```
 
@@ -122,6 +140,7 @@ git mv docs/qa/gates/0.6-ci-cd-pipeline-deployment-infrastructure.yml docs/qa/ga
 **File**: `docs/architecture/source-tree.md`
 
 **Edit (Line 148)**:
+
 ```
 # OLD
 │   └── 0.6.cicd-pipeline-deployment.md
@@ -135,6 +154,7 @@ git mv docs/qa/gates/0.6-ci-cd-pipeline-deployment-infrastructure.yml docs/qa/ga
 ### 6. Verification Task
 
 **Check**: Does Story 0.6 (new External Services) have a QA gate file?
+
 - Search for: `docs/qa/gates/0.6-external-service*` or similar
 - If not found, note in commit message that it may need creation later
 
@@ -143,6 +163,7 @@ git mv docs/qa/gates/0.6-ci-cd-pipeline-deployment-infrastructure.yml docs/qa/ga
 ## Step-by-Step Execution Plan
 
 ### Step 1: Rename Story Files (Preserve Git History)
+
 ```bash
 # Rename CI/CD story (0.6 → 0.7)
 git mv docs/stories/0.6.ci-cd-pipeline-deployment-infrastructure.md docs/stories/0.7.ci-cd-pipeline-deployment-infrastructure.md
@@ -152,33 +173,45 @@ git mv docs/stories/0.7.external-service-integration-planning.story.md docs/stor
 ```
 
 ### Step 2: Update Story Status Fields
+
 **File**: `docs/stories/0.7.ci-cd-pipeline-deployment-infrastructure.md`
+
 - Line 5: Change `Done` → `Not Started`
 
 **File**: `docs/stories/0.6.external-service-integration-planning.md`
+
 - Find status field and ensure it says `Done`
 
 ### Step 3: Rename QA Gate File
+
 ```bash
 git mv docs/qa/gates/0.6-ci-cd-pipeline-deployment-infrastructure.yml docs/qa/gates/0.7-ci-cd-pipeline-deployment-infrastructure.yml
 ```
 
 ### Step 4: Update PRD Main Document
+
 **File**: `docs/prd.md`
+
 - Line 237: Update story heading (0.6: CI/CD → External Services)
 - Line 259: Update story heading (0.7: External Services → CI/CD)
 
 ### Step 5: Update PRD User Stories Document
+
 **File**: `docs/prd/user-stories.md`
+
 - Line 122: Update story heading (0.6: CI/CD → External Services)
 - Line 146: Update story heading (0.7: External Services → CI/CD)
 
 ### Step 6: Update Architecture Documentation
+
 **File**: `docs/architecture/source-tree.md`
+
 - Line 148: Update file listing (0.6 → 0.7)
 
 ### Step 7: Verification
+
 Run these checks to ensure no broken references:
+
 ```bash
 # Check for any remaining incorrect references
 grep -r "Story 0\.6.*CI/CD" docs/
@@ -191,6 +224,7 @@ ls -la docs/qa/gates/0.7-ci-cd-pipeline-deployment-infrastructure.yml
 ```
 
 ### Step 8: Commit Changes
+
 ```bash
 git add -A
 git commit -m "DOCS: Fix Epic 0 story sequence (swap 0.6 and 0.7)
@@ -238,6 +272,7 @@ Verify these conditions after implementation:
 ## Questions or Issues?
 
 If you encounter any issues during implementation:
+
 1. Check the Sprint Change Proposal document for detailed context
 2. Contact Sarah (Product Owner) for clarification
 3. Document any unexpected findings in the commit message

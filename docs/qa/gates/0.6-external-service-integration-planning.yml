@@ -81,7 +81,11 @@ recommendations:
   immediate: []
   future:
     - action: 'Consider implementing DOMPurify or similar for email template sanitization'
-      refs: ['lib/email-service.ts:134-260', 'docs/stories/0.6.external-service-integration-planning.md:217-222']
+      refs:
+        [
+          'lib/email-service.ts:134-260',
+          'docs/stories/0.6.external-service-integration-planning.md:217-222',
+        ]
     - action: 'Add integration tests with actual Resend staging API when API key available'
       refs: ['src/__tests__/email-service.test.ts']
 

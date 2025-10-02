@@ -44,7 +44,11 @@ describe('Storage Service', () => {
     })
 
     it('should sanitize filename to prevent path traversal', () => {
-      const path = generateFilePath('user123', 'model456', '../../../etc/passwd')
+      const path = generateFilePath(
+        'user123',
+        'model456',
+        '../../../etc/passwd',
+      )
       // Path traversal patterns are removed
       expect(path).toBe('users/user123/models/model456/etcpasswd')
     })
@@ -132,21 +136,24 @@ describe('Storage Service', () => {
       }
     })
 
-    it.skipIf(!minioAvailable)('should upload a file successfully', async () => {
-      const content = 'Test file content for storage test'
-      const result = await storage.put(testKey, content, {
-        contentType: 'model/stl',
-        metadata: {
-          userId: testUserId,
-          modelId: testModelId,
-        },
-      })
+    it.skipIf(!minioAvailable)(
+      'should upload a file successfully',
+      async () => {
+        const content = 'Test file content for storage test'
+        const result = await storage.put(testKey, content, {
+          contentType: 'model/stl',
+          metadata: {
+            userId: testUserId,
+            modelId: testModelId,
+          },
+        })
 
-      expect(result.key).toBe(testKey)
-      expect(result.size).toBeGreaterThan(0)
-      expect(result.etag).toBeDefined()
-      expect(result.uploaded).toBeInstanceOf(Date)
-    })
+        expect(result.key).toBe(testKey)
+        expect(result.size).toBeGreaterThan(0)
+        expect(result.etag).toBeDefined()
+        expect(result.uploaded).toBeInstanceOf(Date)
+      },
+    )
 
     it.skipIf(!minioAvailable)('should check if file exists', async () => {
       const metadata = await storage.head(testKey)
@@ -155,25 +162,28 @@ describe('Storage Service', () => {
       expect(metadata?.size).toBeGreaterThan(0)
     })
 
-    it.skipIf(!minioAvailable)('should download a file successfully', async () => {
-      const result = await storage.get(testKey)
-      expect(result).not.toBeNull()
-      if (!result) return
+    it.skipIf(!minioAvailable)(
+      'should download a file successfully',
+      async () => {
+        const result = await storage.get(testKey)
+        expect(result).not.toBeNull()
+        if (!result) return
 
-      expect(result.body).toBeInstanceOf(ReadableStream)
-      expect(result.metadata.key).toBe(testKey)
+        expect(result.body).toBeInstanceOf(ReadableStream)
+        expect(result.metadata.key).toBe(testKey)
 
-      // Read stream content
-      const reader = result.body.getReader()
-      const chunks: Array<Uint8Array> = []
-      let readResult = await reader.read()
-      while (!readResult.done) {
-        chunks.push(readResult.value)
-        readResult = await reader.read()
-      }
-      const content = new TextDecoder().decode(Buffer.concat(chunks))
-      expect(content).toBe('Test file content for storage test')
-    })
+        // Read stream content
+        const reader = result.body.getReader()
+        const chunks: Array<Uint8Array> = []
+        let readResult = await reader.read()
+        while (!readResult.done) {
+          chunks.push(readResult.value)
+          readResult = await reader.read()
+        }
+        const content = new TextDecoder().decode(Buffer.concat(chunks))
+        expect(content).toBe('Test file content for storage test')
+      },
+    )
 
     it.skipIf(!minioAvailable)('should list files with prefix', async () => {
       const prefix = `users/${testUserId}/`
@@ -185,19 +195,25 @@ describe('Storage Service', () => {
       expect(result.objects[0].key).toContain(testUserId)
     })
 
-    it.skipIf(!minioAvailable)('should delete a file successfully', async () => {
-      await storage.delete(testKey)
+    it.skipIf(!minioAvailable)(
+      'should delete a file successfully',
+      async () => {
+        await storage.delete(testKey)
 
-      // Verify deletion
-      const metadata = await storage.head(testKey)
-      expect(metadata).toBeNull()
-    })
+        // Verify deletion
+        const metadata = await storage.head(testKey)
+        expect(metadata).toBeNull()
+      },
+    )
 
-    it.skipIf(!minioAvailable)('should return null for non-existent file', async () => {
-      const nonExistentKey = 'users/nonexistent/models/fake/test.stl'
-      const result = await storage.get(nonExistentKey)
-      expect(result).toBeNull()
-    })
+    it.skipIf(!minioAvailable)(
+      'should return null for non-existent file',
+      async () => {
+        const nonExistentKey = 'users/nonexistent/models/fake/test.stl'
+        const result = await storage.get(nonExistentKey)
+        expect(result).toBeNull()
+      },
+    )
 
     it.skipIf(!minioAvailable)('should handle blob uploads', async () => {
       const blob = new Blob(['Blob test content'], { type: 'model/stl' })
@@ -214,20 +230,27 @@ describe('Storage Service', () => {
       await storage.delete(blobKey)
     })
 
-    it.skipIf(!minioAvailable)('should handle ArrayBuffer uploads', async () => {
-      const buffer = new TextEncoder().encode('ArrayBuffer test content')
-      const bufferKey = generateFilePath(testUserId, testModelId, 'buffer-test.stl')
+    it.skipIf(!minioAvailable)(
+      'should handle ArrayBuffer uploads',
+      async () => {
+        const buffer = new TextEncoder().encode('ArrayBuffer test content')
+        const bufferKey = generateFilePath(
+          testUserId,
+          testModelId,
+          'buffer-test.stl',
+        )
 
-      const result = await storage.put(bufferKey, buffer.buffer, {
-        contentType: 'model/stl',
-      })
+        const result = await storage.put(bufferKey, buffer.buffer, {
+          contentType: 'model/stl',
+        })
 
-      expect(result.key).toBe(bufferKey)
-      expect(result.size).toBeGreaterThan(0)
+        expect(result.key).toBe(bufferKey)
+        expect(result.size).toBeGreaterThan(0)
 
-      // Cleanup
-      await storage.delete(bufferKey)
-    })
+        // Cleanup
+        await storage.delete(bufferKey)
+      },
+    )
   })
 
   describe('Storage Adapter Creation', () => {

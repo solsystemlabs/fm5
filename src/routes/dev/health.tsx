@@ -32,7 +32,9 @@ function DevHealthPage() {
   if (healthQuery.isLoading) {
     return (
       <div className="container mx-auto p-8">
-        <h1 className="text-3xl font-bold mb-8">Environment Health Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-8">
+          Environment Health Dashboard
+        </h1>
         <p>Loading health status...</p>
       </div>
     )
@@ -41,9 +43,13 @@ function DevHealthPage() {
   if (healthQuery.error) {
     return (
       <div className="container mx-auto p-8">
-        <h1 className="text-3xl font-bold mb-8">Environment Health Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-8">
+          Environment Health Dashboard
+        </h1>
         <div className="bg-red-50 border border-red-200 p-4 rounded">
-          <p className="text-red-800">Error loading health status: {healthQuery.error.message}</p>
+          <p className="text-red-800">
+            Error loading health status: {healthQuery.error.message}
+          </p>
         </div>
       </div>
     )
@@ -79,7 +85,9 @@ function DevHealthPage() {
         <div className="flex justify-between items-center">
           <div>
             <h2 className="text-2xl font-semibold">System Status</h2>
-            <p className="text-sm opacity-75">Environment: {health.environment}</p>
+            <p className="text-sm opacity-75">
+              Environment: {health.environment}
+            </p>
           </div>
           <div className="text-right">
             <div className="text-3xl font-bold capitalize">{health.status}</div>
@@ -140,7 +148,12 @@ interface ServiceStatusCardProps {
   description: string
 }
 
-function ServiceStatusCard({ name, service, icon, description }: ServiceStatusCardProps) {
+function ServiceStatusCard({
+  name,
+  service,
+  icon,
+  description,
+}: ServiceStatusCardProps) {
   const statusColor = {
     ok: 'bg-green-500',
     degraded: 'bg-yellow-500',

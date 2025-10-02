@@ -10,8 +10,8 @@
  * @see docs/architecture/deployment-infrastructure.md
  */
 
-import {  Resend } from 'resend'
-import type {CreateEmailResponse} from 'resend';
+import { Resend } from 'resend'
+import type { CreateEmailResponse } from 'resend'
 
 export interface EmailTemplate {
   subject: string
@@ -265,7 +265,7 @@ Need help getting started? Check out our documentation at https://fm5.app/docs o
 export async function sendVerificationEmail(
   email: string,
   verificationUrl: string,
-  userName?: string
+  userName?: string,
 ): Promise<EmailResult> {
   const adapter = createEmailAdapter()
   const template = EmailTemplates.verification(verificationUrl, userName)
@@ -284,7 +284,7 @@ export async function sendVerificationEmail(
 export async function sendPasswordResetEmail(
   email: string,
   resetUrl: string,
-  userName?: string
+  userName?: string,
 ): Promise<EmailResult> {
   const adapter = createEmailAdapter()
   const template = EmailTemplates.passwordReset(resetUrl, userName)
@@ -302,7 +302,7 @@ export async function sendPasswordResetEmail(
  */
 export async function sendWelcomeEmail(
   email: string,
-  userName: string
+  userName: string,
 ): Promise<EmailResult> {
   const adapter = createEmailAdapter()
   const template = EmailTemplates.welcome(userName)

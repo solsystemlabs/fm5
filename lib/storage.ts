@@ -57,7 +57,7 @@ export interface StorageAdapter {
     options: {
       contentType: string
       metadata?: Record<string, string>
-    }
+    },
   ) => Promise<StorageObject>
 
   /**
@@ -126,7 +126,7 @@ class MinioAdapter implements StorageAdapter {
     options: {
       contentType: string
       metadata?: Record<string, string>
-    }
+    },
   ): Promise<StorageObject> {
     await this.ensureBucket()
 
@@ -158,7 +158,7 @@ class MinioAdapter implements StorageAdapter {
       key,
       buffer,
       buffer.length,
-      metadata
+      metadata,
     )
 
     return {
@@ -238,7 +238,7 @@ class MinioAdapter implements StorageAdapter {
     const stream = this.client.listObjects(
       this.bucketName,
       options.prefix || '',
-      true // recursive = true to get all files, not just directory prefixes
+      true, // recursive = true to get all files, not just directory prefixes
     )
 
     return new Promise((resolve, reject) => {
@@ -283,7 +283,7 @@ class R2Adapter implements StorageAdapter {
     options: {
       contentType: string
       metadata?: Record<string, string>
-    }
+    },
   ): Promise<StorageObject> {
     // Convert Blob/ReadableStream to ArrayBuffer to avoid type conflicts
     // between Node.js and Cloudflare Workers type definitions
@@ -414,7 +414,7 @@ export function createStorageAdapter(env?: WorkerEnv): StorageAdapter {
 export function generateFilePath(
   userId: string,
   modelId: string,
-  filename: string
+  filename: string,
 ): string {
   // Remove path traversal patterns and path separators first
   let sanitizedFilename = filename.replace(/\.\.\//g, '').replace(/\.\.\\/g, '')
@@ -435,7 +435,7 @@ export function validateFileOwnership(key: string, userId: string): boolean {
  */
 export function validateFileSize(
   size: number,
-  maxSize: number = 100 * 1024 * 1024 // 100MB default
+  maxSize: number = 100 * 1024 * 1024, // 100MB default
 ): boolean {
   return size > 0 && size <= maxSize
 }
@@ -450,7 +450,7 @@ export function validateFileType(
     'application/sla',
     'model/obj',
     'application/octet-stream',
-  ]
+  ],
 ): boolean {
   return allowedTypes.includes(contentType)
 }

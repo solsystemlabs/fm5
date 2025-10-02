@@ -184,12 +184,14 @@ FM5 implements three separate workflows following industry best practices for pe
 **Trigger:** All pull requests to master branch
 
 **Jobs (run in parallel):**
+
 1. **ESLint**: Code quality and style checking
 2. **TypeScript**: Type checking and compilation validation
 3. **Prettier**: Code formatting validation
 4. **Tests**: Unit and integration test execution
 
 **Benefits:**
+
 - Parallel execution reduces feedback time from ~10min to ~3min
 - Clear separation of quality dimensions
 - Independent job failure identification
@@ -202,11 +204,13 @@ FM5 implements three separate workflows following industry best practices for pe
 **Trigger:** Push to master branch (after PR merge)
 
 **Jobs:**
+
 1. **Build**: Tanstack Start production build with Nitro output
 2. **Deploy**: Wrangler deployment to staging Worker
 3. **Integration Tests**: Validate staging deployment health
 
 **Benefits:**
+
 - Automatic staging updates on merge
 - Integration testing against live staging environment
 - Production parity validation
@@ -218,12 +222,14 @@ FM5 implements three separate workflows following industry best practices for pe
 **Trigger:** Manual workflow dispatch
 
 **Jobs:**
+
 1. **Build**: Production-optimized bundle
 2. **Deploy**: Wrangler deployment to production Worker with approval
 3. **Smoke Tests**: Basic production health validation
 4. **Rollback Ready**: Automated rollback on failure
 
 **Benefits:**
+
 - Manual control over production releases
 - Approval gates for compliance
 - Automated rollback procedures
@@ -361,11 +367,13 @@ jobs:
 #### Performance Comparison
 
 **Before (single workflow):**
+
 - Sequential execution: ~10-12 minutes
 - All steps run even if early step fails
 - Difficult to identify specific failure point
 
 **After (multi-workflow with parallelization):**
+
 - PR checks (parallel): ~3-4 minutes
 - Staging deploy: ~2-3 minutes
 - Production deploy: ~2-3 minutes

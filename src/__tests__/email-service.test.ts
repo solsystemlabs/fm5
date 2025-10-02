@@ -14,7 +14,10 @@ import {
 describe('Email Service', () => {
   describe('Email Templates', () => {
     it('should generate verification email template', () => {
-      const template = EmailTemplates.verification('https://fm5.app/verify?token=abc123', 'John')
+      const template = EmailTemplates.verification(
+        'https://fm5.app/verify?token=abc123',
+        'John',
+      )
 
       expect(template.subject).toBe('Verify your FM5 account')
       expect(template.html).toContain('Hi John')
@@ -24,14 +27,19 @@ describe('Email Service', () => {
     })
 
     it('should generate verification email without username', () => {
-      const template = EmailTemplates.verification('https://fm5.app/verify?token=abc123')
+      const template = EmailTemplates.verification(
+        'https://fm5.app/verify?token=abc123',
+      )
 
       expect(template.html).toContain('Hi there')
       expect(template.text).toContain('Hi there')
     })
 
     it('should generate password reset email template', () => {
-      const template = EmailTemplates.passwordReset('https://fm5.app/reset?token=xyz789', 'Jane')
+      const template = EmailTemplates.passwordReset(
+        'https://fm5.app/reset?token=xyz789',
+        'Jane',
+      )
 
       expect(template.subject).toBe('Reset your FM5 password')
       expect(template.html).toContain('Hi Jane')
@@ -92,7 +100,7 @@ describe('Email Service', () => {
       const result = await sendVerificationEmail(
         'test@example.com',
         'https://fm5.app/verify?token=abc123',
-        'Test User'
+        'Test User',
       )
 
       expect(result.success).toBe(true)
@@ -108,7 +116,7 @@ describe('Email Service', () => {
       const result = await sendPasswordResetEmail(
         'test@example.com',
         'https://fm5.app/reset?token=xyz789',
-        'Test User'
+        'Test User',
       )
 
       expect(result.success).toBe(true)
@@ -133,7 +141,10 @@ describe('Email Service', () => {
 
   describe('Email Content Validation', () => {
     it('should include proper email structure in verification template', () => {
-      const template = EmailTemplates.verification('https://fm5.app/verify', 'User')
+      const template = EmailTemplates.verification(
+        'https://fm5.app/verify',
+        'User',
+      )
 
       // HTML should have proper button styling
       expect(template.html).toContain('background-color: #4F46E5')
@@ -148,7 +159,10 @@ describe('Email Service', () => {
     })
 
     it('should include expiration notice in password reset template', () => {
-      const template = EmailTemplates.passwordReset('https://fm5.app/reset', 'User')
+      const template = EmailTemplates.passwordReset(
+        'https://fm5.app/reset',
+        'User',
+      )
 
       expect(template.html).toContain('expire in 1 hour')
       expect(template.text).toContain('expire in 1 hour')

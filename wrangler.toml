@@ -1,5 +1,5 @@
 name = "fm5"
-main = ".output/server/index.mjs"
+main = "@tanstack/react-start/server-entry"
 compatibility_date = "2025-09-24"
 compatibility_flags = ["nodejs_compat"]
 
@@ -30,4 +30,3 @@ vars = { NODE_ENV = "production", APP_ENV = "production" }
 [[env.production.r2_buckets]]
 binding = "FILE_STORAGE"
 bucket_name = "fm5-production-files"
-

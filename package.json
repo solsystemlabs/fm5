@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "start": "node .output/server/index.mjs",
-    "build": "vite build",
-    "serve": "vite preview",
+    "build": "vite build && tsc --noEmit",
+    "preview": "vite preview",
     "test": "vitest run",
     "test:prepare": "prisma generate && prisma db push --skip-generate",
     "lint": "eslint",
@@ -52,6 +52,7 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.13.9",
     "@cloudflare/workers-types": "^4.20251001.0",
     "@tanstack/eslint-config": "^0.3.0",
     "@testing-library/dom": "^10.4.0",

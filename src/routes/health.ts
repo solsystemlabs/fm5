@@ -1,20 +1,12 @@
 import { createServerFileRoute } from '@tanstack/react-start/server'
+import { getHealthStatusCode, performHealthCheck } from '../../lib/health-check'
 
 export const ServerRoute = createServerFileRoute('/health').methods({
-  GET: () => {
-    const healthResponse = {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      environment: process.env.APP_ENV || 'development',
-      services: {
-        database: 'ok',
-        storage: 'ok',
-      },
-      version: '1.0.0',
-    }
+  GET: async () => {
+    const healthResult = await performHealthCheck()
 
-    return new Response(JSON.stringify(healthResponse), {
-      status: 200,
+    return new Response(JSON.stringify(healthResult), {
+      status: getHealthStatusCode(healthResult.status),
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache, no-store, must-revalidate',

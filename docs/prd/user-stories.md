@@ -119,7 +119,29 @@ so that user management and security are established from the foundation.
 - Authentication state management with Tanstack Query
 - Logout and session expiry handling
 
-**Story 0.6: CI/CD Pipeline and Deployment Infrastructure**
+**Story 0.6: External Service Integration Planning**
+As a developer,
+I want external service dependencies configured and ready,
+so that features requiring third-party services work reliably.
+
+**Acceptance Criteria:**
+
+1. Cloudflare R2 account setup with API keys and bucket configuration
+2. DNS configuration planned and domain registration requirements documented
+3. Resend email service configured with API keys and email templates
+4. Cloudflare CDN integration configured for global asset delivery
+5. Service monitoring and alerting configured
+
+**Technical Requirements:**
+
+- R2 bucket policies configured for secure file access with staging/production separation
+- Resend email templates created for user verification and system notifications
+- Cloudflare CDN integrated with Workers for optimal static asset delivery
+- Cloudflare Analytics configured for service monitoring and performance tracking
+- Cloudflare Workers rate limiting and quota management implementation
+- Cost monitoring and alerts configured for Cloudflare services and Xata usage
+
+**Story 0.7: CI/CD Pipeline and Deployment Infrastructure**
 As a developer,
 I want automated deployment pipeline and production infrastructure configured with Cloudflare Workers,
 so that code can be deployed safely and consistently to staging and production environments with global performance.
@@ -142,28 +164,6 @@ so that code can be deployed safely and consistently to staging and production e
 - Xata database integration with HTTP API for connection management
 - Wrangler CLI deployment with rollback capabilities and version management
 - Health check endpoints for monitoring Workers and database connectivity
-
-**Story 0.7: External Service Integration Planning**
-As a developer,
-I want external service dependencies configured and ready,
-so that features requiring third-party services work reliably.
-
-**Acceptance Criteria:**
-
-1. Cloudflare R2 account setup with API keys and bucket configuration
-2. DNS configuration planned and domain registration requirements documented
-3. Resend email service configured with API keys and email templates
-4. Cloudflare CDN integration configured for global asset delivery
-5. Service monitoring and alerting configured
-
-**Technical Requirements:**
-
-- R2 bucket policies configured for secure file access with staging/production separation
-- Resend email templates created for user verification and system notifications
-- Cloudflare CDN integrated with Workers for optimal static asset delivery
-- Cloudflare Analytics configured for service monitoring and performance tracking
-- Cloudflare Workers rate limiting and quota management implementation
-- Cost monitoring and alerts configured for Cloudflare services and Xata usage
 
 **Story 0.8: Error Handling and User Documentation Framework**
 As a developer,
@@ -284,7 +284,7 @@ so that my business information remains private and secure.
 **Dependencies**: Must complete Epic 0 and Epic 1 entirely before beginning, specifically:
 
 - Epic 1 (User Management) - Required for user-specific file organization and access control
-- Story 0.7 (External Service Integration) - Required for R2 bucket configuration
+- Story 0.6 (External Service Integration) - Required for R2 bucket configuration
 - Story 0.8 (Error Handling Framework) - Required for file upload error states
 
 **Story 2.1: Cloudflare R2 Integration and File Storage Setup**
@@ -311,7 +311,7 @@ so that model and sliced files can be uploaded, stored, and accessed reliably wi
 - JWT token validation for all file operations
 - User quota and rate limiting per authentication framework
 
-**Dependencies**: Requires Epic 1 (User Management) and Story 0.7 (External Services)
+**Dependencies**: Requires Epic 1 (User Management) and Story 0.6 (External Services)
 
 **Story 2.2: Core Metadata Extraction Library**
 As a developer,

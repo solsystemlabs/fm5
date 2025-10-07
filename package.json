@@ -17,8 +17,8 @@
     "secrets:push:production": "./scripts/manage-secrets.sh push production",
     "secrets:list:staging": "./scripts/manage-secrets.sh list staging",
     "secrets:list:production": "./scripts/manage-secrets.sh list production",
-    "deploy:staging": "npm run build && wrangler deploy --env staging",
-    "deploy:production": "npm run build && wrangler deploy --env production"
+    "deploy:staging": "npm run build && wrangler deploy --config wrangler.staging.toml",
+    "deploy:production": "npm run build && wrangler deploy --config wrangler.production.toml"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
